@@ -28,6 +28,7 @@
 #define APM_BUILD_ArduSub        7
 #define APM_BUILD_iofirmware     8
 #define APM_BUILD_AP_Periph      9
+#define APM_BUILD_HCAUV          10
 
 /*
   using this macro catches cases where we try to check vehicle type on
