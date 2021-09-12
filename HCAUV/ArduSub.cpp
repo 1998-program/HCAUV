@@ -94,10 +94,15 @@ void Sub::setup()
 void Sub::loop()
 {
     scheduler.loop();
+<<<<<<< HEAD
     G_Dt = scheduler.get_loop_period_s();
     hal.uartD->printf("Sub::loop()");
     hal.uartC->printf("Sub::loop()");
 
+=======
+	// G_Dt = 0.25ms
+    G_Dt = scheduler.get_loop_period_s(); 
+>>>>>>> bc873e1803d65cc21f93bfc065b8e7f5de5dba1f
 }
 
 

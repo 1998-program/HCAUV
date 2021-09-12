@@ -170,7 +170,12 @@ void AP_Scheduler::run(uint32_t time_available)
         // run it
         _task_time_started = now;
         hal.util->persistent_data.scheduler_task = i;
+<<<<<<< HEAD
         hal.uartD->printf("task : %d\n",i);
+=======
+		hal.uartD->printf("task : %d\n",i);
+		
+>>>>>>> bc873e1803d65cc21f93bfc065b8e7f5de5dba1f
         if (_debug > 1 && _perf_counters && _perf_counters[i]) {
             hal.util->perf_begin(_perf_counters[i]);
         }
@@ -272,6 +277,7 @@ void AP_Scheduler::loop()
         hal.scheduler->delay_microseconds(loop_delay_us);
     }
 #endif
+
 
     // tell the scheduler one tick has passed
     tick();
