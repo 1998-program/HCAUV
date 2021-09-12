@@ -85,6 +85,7 @@ void Sub::setup()
     AP_Param::setup_sketch_defaults();
 
     init_ardupilot();
+    hal.uartD->printf("Sub::setup");
 
     // initialise the main loop scheduler
     scheduler.init(&scheduler_tasks[0], ARRAY_SIZE(scheduler_tasks), MASK_LOG_PM);
@@ -94,6 +95,9 @@ void Sub::loop()
 {
     scheduler.loop();
     G_Dt = scheduler.get_loop_period_s();
+    hal.uartD->printf("Sub::loop()");
+    hal.uartC->printf("Sub::loop()");
+
 }
 
 

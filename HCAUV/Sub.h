@@ -77,6 +77,8 @@
 #include <AP_LeakDetector/AP_LeakDetector.h> // Leak detector
 #include <AP_TemperatureSensor/TSYS01.h>
 #include <AP_Common/AP_FWVersion.h>
+//#include <AC_Eigen/Core>
+
 
 // Local modules
 #include "defines.h"

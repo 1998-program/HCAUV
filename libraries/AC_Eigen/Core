@@ -53,7 +53,7 @@
 // and inclusion of their respective header files
 #include "src/Core/util/MKL_support.h"
 
-
+/*
 #if defined(EIGEN_HAS_CUDA_FP16) || defined(EIGEN_HAS_HIP_FP16)
   #define EIGEN_HAS_GPU_FP16
 #endif
@@ -69,6 +69,7 @@
 #ifdef EIGEN_HAS_OPENMP
 #include <omp.h>
 #endif
+*/
 
 // MSVC for windows mobile does not have the errno.h file
 #if !(EIGEN_COMP_MSVC && EIGEN_OS_WINCE) && !EIGEN_COMP_ARM

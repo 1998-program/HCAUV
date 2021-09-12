@@ -170,6 +170,7 @@ void AP_Scheduler::run(uint32_t time_available)
         // run it
         _task_time_started = now;
         hal.util->persistent_data.scheduler_task = i;
+        hal.uartD->printf("task : %d\n",i);
         if (_debug > 1 && _perf_counters && _perf_counters[i]) {
             hal.util->perf_begin(_perf_counters[i]);
         }
