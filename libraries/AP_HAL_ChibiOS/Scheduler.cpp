@@ -200,6 +200,8 @@ void Scheduler::delay(uint16_t ms)
 void Scheduler::register_timer_process(AP_HAL::MemberProc proc)
 {
     chBSemWait(&_timer_semaphore);
+	hal.uartD->printf("register_timer_process\n");
+
     for (uint8_t i = 0; i < _num_timer_procs; i++) {
         if (_timer_proc[i] == proc) {
             chBSemSignal(&_timer_semaphore);
@@ -275,6 +277,9 @@ void Scheduler::reboot(bool hold_in_bootloader)
 
 void Scheduler::_run_timers()
 {
+	hal.uartD->printf("CHIBIOS\r\n");
+	hal.uartD->printf("_in_timer_proc=%d\r\n",_in_timer_proc);
+
     if (_in_timer_proc) {
         return;
     }

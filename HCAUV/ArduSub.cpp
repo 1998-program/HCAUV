@@ -85,7 +85,7 @@ void Sub::setup()
     AP_Param::setup_sketch_defaults();
 
     init_ardupilot();
-    hal.uartD->printf("Sub::setup");
+//    hal.uartD->printf("Sub::setup");
 
     // initialise the main loop scheduler
     scheduler.init(&scheduler_tasks[0], ARRAY_SIZE(scheduler_tasks), MASK_LOG_PM);
@@ -93,7 +93,7 @@ void Sub::setup()
 
 void Sub::loop()
 {
-	//loop运行起来
+	//loop运行起来 如何调度？
     scheduler.loop();
 	//400HZ 2.5ms
     G_Dt = scheduler.get_loop_period_s();
