@@ -64,6 +64,8 @@ THD_WORKING_AREA(_monitor_thread_wa, MONITOR_THD_WA_SIZE);
 
 Scheduler::Scheduler()
 {
+	number = 0;
+	number_hz = 0;
 }
 
 void Scheduler::init()
