@@ -64,14 +64,15 @@ THD_WORKING_AREA(_monitor_thread_wa, MONITOR_THD_WA_SIZE);
 
 Scheduler::Scheduler()
 {
-	number = 0;
-	number_hz = 0;
+	 
 }
 
 void Scheduler::init()
 {
     chBSemObjectInit(&_timer_semaphore, false);
     chBSemObjectInit(&_io_semaphore, false);
+	number = 0;
+	number_hz = 0;
 
 #ifndef HAL_NO_MONITOR_THREAD
     // setup the monitor thread - this is used to detect software lockups
