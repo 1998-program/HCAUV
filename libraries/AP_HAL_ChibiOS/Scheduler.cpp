@@ -280,11 +280,11 @@ void Scheduler::reboot(bool hold_in_bootloader)
 
 void Scheduler::_run_timers()
 {
-	hal.uartD->printf("CHIBIOS\r\n");
-	hal.uartD->printf("_in_timer_proc=%d\r\n",_in_timer_proc);
+//	hal.uartD->printf("CHIBIOS\r\n");
+//	hal.uartD->printf("_in_timer_proc=%d\r\n",_in_timer_proc);
 	
 	number++;
-	if(number == 1000){
+	if(number == 100){
 		number_hz++;
 		hal.uartD->printf("number_hz:%d\n",number_hz);
 	}
