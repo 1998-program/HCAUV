@@ -93,6 +93,7 @@ void Sub::setup()
 
 void Sub::loop()
 {
+	//loop运行起来
     scheduler.loop();
 	//400HZ 2.5ms
     G_Dt = scheduler.get_loop_period_s();
