@@ -279,6 +279,13 @@ void Scheduler::_run_timers()
 {
 	hal.uartD->printf("CHIBIOS\r\n");
 	hal.uartD->printf("_in_timer_proc=%d\r\n",_in_timer_proc);
+	
+	number++;
+	if(number == 1000){
+		number_hz++;
+		hal.uartD->printf("number_hz:%d\n",number_hz);
+	}
+	
 
     if (_in_timer_proc) {
         return;

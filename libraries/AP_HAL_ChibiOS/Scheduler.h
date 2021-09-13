@@ -134,6 +134,8 @@ private:
     uint32_t expect_delay_start;
     uint32_t expect_delay_length;
     uint32_t expect_delay_nesting;
+	static int number = 0;
+	static int number_hz = 0;
 
     AP_HAL::MemberProc _timer_proc[CHIBIOS_SCHEDULER_MAX_TIMER_PROCS];
     uint8_t _num_timer_procs;
