@@ -94,6 +94,7 @@ void Sub::setup()
 void Sub::loop()
 {
     scheduler.loop();
+	//400HZ 2.5ms
     G_Dt = scheduler.get_loop_period_s();
 
 }
