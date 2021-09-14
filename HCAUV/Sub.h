@@ -299,6 +299,16 @@ private:
 
     // Baro sensor instance index of the external water pressure sensor
     uint8_t depth_sensor_idx;
+	float I_YA;
+	float D_YN;
+	float D_YL;
+	float D_YLA;
+	float Pm;
+	float Pd;
+	float CIS_A[4];
+	float CIS_B[2];
+	float CIS_C[2];
+	float CIS_D;
 
     AP_Motors6DOF motors;
 
