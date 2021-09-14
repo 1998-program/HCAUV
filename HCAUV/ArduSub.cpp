@@ -352,6 +352,10 @@ bool Sub::control_check_barometer()
 #endif
     return true;
 }
+void Sub::init_mod_ciscrea(){
+
+
+}
 
 
 AP_HAL_MAIN_CALLBACKS(&sub);
