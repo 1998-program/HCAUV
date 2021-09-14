@@ -354,10 +354,10 @@ bool Sub::control_check_barometer()
     return true;
 }
 void Sub::init_mod_ciscrea(){
-	CIS_A[4] = {1.0,0.0025,0,0.9910};
-	CIS_B[2] = {0,0.005};
-	CIS_C[2] = {1.0,0};
-	CIS_D = 0;
+//	CIS_A[4] = {1.0,0.0025,0,0.9910};
+//	CIS_B[2] = {0,0.005};
+//	CIS_C[2] = {1.0,0};
+//	CIS_D = 0;
 
 }
 

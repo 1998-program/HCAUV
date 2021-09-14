@@ -305,10 +305,10 @@ private:
 	float D_YLA;
 	float Pm;
 	float Pd;
-	float CIS_A[4];
-	float CIS_B[2];
-	float CIS_C[2];
-	float CIS_D;
+	const float CIS_A[4] = {1.0,0.0025,0,0.9910};
+	const float CIS_B[2] = {0,0.005};
+	const float CIS_C[2] = {1,0};
+	const float CIS_D = 0;
 
     AP_Motors6DOF motors;
 
