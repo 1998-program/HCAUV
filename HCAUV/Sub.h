@@ -309,6 +309,13 @@ private:
 	const float CIS_B[2] = {0,0.005};
 	const float CIS_C[2] = {1,0};
 	const float CIS_D = 0;
+	float torque;
+	float real_angle;
+	float X1_N_1;
+	float X1_N;
+	float X2_N_1;
+	float X2_N;
+	
 
     AP_Motors6DOF motors;
 
