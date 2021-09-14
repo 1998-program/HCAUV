@@ -91,7 +91,7 @@ void Sub::setup()
     scheduler.init(&scheduler_tasks[0], ARRAY_SIZE(scheduler_tasks), MASK_LOG_PM);
 	init_mod_ciscrea();
 	hal.uartD->printf("ciscrea_A:%f",CIS_A[3]);
-	hal.uartD->printf("X1_N:",X1_N);
+	hal.uartD->printf("X1_N:%f",X1_N);
 }
 
 void Sub::loop()
