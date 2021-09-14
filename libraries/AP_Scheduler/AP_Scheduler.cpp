@@ -292,7 +292,7 @@ void AP_Scheduler::loop()
 
     // add in extra loop time determined by not achieving scheduler tasks
     time_available += extra_loop_us;
-	hal.uartD->printf("time_available:%d",time_available);
+//	hal.uartD->printf("time_available:%d",time_available);
 
     // run the tasks
     run(time_available);

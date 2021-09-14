@@ -203,7 +203,7 @@ void Scheduler::delay(uint16_t ms)
 void Scheduler::register_timer_process(AP_HAL::MemberProc proc)
 {
     chBSemWait(&_timer_semaphore);
-	hal.uartD->printf("register_timer_process\n");
+//	hal.uartD->printf("register_timer_process\n");
 
     for (uint8_t i = 0; i < _num_timer_procs; i++) {
         if (_timer_proc[i] == proc) {
@@ -283,11 +283,11 @@ void Scheduler::_run_timers()
 //	hal.uartD->printf("CHIBIOS\r\n");
 //	hal.uartD->printf("_in_timer_proc=%d\r\n",_in_timer_proc);
 	
-	number++;
-	if(number == 100){
-		number_hz++;
-		hal.uartD->printf("number_hz:%d\n",number_hz);
-	}
+//	number++;
+//	if(number == 100){
+//		number_hz++;
+//		hal.uartD->printf("number_hz:%d\n",number_hz);
+//	}
 	
 
     if (_in_timer_proc) {

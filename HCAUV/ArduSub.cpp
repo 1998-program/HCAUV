@@ -89,6 +89,7 @@ void Sub::setup()
 
     // initialise the main loop scheduler
     scheduler.init(&scheduler_tasks[0], ARRAY_SIZE(scheduler_tasks), MASK_LOG_PM);
+	init_mod_ciscrea();
 }
 
 void Sub::loop()
@@ -351,5 +352,6 @@ bool Sub::control_check_barometer()
 #endif
     return true;
 }
+
 
 AP_HAL_MAIN_CALLBACKS(&sub);

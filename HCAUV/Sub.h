@@ -461,6 +461,13 @@ private:
     static const AP_Param::Info var_info[];
     static const struct LogStructure log_structure[];
 
+	//ciscrea 
+	void init_mod_ciscrea();
+	void cal_ciscrea_angle();
+	void send_to_rasp();
+	void receive_from_rasp();
+
+	//ardusub
     void fast_loop();
     void fifty_hz_loop();
     void update_batt_compass(void);
@@ -693,6 +700,7 @@ private:
     uint32_t last_do_motor_test_ms = 0;
 
     bool control_check_barometer();
+	
 
     enum Failsafe_Action {
         Failsafe_Action_None    = 0,
