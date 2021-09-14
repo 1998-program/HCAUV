@@ -363,7 +363,7 @@ void Sub::init_mod_ciscrea(){
 	X2_N = 0.0;
 	X1_N_1 = 0.0;
 	X2_N_1 = 0.0;
-	torque = 1.0;
+	torque = 0.0;
 	
 }
 void Sub::cal_ciscrea_angle(){
@@ -372,6 +372,12 @@ void Sub::cal_ciscrea_angle(){
 	real_angle = X1_N;
 	X1_N = X1_N_1;
 	X2_N = X2_N_1;
+}
+void Sub::send_to_rasp(){
+
+}
+void Sub::receive_from_rasp(){
+
 }
 
 
