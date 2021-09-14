@@ -90,8 +90,8 @@ void Sub::setup()
     // initialise the main loop scheduler
     scheduler.init(&scheduler_tasks[0], ARRAY_SIZE(scheduler_tasks), MASK_LOG_PM);
 	init_mod_ciscrea();
-	hal.uartD->printf("ciscrea_A:%f",CIS_A[3]);
-	hal.uartD->printf("X1_N:%f",X1_N);
+	hal.uartD->printf("ciscrea_A:%f\n",CIS_A[3]);
+	hal.uartD->printf("X1_N:%f\n",X1_N);
 }
 
 void Sub::loop()
@@ -120,6 +120,7 @@ void Sub::fast_loop()
     motors_output();
 	
 	cal_ciscrea_angle();
+	hal.uartD->printf("real_angle:%f\n",real_angle);
 	
     // run EKF state estimator (expensive)
     // --------------------
@@ -360,10 +361,17 @@ bool Sub::control_check_barometer()
 void Sub::init_mod_ciscrea(){
 	X1_N = ahrs.yaw_sensor;
 	X2_N = 0.0;
+	X1_N_1 = 0.0;
+	X2_N_1 = 0.0;
+	torque = 1.0;
+	
 }
 void Sub::cal_ciscrea_angle(){
-	
-
+	X1_N_1 = CIS_A[0] * X1_N + CIS_A[1] * X2_N + 0.0;
+	X2_N_1 = CIS_A[2] * X1_N + CIS_A[3] * X2_N + CIS_B[1] * torque;
+	real_angle = X1_N;
+	X1_N = X1_N_1;
+	X2_N = X2_N_1;
 }
 
 
