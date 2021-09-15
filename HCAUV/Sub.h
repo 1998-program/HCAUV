@@ -476,7 +476,7 @@ private:
     uint32_t last_pilot_yaw_input_ms;
     uint32_t fs_terrain_recover_start_ms;
 
-	char _buffer[15];                                                     ///< buffer for the current term within the current sentence
+	char _buffer[31];                                                     ///< buffer for the current term within the current sentence
     uint8_t _sentence_type;                                     ///< the sentence type currently being processed
     uint8_t _buffer_number;                                       ///< term index within the current sentence
     uint8_t _buffer_offset;                                       ///< character offset with the term being received
@@ -490,8 +490,8 @@ private:
 	void init_mod_ciscrea();
 	void cal_ciscrea_angle();
 	void send_to_rasp();
-	bool receive_from_rasp();
-	bool hc_decode(int16_t numc,char c);
+	void receive_from_rasp();
+	bool hc_decode(int16_t numc);
 
 	//ardusub
     void fast_loop();

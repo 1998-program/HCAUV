@@ -377,51 +377,61 @@ void Sub::cal_ciscrea_angle(){
 void Sub::send_to_rasp(){
 
 }
-bool Sub::receive_from_rasp(){
+void Sub::receive_from_rasp(){
 	int16_t numc;
-	bool parsed = false;
+
 	numc = hal.uartD->available();
 	hal.uartD->printf("numc:%d\n",numc);
 	int i = 0;
 	if(numc){
 		while (i < numc){
-			_buffer[i]=hal.uartD->read();
+			_buffer[i] = hal.uartD->read();
 			hal.uartD->printf("receive:%c\n",_buffer[i]);
 			i += 1;
 		}
 	}
+	hc_decode(numc);	
+	hal.uartD->printf("real_angle:%c\n",real_angle);
 	
-//	while(numc--){
-//		char c = hal.uartD->read();
-//		hal.uartD->printf("receive:%c\n",c);
-////		if(hc_decode(numc,c)){
-////			parsed = true;
-////		}
-//	}
-	return parsed;
+
 }
-bool Sub::hc_decode(int16_t numc,char c){
+bool Sub::hc_decode(int16_t numc){
+	uint8_t len = 0;
+	uint8_t ID;
+	bool flag = 0;
+	float number = 0.0;
+	
+	if(_buffer[0] == '$'){
+		uint16_t j = 10;
+		len = _buffer[1];
+		ID = _buffer[2];
+		for(int i = 1; i <= len; i++){
+			if(_buffer[2 + i] == '.'){
+				flag = 1;
+			}
+			else{
+				if(flag == 0){
+					number = number *10 + _buffer[2 + i];
+				}
+				else{
+					number = number + _buffer[2 + i] / j;
+					j = j *10;
+				}
+			}
+		}
+		switch ID:
+			case '0':
+					real_angle = number;
 
-
-//	bool valid_sentence = false;
-
-//	_sentence_length++;
-//
-//	switch(c){
-//		case ',':break;
-//		
-//		case '*':
-//			if(_buffer_offset < sizeof(_buffer)){
-//				_buffer[_buffer_offset] = 0;
-//					
-//			
-//			}break;
-//			
-//
-//		case '$':break;
+			case '1':
+					torque = number;
 			
-//	}
-	return 0;
+		
+					
+	} 
+	else return false;
+	
+	return false;
 }
 
 
