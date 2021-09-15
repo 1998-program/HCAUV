@@ -398,7 +398,7 @@ void Sub::receive_from_rasp(){
 bool Sub::hc_decode(int16_t numc){
 	uint8_t len = 0;
 	uint8_t ID;
-	bool flag = 0;
+	bool flag = false;
 	float number = 0.0;
 	
 	if(_buffer[0] == '$'){
@@ -415,9 +415,10 @@ bool Sub::hc_decode(int16_t numc){
 				}
 				else{
 					number = number + _buffer[2 + i] / j;
-					j = j *10;
+					j = j * 10;
 				}
 			}
+			hal.uartD->printf("_buffer:%c",_buffer[i+2]);
 		}
 		switch (ID){
 			case '0':
@@ -426,6 +427,7 @@ bool Sub::hc_decode(int16_t numc){
 			case '1':
 					torque = number;break;
 			}
+		flag = true;
 		
 	} 
 	else return false;
