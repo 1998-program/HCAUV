@@ -385,31 +385,32 @@ bool Sub::receive_from_rasp(){
 	while(numc--){
 		char c = hal.uartD->read();
 		hal.uartD->printf("receive:%c\n",c);
-		if(hc_decode(c)){
-			parsed = true;
-		}
+//		if(hc_decode(c)){
+//			parsed = true;
+//		}
 	}
 	return parsed;
 }
 bool Sub::hc_decode(char c){
+
 //	bool valid_sentence = false;
 
-	_sentence_length++;
-
-	switch(c){
-		case ',':break;
-		
-		case '*':
-			if(_buffer_offset < sizeof(_buffer)){
-				_buffer[_buffer_offset] = 0;
-					
+//	_sentence_length++;
+//
+//	switch(c){
+//		case ',':break;
+//		
+//		case '*':
+//			if(_buffer_offset < sizeof(_buffer)){
+//				_buffer[_buffer_offset] = 0;
+//					
+//			
+//			}break;
+//			
+//
+//		case '$':break;
 			
-			}break;
-			
-
-		case '$':break;
-			
-	}
+//	}
 }
 
 
