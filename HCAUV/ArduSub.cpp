@@ -411,6 +411,7 @@ bool Sub::hc_decode(char c){
 //		case '$':break;
 			
 //	}
+	return 0;
 }
 
 
