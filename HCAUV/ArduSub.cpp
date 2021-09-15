@@ -377,7 +377,13 @@ void Sub::send_to_rasp(){
 
 }
 void Sub::receive_from_rasp(){
-
+	int16_t numc;
+	bool parsed = false;
+	numc = port_D->available();
+	while(numc--){
+		char c = port_D->read();
+		hal.uartD->printf("receive:%c",c);
+	}
 }
 
 

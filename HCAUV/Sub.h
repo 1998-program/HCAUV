@@ -316,6 +316,8 @@ private:
 	float X2_N_1;
 	float X2_N;
 	
+	AP_HAL::UARTDriver *port_D;
+	
 
     AP_Motors6DOF motors;
 
