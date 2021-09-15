@@ -491,7 +491,7 @@ private:
 	void cal_ciscrea_angle();
 	void send_to_rasp();
 	bool receive_from_rasp();
-	bool hc_decode(char c);
+	bool hc_decode(int16_t numc,char c);
 
 	//ardusub
     void fast_loop();

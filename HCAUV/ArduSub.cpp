@@ -382,16 +382,26 @@ bool Sub::receive_from_rasp(){
 	bool parsed = false;
 	numc = hal.uartD->available();
 	hal.uartD->printf("numc:%d\n",numc);
-	while(numc--){
-		char c = hal.uartD->read();
-		hal.uartD->printf("receive:%c\n",c);
-//		if(hc_decode(c)){
-//			parsed = true;
-//		}
+	int i = 0;
+	if(numc){
+		while (i < numc){
+			_buffer[i]=hal.uartD->read();
+			hal.uartD->printf("receive:%c\n",_buffer[i]);
+			i += 1;
+		}
 	}
+	
+//	while(numc--){
+//		char c = hal.uartD->read();
+//		hal.uartD->printf("receive:%c\n",c);
+////		if(hc_decode(numc,c)){
+////			parsed = true;
+////		}
+//	}
 	return parsed;
 }
-bool Sub::hc_decode(char c){
+bool Sub::hc_decode(int16_t numc,char c){
+
 
 //	bool valid_sentence = false;
 
