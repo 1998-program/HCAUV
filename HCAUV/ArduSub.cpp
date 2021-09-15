@@ -419,12 +419,13 @@ bool Sub::hc_decode(int16_t numc){
 				}
 			}
 		}
-		switch ID:
+		switch (ID){
 			case '0':
-					real_angle = number;
+					real_angle = number;break;
 
 			case '1':
-					torque = number;
+					torque = number;break;
+			}
 			
 		
 					
