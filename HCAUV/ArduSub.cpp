@@ -404,10 +404,10 @@ bool Sub::hc_decode(char c){
 				_buffer[_buffer_offset] = 0;
 					
 			
-			}
+			}break;
 			
 
-		case '$':
+		case '$':break;
 			
 	}
 }
