@@ -377,15 +377,41 @@ void Sub::cal_ciscrea_angle(){
 void Sub::send_to_rasp(){
 
 }
-void Sub::receive_from_rasp(){
+bool Sub::receive_from_rasp(){
 	int16_t numc;
-//	bool parsed = false;
+	bool parsed = false;
 	numc = hal.uartD->available();
+	hal.uartD->printf("numc:%d\n",numc);
 	while(numc--){
 		char c = hal.uartD->read();
-		hal.uartD->printf("receive:%c",c);
+		hal.uartD->printf("receive:%c\n",c);
+		if(hc_decode(c)){
+			parsed = true;
+		}
+	}
+	return parsed;
+}
+bool Sub::hc_decode(char c){
+	bool valid_sentence = false;
+
+	_sentence_length++;
+
+	switch(c){
+		case ',':break;
+		
+		case '*':
+			if(_buffer_offset < sizeof(_buffer)){
+				_buffer[_buffer_offset] = 0;
+					
+			
+			}
+			
+
+		case '$':
+			
 	}
 }
+
 
 
 AP_HAL_MAIN_CALLBACKS(&sub);
