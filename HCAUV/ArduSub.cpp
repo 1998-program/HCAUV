@@ -121,7 +121,7 @@ void Sub::fast_loop()
 	
 	cal_ciscrea_angle();
 	hal.uartD->printf("real_angle:%f\n",real_angle);
-//	receive_from_rasp();
+	receive_from_rasp();
 	
     // run EKF state estimator (expensive)
     // --------------------
@@ -380,9 +380,9 @@ void Sub::send_to_rasp(){
 void Sub::receive_from_rasp(){
 	int16_t numc;
 //	bool parsed = false;
-	numc = port_D->available();
+	numc = hal.uartD->available();
 	while(numc--){
-		char c = port_D->read();
+		char c = hal.uartD->read();
 		hal.uartD->printf("receive:%c",c);
 	}
 }
