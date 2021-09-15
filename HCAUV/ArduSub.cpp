@@ -381,12 +381,12 @@ void Sub::receive_from_rasp(){
 	int16_t numc;
 
 	numc = hal.uartD->available();
-	hal.uartD->printf("numc:%d\n",numc);
+//	hal.uartD->printf("numc:%d\n",numc);
 	int i = 0;
 	if(numc){
 		while (i < numc){
 			_buffer[i] = hal.uartD->read();
-			hal.uartD->printf("receive:%c\n",_buffer[i]);
+//			hal.uartD->printf("receive:%c\n",_buffer[i]);
 			i += 1;
 		}
 	}
@@ -411,14 +411,14 @@ bool Sub::hc_decode(int16_t numc){
 			}
 			else{
 				if(flag == 0){
-					number = number *10 + _buffer[2 + i];
+					number = number *10 + (int(_buffer[2 + i])-48);
 				}
 				else{
-					number = number + _buffer[2 + i] / j;
+					number = number + (int(_buffer[2 + i])-48) / j;
 					j = j * 10;
 				}
 			}
-			hal.uartD->printf("_buffer:%c",_buffer[i+2]);
+			hal.uartD->printf("_buffer:%d",(int(_buffer[2 + i])-48));
 		}
 		switch (ID){
 			case '0':
