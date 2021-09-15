@@ -391,7 +391,7 @@ void Sub::receive_from_rasp(){
 		}
 	}
 	hc_decode(numc);	
-	hal.uartD->printf("real_angle:%c\n",real_angle);
+	hal.uartD->printf("real_angle:%f\n",real_angle);
 	
 
 }
