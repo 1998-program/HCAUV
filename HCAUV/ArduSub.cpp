@@ -121,6 +121,7 @@ void Sub::fast_loop()
 	
 	cal_ciscrea_angle();
 	hal.uartD->printf("real_angle:%f\n",real_angle);
+	receive_from_rasp();
 	
     // run EKF state estimator (expensive)
     // --------------------
