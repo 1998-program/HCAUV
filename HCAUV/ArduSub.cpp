@@ -403,7 +403,7 @@ bool Sub::hc_decode(int16_t numc){
 	
 	if(_buffer[0] == '$'){
 		uint16_t j = 10;
-		len = _buffer[1];
+		len = int(_buffer[1]) - 48;
 		ID = _buffer[2];
 		for(int i = 1; i <= len; i++){
 			if(_buffer[2 + i] == '.'){
