@@ -392,7 +392,7 @@ bool Sub::receive_from_rasp(){
 	return parsed;
 }
 bool Sub::hc_decode(char c){
-	bool valid_sentence = false;
+//	bool valid_sentence = false;
 
 	_sentence_length++;
 
