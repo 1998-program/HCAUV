@@ -414,7 +414,7 @@ bool Sub::hc_decode(int16_t numc){
 					number = number *10 + (int(_buffer[2 + i])-48);
 				}
 				else{
-					number = number + (int(_buffer[2 + i])-48) / j;
+					number = number + (float(_buffer[2 + i])-48) / j;
 					j = j * 10;
 				}
 			}
