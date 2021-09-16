@@ -379,7 +379,7 @@ void Sub::cal_ciscrea_angle(){
 void Sub::send_to_rasp(){
 	float code_torque = 0.0;
 	code_torque = real_angle;
-	tran1.d = real_angle;
+	tran1.d = code_torque;
 	hc_code();
 	hal.uartD->write(_buffertx);
 
