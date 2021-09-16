@@ -290,8 +290,8 @@ void AP_SerialManager::init_console()
     // initialise console immediately at default size and baud
     state[0].uart = hal.uartA;  // serial0, uartA, always console
     state[0].uart->begin(AP_SERIALMANAGER_CONSOLE_BAUD,
-                         AP_SERIALMANAGER_CONSOLE_BUFSIZE_RX,
-                         AP_SERIALMANAGER_CONSOLE_BUFSIZE_TX);
+                         AP_SERIALMANAGER_CONSOLE_BUFSIZE_RX, //128
+                         AP_SERIALMANAGER_CONSOLE_BUFSIZE_TX); //512
 }
 
 extern bool g_nsh_should_exit;

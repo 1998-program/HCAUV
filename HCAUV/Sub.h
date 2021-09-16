@@ -476,8 +476,9 @@ private:
     uint32_t last_pilot_yaw_input_ms;
     uint32_t fs_terrain_recover_start_ms;
 
-	char _buffer[31];                                                     ///< buffer for the current term within the current sentence
-    uint8_t _sentence_type;                                     ///< the sentence type currently being processed
+	char _bufferrx[32];                                                     ///< buffer for the current term within the current sentence
+	char _buffertx[32];
+	uint8_t _sentence_type;                                     ///< the sentence type currently being processed
     uint8_t _buffer_number;                                       ///< term index within the current sentence
     uint8_t _buffer_offset;                                       ///< character offset with the term being received
     uint16_t _sentence_length;
@@ -492,6 +493,7 @@ private:
 	void send_to_rasp();
 	void receive_from_rasp();
 	bool hc_decode(int16_t numc);
+	int hc_code();
 
 	//ardusub
     void fast_loop();

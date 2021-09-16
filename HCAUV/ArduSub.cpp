@@ -375,6 +375,7 @@ void Sub::cal_ciscrea_angle(){
 //	X2_N = X2_N_1;
 }
 void Sub::send_to_rasp(){
+	
 
 }
 void Sub::receive_from_rasp(){
@@ -385,40 +386,52 @@ void Sub::receive_from_rasp(){
 	int i = 0;
 	if(numc){
 		while (i < numc){
-			_buffer[i] = hal.uartD->read();
+			_bufferrx[i] = hal.uartD->read();
 //			hal.uartD->printf("receive:%c\n",_buffer[i]);
 			i += 1;
 		}
 	}
-	hc_decode(numc);	
+	if(hc_decode(numc)){}	
 	hal.uartD->printf("real_angle:%f\n",real_angle);
+	while(i < numc){
+		_bufferrx[i] = 0;
+	}
+	hal.uartD->printf("_bufferrx is 0 ?:%d",int(_bufferrx[3]);
 	
 
 }
+
+int Sub::hc_code(){
+	float code_torque = 0.0;
+	_buffertx[0] = '$';
+	
+	
+}
+
 bool Sub::hc_decode(int16_t numc){
 	uint8_t len = 0;
 	uint8_t ID;
 	bool flag = false;
 	float number = 0.0;
 	
-	if(_buffer[0] == '$'){
+	if(_bufferrx[0] == '$'){
 		uint16_t j = 10;
-		len = int(_buffer[1]) - 48;
-		ID = _buffer[2];
+		len = int(_bufferrx[1]) - 48;
+		ID = _bufferrx[2];
 		for(int i = 1; i <= len; i++){
-			if(_buffer[2 + i] == '.'){
+			if(_bufferrx[2 + i] == '.'){
 				flag = 1;
 			}
 			else{
 				if(flag == 0){
-					number = number *10 + (int(_buffer[2 + i])-48);
+					number = number *10 + (int(_bufferrx[2 + i])-48);
 				}
 				else{
-					number = number + (float(_buffer[2 + i])-48) / j;
+					number = number + (float(_bufferrx[2 + i])-48) / j;
 					j = j * 10;
 				}
 			}
-			hal.uartD->printf("_buffer:%d",(int(_buffer[2 + i])-48));
+			hal.uartD->printf("_bufferrx:%d",(int(_bufferrx[2 + i])-48));
 		}
 		switch (ID){
 			case '0':
@@ -428,6 +441,8 @@ bool Sub::hc_decode(int16_t numc){
 					torque = number;break;
 			}
 		flag = true;
+		
+		return true;
 		
 	} 
 	else return false;
