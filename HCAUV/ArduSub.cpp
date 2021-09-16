@@ -401,12 +401,12 @@ void Sub::receive_from_rasp(){
 
 }
 
-int Sub::hc_code(){
-//	float code_torque = 0.0;
-	_buffertx[0] = '$';
-	
-	
-}
+//int Sub::hc_code(){
+////	float code_torque = 0.0;
+//	_buffertx[0] = '$';
+//	
+//	
+//}
 
 bool Sub::hc_decode(int16_t numc){
 	uint8_t len = 0;
