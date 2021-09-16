@@ -122,7 +122,8 @@ void Sub::fast_loop()
 	cal_ciscrea_angle();
 //	hal.uartD->printf("real_angle:%f\n",real_angle);
 	receive_from_rasp();
-	
+
+	send_to_rasp();
     // run EKF state estimator (expensive)
     // --------------------
     read_AHRS();
@@ -378,6 +379,7 @@ void Sub::cal_ciscrea_angle(){
 
 void Sub::send_to_rasp(){
 	float code_torque = 0.0;
+	real_angle = 123.4567;
 	code_torque = real_angle;
 	tran1.d = code_torque;
 	hc_code();
