@@ -402,7 +402,7 @@ void Sub::receive_from_rasp(){
 }
 
 int Sub::hc_code(){
-	float code_torque = 0.0;
+//	float code_torque = 0.0;
 	_buffertx[0] = '$';
 	
 	
