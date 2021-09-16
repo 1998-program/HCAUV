@@ -297,6 +297,13 @@ private:
         uint8_t compass     : 1;    // true if compass is healthy
     } sensor_health;
 
+	union transmit
+	{
+		 float d;
+         unsigned char data[4];
+	}tran1;
+	
+
     // Baro sensor instance index of the external water pressure sensor
     uint8_t depth_sensor_idx;
 	float I_YA;
@@ -493,7 +500,7 @@ private:
 	void send_to_rasp();
 	void receive_from_rasp();
 	bool hc_decode(int16_t numc);
-	int hc_code();
+	void hc_code();
 
 	//ardusub
     void fast_loop();

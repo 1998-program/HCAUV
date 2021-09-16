@@ -120,7 +120,7 @@ void Sub::fast_loop()
     motors_output();
 	
 	cal_ciscrea_angle();
-	hal.uartD->printf("real_angle:%f\n",real_angle);
+//	hal.uartD->printf("real_angle:%f\n",real_angle);
 	receive_from_rasp();
 	
     // run EKF state estimator (expensive)
@@ -374,8 +374,18 @@ void Sub::cal_ciscrea_angle(){
 //	X1_N = X1_N_1;
 //	X2_N = X2_N_1;
 }
+
+
 void Sub::send_to_rasp(){
-	
+	float code_torque = 0.0;
+	code_torque = real_angle;
+	tran1.d = real_angle;
+	hc_code();
+	hal.uartD->write(_buffertx,8);
+
+	for(int i = 0; i < 8; i++){
+		_buffertx[i] = 0;
+	}
 
 }
 void Sub::receive_from_rasp(){
@@ -391,22 +401,28 @@ void Sub::receive_from_rasp(){
 			i += 1;
 		}
 	}
+	i = 0;
 	if(hc_decode(numc)){}	
-	hal.uartD->printf("real_angle:%f\n",real_angle);
+	hal.uartD->printf("receive_real_angle:%f\n",real_angle);
 	while(i < numc){
 		_bufferrx[i] = 0;
 	}
-	hal.uartD->printf("_bufferrx is 0 ?:%d",int(_bufferrx[3]));
+//	hal.uartD->printf("_bufferrx is 0 ?:%d",int(_bufferrx[3]));
 	
 
 }
 
-//int Sub::hc_code(){
-////	float code_torque = 0.0;
-//	_buffertx[0] = '$';
-//	
-//	
-//}
+void Sub::hc_code(){
+//	float code_torque = 0.0;
+	_buffertx[0] = '$'; //head
+	_buffertx[1] = '4'; //LEN
+	_buffertx[2] = '0'; //ID
+	_bufferrx[3] = tran1.data[0];
+	_bufferrx[4] = tran1.data[1];
+	_bufferrx[5] = tran1.data[2];
+	_bufferrx[6] = tran1.data[3];
+	_bufferrx[7] = '*';
+}
 
 bool Sub::hc_decode(int16_t numc){
 	uint8_t len = 0;
@@ -431,7 +447,7 @@ bool Sub::hc_decode(int16_t numc){
 					j = j * 10;
 				}
 			}
-			hal.uartD->printf("_bufferrx:%d",(int(_bufferrx[2 + i])-48));
+//			hal.uartD->printf("_bufferrx:%d",(int(_bufferrx[2 + i])-48));
 		}
 		switch (ID){
 			case '0':
