@@ -405,7 +405,7 @@ void Sub::receive_from_rasp(){
 	}
 	i = 0;
 	if(hc_decode(numc)){}	
-	hal.uartD->printf("receive_real_angle:%f\n",real_angle);
+//	hal.uartD->printf("receive_real_angle:%f\n",real_angle);
 	while(i < numc){
 		_bufferrx[i] = 0;
 	}
