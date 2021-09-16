@@ -396,7 +396,7 @@ void Sub::receive_from_rasp(){
 	while(i < numc){
 		_bufferrx[i] = 0;
 	}
-	hal.uartD->printf("_bufferrx is 0 ?:%d",int(_bufferrx[3]);
+	hal.uartD->printf("_bufferrx is 0 ?:%d",int(_bufferrx[3]));
 	
 
 }
