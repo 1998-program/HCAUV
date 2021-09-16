@@ -381,7 +381,7 @@ void Sub::send_to_rasp(){
 	code_torque = real_angle;
 	tran1.d = real_angle;
 	hc_code();
-	hal.uartD->write(_buffertx,8);
+	hal.uartD->write(_buffertx);
 
 	for(int i = 0; i < 8; i++){
 		_buffertx[i] = 0;
