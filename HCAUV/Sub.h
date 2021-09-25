@@ -501,6 +501,7 @@ private:
 	void receive_from_rasp();
 	bool hc_decode(int16_t numc);
 	void hc_code();
+	void uart_test();
 
 	//ardusub
     void fast_loop();

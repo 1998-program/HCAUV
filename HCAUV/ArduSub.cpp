@@ -119,11 +119,15 @@ void Sub::fast_loop()
     // send outputs to the motors library
     motors_output();
 	
-	cal_ciscrea_angle();
-//	hal.uartD->printf("real_angle:%f\n",real_angle);
-	receive_from_rasp();
+//	cal_ciscrea_angle();
+////	hal.uartD->printf("real_angle:%f\n",real_angle);
+//	receive_from_rasp();
+//
+//	send_to_rasp();
 
-	send_to_rasp();
+	//uart test
+	uart_test();
+
     // run EKF state estimator (expensive)
     // --------------------
     read_AHRS();
@@ -412,6 +416,10 @@ void Sub::receive_from_rasp(){
 //	hal.uartD->printf("_bufferrx is 0 ?:%d",int(_bufferrx[3]));
 	
 
+}
+
+void Sub::uart_test(){
+	hal.uartD->printf("123");
 }
 
 void Sub::hc_code(){
