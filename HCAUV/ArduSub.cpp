@@ -393,31 +393,36 @@ void Sub::send_to_rasp(){
 	_bufferrx[5] = 0x44;
 	_bufferrx[6] = 0x7E;
 	_bufferrx[7] = 0x7F;
-	int i = 0;
-	while(i < 8){
-		hal.uartD->write(_buffertx[i]);
-		hal.scheduler->delay(10);
-		i += 1;
-	}
-		
-//	hal.uartD->write(_buffertx[0]);
-//	hal.uartD->write(_bufferrx[1]);
-//	hal.uartD->write(_bufferrx[2]);
-//	hal.uartD->write(_bufferrx[3]);
-//	hal.uartD->write(_bufferrx[4]);
-//	hal.uartD->write(_bufferrx[5]);
-//	hal.uartD->write(_bufferrx[6]);
-//	hal.uartD->write(_bufferrx[7]);
-	for(int j = 0; j < 8; j++){
-		hal.uartD->printf("%c\n",_buffertx[i]);
-		hal.scheduler->delay(10);
-	}
+//	int i = 0;
+//	while(i < 8){
+//		hal.uartD->write(_buffertx[i]);
+//		hal.scheduler->delay(10);
+//		i += 1;
+//	}		
+	hal.uartD->write(_buffertx[0]);
+	hal.uartD->write(_bufferrx[1]);
+	hal.uartD->write(_bufferrx[2]);
+	hal.uartD->write(_bufferrx[3]);
+	hal.uartD->write(_bufferrx[4]);
+	hal.uartD->write(_bufferrx[5]);
+	hal.uartD->write(_bufferrx[6]);
+	hal.uartD->write(_bufferrx[7]);
+//	for(int j = 0; j < 8; j++){
+//		hal.uartD->printf("%c\n",_buffertx[i]);
+//		hal.scheduler->delay(10);
+//	}
 //	hal.uartD->write(const uint8_t * buffer, size_t size)
 //  hal.uartD->write(const uint8_t * buffer, size_t size)	
 
-	for(int j = 0; j < 8; j++){
-		_buffertx[j] = 0;
-	}
+	_buffertx[0] = 0x00;
+	_bufferrx[1] = 0x00;
+	_bufferrx[2] = 0x00;
+	_bufferrx[3] = 0x00;
+	_bufferrx[4] = 0x00;
+	_bufferrx[5] = 0x00;
+	_bufferrx[6] = 0x00;
+	_bufferrx[7] = 0x00;
+
 
 }
 void Sub::receive_from_rasp(){
