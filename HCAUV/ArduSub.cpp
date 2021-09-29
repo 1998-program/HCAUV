@@ -385,7 +385,7 @@ void Sub::send_to_rasp(){
 //	float code_torque = 0.0;
 	real_angle = 123.45678;
 //	code_torque = real_angle;
-	_buffertx[0] = 0x3A;
+	_buffertx[0] = 0x3D;
 	_bufferrx[1] = 0x3B;
 	_bufferrx[2] = 0x11;
 	_bufferrx[3] = 0x22;
