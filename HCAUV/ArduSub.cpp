@@ -397,7 +397,6 @@ void Sub::send_to_rasp(){
 	while(i < 8){
 		hal.uartD->write(_buffertx[i]);
 		i += 1;
-		hal.uartD->printf("%d\n",i);
 	}
 		
 //	hal.uartD->write(_buffertx[0]);
@@ -408,12 +407,9 @@ void Sub::send_to_rasp(){
 //	hal.uartD->write(_bufferrx[5]);
 //	hal.uartD->write(_bufferrx[6]);
 //	hal.uartD->write(_bufferrx[7]);
-//	for(int i = 0; i < 8; i++){
-//		hal.scheduler->delay(1);
-////		hal.uartD->write(_buffertx[i]);
-////		hal.uartD->UARTDriver().write(_buffertx,8);
-////		hal.uartD->printf(const char * fmt, ...)
-//	}
+	for(int i = 0; i < 8; i++){
+		hal.uartD->printf("%c\n",_buffertx[i]);
+	}
 //	hal.uartD->write(const uint8_t * buffer, size_t size)
 //  hal.uartD->write(const uint8_t * buffer, size_t size)	
 
