@@ -299,9 +299,9 @@ private:
 
 	union transmit
 	{
-		 float d;
-         unsigned char data[4];
-	}tran1;
+		 float angleX;
+         unsigned char angle_char[4];
+	}tran_angle;
 	
 
     // Baro sensor instance index of the external water pressure sensor
