@@ -496,7 +496,7 @@ void Sub::receive_from_rasp(){
 
 	//处理程序
 	
-	hc_decode(numc);
+//	hc_decode(numc);
 	
 	hal.uartD->write(_bufferrx[0]);
 	hal.uartD->write(_bufferrx[1]);
