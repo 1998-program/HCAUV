@@ -396,6 +396,7 @@ void Sub::send_to_rasp(){
 	int i = 0;
 	while(i < 8){
 		hal.uartD->write(_buffertx[i]);
+		hal.scheduler->delay(10);
 		i += 1;
 	}
 		
@@ -409,6 +410,7 @@ void Sub::send_to_rasp(){
 //	hal.uartD->write(_bufferrx[7]);
 	for(int j = 0; j < 8; j++){
 		hal.uartD->printf("%c\n",_buffertx[i]);
+		hal.scheduler->delay(10);
 	}
 //	hal.uartD->write(const uint8_t * buffer, size_t size)
 //  hal.uartD->write(const uint8_t * buffer, size_t size)	
