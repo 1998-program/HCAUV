@@ -393,9 +393,9 @@ void Sub::send_to_rasp(){
 	_bufferrx[5] = 0x44;
 	_bufferrx[6] = 0x7E;
 	_bufferrx[7] = 0x7F;
-	hal.uartD->write(0x3D);
-	hal.uartD->write(0x3B);
-	hal.uartD->write(0x11);
+	hal.uartD->write(_buffertx[0]);
+	hal.uartD->write(_bufferrx[1]);
+	hal.uartD->write(_bufferrx[2]);
 	hal.uartD->write(0x22);
 	hal.uartD->write(0x33);
 	hal.uartD->write(0x44);
