@@ -126,7 +126,7 @@ void Sub::fast_loop()
 	send_to_rasp();
 
 	//uart test
-	uart_test();
+//	uart_test();
 
     // run EKF state estimator (expensive)
     // --------------------
@@ -394,13 +394,13 @@ void Sub::send_to_rasp(){
 	_bufferrx[6] = 0x7E;
 	_bufferrx[7] = 0x7F;
 
-	for(int i = 0; i < 8; i++){
-		hal.uartD->write(_buffertx[i]);
-	}
-	
+//	for(int i = 0; i < 8; i++){
+		hal.uartD->write(_buffertx[7]);
+//	}
+//  hal.uartD->write(const uint8_t * buffer, size_t size)	
 
-	for(int i = 0; i < 8; i++){
-		_buffertx[i] = 0;
+	for(int j = 0; j < 8; i++){
+		_buffertx[j] = 0;
 	}
 
 }
