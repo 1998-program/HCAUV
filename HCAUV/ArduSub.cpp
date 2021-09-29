@@ -393,10 +393,10 @@ void Sub::send_to_rasp(){
 	_bufferrx[5] = 0x44;
 	_bufferrx[6] = 0x7E;
 	_bufferrx[7] = 0x7F;
-	int i;
-	for(i = 0;i<8;i++){
+	int i = 0;
+	while(i < 8){
 		hal.uartD->write(_buffertx[i]);
-
+		i += 1;
 	}
 		
 //	hal.uartD->write(_buffertx[0]);
