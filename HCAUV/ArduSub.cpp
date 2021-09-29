@@ -121,7 +121,7 @@ void Sub::fast_loop()
 	
 //	cal_ciscrea_angle();
 ////	hal.uartD->printf("real_angle:%f\n",real_angle);
-//	receive_from_rasp();
+	receive_from_rasp();
 //
 	send_to_rasp();
 
@@ -412,7 +412,6 @@ void Sub::send_to_rasp(){
 //		hal.scheduler->delay(10);
 //	}
 //	hal.uartD->write(const uint8_t * buffer, size_t size)
-//  hal.uartD->write(const uint8_t * buffer, size_t size)	
 
 	_buffertx[0] = 0x00;
 	_bufferrx[1] = 0x00;
@@ -439,11 +438,24 @@ void Sub::receive_from_rasp(){
 		}
 	}
 	i = 0;
-	if(hc_decode(numc)){}	
+//	if(hc_decode(numc)){}	
 //	hal.uartD->printf("receive_real_angle:%f\n",real_angle);
-	while(i < numc){
-		_bufferrx[i] = 0;
-	}
+
+	//处理程序
+	
+	hal.uartC->write(_bufferrx[0]);
+	hal.uartC->write(_bufferrx[1]);
+	hal.uartC->write(_bufferrx[2]);
+	hal.uartC->write(_bufferrx[3]);
+	
+//	while(i < numc){
+//		_bufferrx[i] = 0;
+//	}
+	_bufferrx[0] = 0x00;
+	_bufferrx[1] = 0x00;
+	_bufferrx[2] = 0x00;
+	_bufferrx[3] = 0x00;
+
 //	hal.uartD->printf("_bufferrx is 0 ?:%d",int(_bufferrx[3]));
 	
 
