@@ -397,6 +397,7 @@ void Sub::send_to_rasp(){
 	while(i < 8){
 		hal.uartD->write(_buffertx[i]);
 		i += 1;
+		hal.uartD->printf("%d\n",i);
 	}
 		
 //	hal.uartD->write(_buffertx[0]);
