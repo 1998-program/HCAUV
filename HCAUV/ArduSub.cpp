@@ -393,14 +393,20 @@ void Sub::send_to_rasp(){
 	_bufferrx[5] = 0x44;
 	_bufferrx[6] = 0x7E;
 	_bufferrx[7] = 0x7F;
-	hal.uartD->write(_buffertx[0]);
-	hal.uartD->write(_bufferrx[1]);
-	hal.uartD->write(_bufferrx[2]);
-	hal.uartD->write(_bufferrx[3]);
-	hal.uartD->write(_bufferrx[4]);
-	hal.uartD->write(_bufferrx[5]);
-	hal.uartD->write(_bufferrx[6]);
-	hal.uartD->write(_bufferrx[7]);
+	int i;
+	for(i = 0;i<8;i++){
+		hal.uartD->write(_buffertx[i]);
+
+	}
+		
+//	hal.uartD->write(_buffertx[0]);
+//	hal.uartD->write(_bufferrx[1]);
+//	hal.uartD->write(_bufferrx[2]);
+//	hal.uartD->write(_bufferrx[3]);
+//	hal.uartD->write(_bufferrx[4]);
+//	hal.uartD->write(_bufferrx[5]);
+//	hal.uartD->write(_bufferrx[6]);
+//	hal.uartD->write(_bufferrx[7]);
 //	for(int i = 0; i < 8; i++){
 //		hal.scheduler->delay(1);
 ////		hal.uartD->write(_buffertx[i]);
