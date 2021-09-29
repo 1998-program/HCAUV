@@ -370,6 +370,9 @@ void Sub::init_mod_ciscrea(){
 	X1_N_1 = 0.0;
 	X2_N_1 = 0.0;
 	torque = 0.0;
+	f_h1_flag = 0;                          // 接收到帧头的第一个字节标志位
+    f_h_flag = 0;                           // 接收到帧头标志位
+    f_t1_flag = 0;                          // 接收到帧尾的第一个字节标志位
 	
 }
 void Sub::cal_ciscrea_angle(){
@@ -429,12 +432,62 @@ void Sub::receive_from_rasp(){
 
 	numc = hal.uartD->available();
 //	hal.uartD->printf("numc:%d\n",numc);
+
+
+
+
 	int i = 0;
 	if(numc){
 		while (i < numc){
 			_bufferrx[i] = hal.uartD->read();
 //			hal.uartD->printf("receive:%c\n",_buffer[i]);
-			i += 1;
+			if(f_h_flag == 1){     //有帧头，判断帧尾，接收消息
+				if (f_t1_flag == 1){   //有帧头，有帧尾1
+					if(_bufferrx[i] == Frame_Tail2){
+						int l = 0;
+						for(l = 2;l < (i -1);i++){
+							_bufferrx[i] += 0x01;
+						}
+						i = 0;
+					}
+					else{
+						f_t1_flag = 0;
+						i++;						
+					}
+				}
+				else{    // 有帧头，无帧尾1
+					if(_bufferrx[i] == Frame_Tail1){
+						f_t1_flag = 1;
+						i++;
+					}
+					else{
+						i++;
+					}
+				}
+					
+			}
+			else{
+				if(f_h1_flag == 1){
+					if(_bufferrx[i] == Frame_Header2){
+						f_h1_flag = 1;
+						i++;
+					}
+					else{
+						f_h1_flag = 0;
+						i = 0;
+					}
+				}
+				else{
+					if(_bufferrx[i] == Frame_Header1){
+						f_h1_flag = 1;
+						i++;
+					}
+					else{
+						i++;
+					}
+				}
+			}
+			
 		}
 	}
 	i = 0;
@@ -443,6 +496,7 @@ void Sub::receive_from_rasp(){
 
 	//处理程序
 	
+	hc_decode(numc);
 	
 	hal.uartD->write(_bufferrx[0]);
 	hal.uartD->write(_bufferrx[1]);
@@ -478,47 +532,54 @@ void Sub::hc_code(){
 //	_bufferrx[7] = '*';
 }
 
-bool Sub::hc_decode(int16_t numc){
-	uint8_t len = 0;
-	uint8_t ID;
-	bool flag = false;
-	float number = 0.0;
-	
-	if(_bufferrx[0] == '$'){
-		uint16_t j = 10;
-		len = int(_bufferrx[1]) - 48;
-		ID = _bufferrx[2];
-		for(int i = 1; i <= len; i++){
-			if(_bufferrx[2 + i] == '.'){
-				flag = 1;
-			}
-			else{
-				if(flag == 0){
-					number = number *10 + (int(_bufferrx[2 + i])-48);
-				}
-				else{
-					number = number + (float(_bufferrx[2 + i])-48) / j;
-					j = j * 10;
-				}
-			}
-//			hal.uartD->printf("_bufferrx:%d",(int(_bufferrx[2 + i])-48));
-		}
-		switch (ID){
-			case '0':
-					real_angle = number;break;
+//void Sub::hc_decode(int16_t numc){
+//	if(numc > 0){
+//		_bufferrx[tnum] == 
+//	}	
+//
+//}
 
-			case '1':
-					torque = number;break;
-			}
-		flag = true;
-		
-		return true;
-		
-	} 
-	else return false;
-	
-	return false;
-}
+//bool Sub::hc_decode(int16_t numc){
+//	uint8_t len = 0;
+//	uint8_t ID;
+//	bool flag = false;
+//	float number = 0.0;
+//	
+//	if(_bufferrx[0] == '$'){
+//		uint16_t j = 10;
+//		len = int(_bufferrx[1]) - 48;
+//		ID = _bufferrx[2];
+//		for(int i = 1; i <= len; i++){
+//			if(_bufferrx[2 + i] == '.'){
+//				flag = 1;
+//			}
+//			else{
+//				if(flag == 0){
+//					number = number *10 + (int(_bufferrx[2 + i])-48);
+//				}
+//				else{
+//					number = number + (float(_bufferrx[2 + i])-48) / j;
+//					j = j * 10;
+//				}
+//			}
+////			hal.uartD->printf("_bufferrx:%d",(int(_bufferrx[2 + i])-48));
+//		}
+//		switch (ID){
+//			case '0':
+//					real_angle = number;break;
+//
+//			case '1':
+//					torque = number;break;
+//			}
+//		flag = true;
+//		
+//		return true;
+//		
+//	} 
+//	else return false;
+//	
+//	return false;
+//}
 
 
 

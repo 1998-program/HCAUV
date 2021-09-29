@@ -21,6 +21,12 @@
 // Header includes
 ////////////////////////////////////////////////////////////////////////////////
 
+#define Frame_Header1   0x3A                    // 串口接收消息包的帧头的第1个字节
+#define Frame_Header2   0x3B                    // 串口接收消息包的帧头的第2个字节
+// 完整的帧尾，2个字节
+#define Frame_Tail1     0x7E                    // 串口接收消息包的帧尾的第1个字节
+#define Frame_Tail2     0x7F                    // 串口接收消息包的帧尾的第2个字节
+
 #include <cmath>
 #include <stdio.h>
 #include <stdarg.h>
@@ -483,6 +489,10 @@ private:
     uint32_t last_pilot_yaw_input_ms;
     uint32_t fs_terrain_recover_start_ms;
 
+	int f_h1_flag;                          // 接收到帧头的第一个字节标志位
+    int f_h_flag;                           // 接收到帧头标志位
+    int f_t1_flag;                          // 接收到帧尾的第一个字节标志位
+
 	unsigned char _bufferrx[32];                                                     ///< buffer for the current term within the current sentence
 	unsigned char _buffertx[32];
 //	uint8_t _buffertx[32];
@@ -500,7 +510,7 @@ private:
 	void cal_ciscrea_angle();
 	void send_to_rasp();
 	void receive_from_rasp();
-	bool hc_decode(int16_t numc);
+	void hc_decode(int16_t numc);
 	void hc_code();
 	void uart_test();
 
