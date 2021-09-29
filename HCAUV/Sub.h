@@ -483,8 +483,8 @@ private:
     uint32_t last_pilot_yaw_input_ms;
     uint32_t fs_terrain_recover_start_ms;
 
-	char _bufferrx[32];                                                     ///< buffer for the current term within the current sentence
-	char _buffertx[32];
+	unsigned char _bufferrx[256];                                                     ///< buffer for the current term within the current sentence
+	unsigned char _buffertx[256];
 	uint8_t _sentence_type;                                     ///< the sentence type currently being processed
     uint8_t _buffer_number;                                       ///< term index within the current sentence
     uint8_t _buffer_offset;                                       ///< character offset with the term being received

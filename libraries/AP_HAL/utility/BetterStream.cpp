@@ -19,8 +19,8 @@ size_t AP_HAL::BetterStream::write(const char *str)
 {
     return write((const uint8_t *)str, strlen(str));
 }
-size_t AP_HAL::BetterStream::write(const char *str,int str_len)
-{
-    return write((const uint8_t *)str, str_len);
-}
+//size_t AP_HAL::BetterStream::write(const char *str,int str_len)
+//{
+//    return write((const uint8_t *)str, str_len);
+//}
 
