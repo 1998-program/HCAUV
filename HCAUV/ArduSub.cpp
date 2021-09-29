@@ -382,7 +382,7 @@ void Sub::cal_ciscrea_angle(){
 
 
 void Sub::send_to_rasp(){
-	float code_torque = 0.0;
+//	float code_torque = 0.0;
 	real_angle = 123.45678;
 //	code_torque = real_angle;
 	_buffertx[0] = 0x3A;
