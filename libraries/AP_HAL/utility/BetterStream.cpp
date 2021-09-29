@@ -15,7 +15,12 @@ void AP_HAL::BetterStream::vprintf(const char *fmt, va_list ap)
     print_vprintf(this, fmt, ap);
 }
 
-size_t AP_HAL::BetterStream::write(const char *str)
+//size_t AP_HAL::BetterStream::write(const char *str)
+//{
+//    return write((const uint8_t *)str, strlen(str));
+//}
+size_t AP_HAL::BetterStream::write(const char *str,int str_len)
 {
-    return write((const uint8_t *)str, strlen(str));
+    return write((const uint8_t *)str, str_len);
 }
+
