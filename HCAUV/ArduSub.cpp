@@ -393,19 +393,26 @@ void Sub::send_to_rasp(){
 	_bufferrx[5] = 0x44;
 	_bufferrx[6] = 0x7E;
 	_bufferrx[7] = 0x7F;
-
-	for(int i = 0; i < 8; i++){
-		hal.scheduler->delay(1);
-		hal.uartD->write(_buffertx[i]);
-//		hal.uartD->UARTDriver().write(_buffertx,8);
-//		hal.uartD->printf(const char * fmt, ...)
-	}
+	hal.uartD->write(0x3D);
+	hal.uartD->write(0x3B);
+	hal.uartD->write(0x11);
+	hal.uartD->write(0x22);
+	hal.uartD->write(0x33);
+	hal.uartD->write(0x44);
+	hal.uartD->write(0x7E);
+	hal.uartD->write(0x7F);
+//	for(int i = 0; i < 8; i++){
+//		hal.scheduler->delay(1);
+////		hal.uartD->write(_buffertx[i]);
+////		hal.uartD->UARTDriver().write(_buffertx,8);
+////		hal.uartD->printf(const char * fmt, ...)
+//	}
 //	hal.uartD->write(const uint8_t * buffer, size_t size)
 //  hal.uartD->write(const uint8_t * buffer, size_t size)	
 
-//	for(int j = 0; j < 8; j++){
-//		_buffertx[j] = 0;
-//	}
+	for(int j = 0; j < 8; j++){
+		_buffertx[j] = 0;
+	}
 
 }
 void Sub::receive_from_rasp(){
