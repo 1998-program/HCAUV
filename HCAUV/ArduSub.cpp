@@ -407,7 +407,7 @@ void Sub::send_to_rasp(){
 //	hal.uartD->write(_bufferrx[5]);
 //	hal.uartD->write(_bufferrx[6]);
 //	hal.uartD->write(_bufferrx[7]);
-	for(int i = 0; i < 8; i++){
+	for(int j = 0; j < 8; j++){
 		hal.uartD->printf("%c\n",_buffertx[i]);
 	}
 //	hal.uartD->write(const uint8_t * buffer, size_t size)
