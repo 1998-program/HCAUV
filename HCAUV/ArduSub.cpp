@@ -123,7 +123,7 @@ void Sub::fast_loop()
 ////	hal.uartD->printf("real_angle:%f\n",real_angle);
 	receive_from_rasp();
 //
-	send_to_rasp();
+//	send_to_rasp();
 
 	//uart test
 //	uart_test();
@@ -443,10 +443,11 @@ void Sub::receive_from_rasp(){
 
 	//处理程序
 	
-	hal.uartC->write(_bufferrx[0]);
-	hal.uartC->write(_bufferrx[1]);
-	hal.uartC->write(_bufferrx[2]);
-	hal.uartC->write(_bufferrx[3]);
+	
+	hal.uartD->write(_bufferrx[0]);
+	hal.uartD->write(_bufferrx[1]);
+	hal.uartD->write(_bufferrx[2]);
+	hal.uartD->write(_bufferrx[3]);
 	
 //	while(i < numc){
 //		_bufferrx[i] = 0;
