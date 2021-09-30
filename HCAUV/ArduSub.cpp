@@ -436,54 +436,54 @@ void Sub::receive_from_rasp(){
 
 
 
-	int i = 0;
+	int tnum = 0;
 	if(numc){
-		while (i < numc){
-			_bufferrx[i] = hal.uartD->read();
+		while (tnum < numc){
+			_bufferrx[tnum] = hal.uartD->read();
 //			hal.uartD->printf("receive:%c\n",_buffer[i]);
 			if(f_h_flag == 1){     //有帧头，判断帧尾，接收消息
 				if (f_t1_flag == 1){   //有帧头，有帧尾1
-					if(_bufferrx[i] == Frame_Tail2){
-						int l = 0;
-						for(l = 2;l < (i -1);l++){
-							_bufferrx[l] += 0x02;
+					if(_bufferrx[tnum] == Frame_Tail2){
+						int i = 0;
+						for(i = 2;i < (tnum -1);i++){
+							_bufferrx[i] += 0x02;
 						}
-						i = 0;
+						tnum = 0;
 					}
 					else{
 						f_t1_flag = 0;
-						i++;						
+						tnum++;						
 					}
 				}
 				else{    // 有帧头，无帧尾1
-					if(_bufferrx[i] == Frame_Tail1){
+					if(_bufferrx[tnum] == Frame_Tail1){
 						f_t1_flag = 1;
-						i++;
+						tnum++;
 					}
 					else{
-						i++;
+						tnum++;
 					}
 				}
 					
 			}
 			else{
 				if(f_h1_flag == 1){
-					if(_bufferrx[i] == Frame_Header2){
-						f_h1_flag = 1;
-						i++;
+					if(_bufferrx[tnum] == Frame_Header2){
+						f_h_flag = 1;
+						tnum++;
 					}
 					else{
 						f_h1_flag = 0;
-						i = 0;
+						tnum = 0;
 					}
 				}
 				else{
 					if(_bufferrx[i] == Frame_Header1){
 						f_h1_flag = 1;
-						i++;
+						tnum++;
 					}
 					else{
-						i++;
+						tnum = 0;
 					}
 				}
 			}
