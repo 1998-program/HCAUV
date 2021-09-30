@@ -478,7 +478,7 @@ void Sub::receive_from_rasp(){
 					}
 				}
 				else{
-					if(_bufferrx[i] == Frame_Header1){
+					if(_bufferrx[tnum] == Frame_Header1){
 						f_h1_flag = 1;
 						tnum++;
 					}
