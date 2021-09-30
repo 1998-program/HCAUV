@@ -124,11 +124,11 @@ void Sub::fast_loop()
 	hal.uartC->printf("real_angle:%f\n",real_angle);
 
 	send_to_rasp();
-	hal.uartC->printf("send_to_rasp\n");
+//	hal.uartC->printf("send_to_rasp\n");
 
 	receive_from_rasp();
 //
-	hal.uartC->printf("receive_from_rasp\n");
+//	hal.uartC->printf("receive_from_rasp\n");
 
 
 	//uart test
