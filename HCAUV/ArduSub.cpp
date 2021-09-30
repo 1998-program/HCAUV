@@ -121,9 +121,12 @@ void Sub::fast_loop()
 	
 //	cal_ciscrea_angle();
 ////	hal.uartD->printf("real_angle:%f\n",real_angle);
+
+	send_to_rasp();
+
 	receive_from_rasp();
 //
-	send_to_rasp();
+
 
 	//uart test
 //	uart_test();
@@ -373,6 +376,7 @@ void Sub::init_mod_ciscrea(){
 	f_h1_flag = 0;                          // 接收到帧头的第一个字节标志位
     f_h_flag = 0;                           // 接收到帧头标志位
     f_t1_flag = 0;                          // 接收到帧尾的第一个字节标志位
+    
 	
 }
 void Sub::cal_ciscrea_angle(){
@@ -386,16 +390,29 @@ void Sub::cal_ciscrea_angle(){
 
 void Sub::send_to_rasp(){
 //	float code_torque = 0.0;
-	real_angle = 123.45678;
+	real_angle = 456.12378;
 //	code_torque = real_angle;
+	tran_angle.angleX = real_angle;
+	
+//	_buffertx[0] = 0x3A;
+//	_bufferrx[1] = 0x3B;
+//	_bufferrx[2] = 0x11;
+//	_bufferrx[3] = 0x12;
+//	_bufferrx[4] = 0x12;
+//	_bufferrx[5] = 0x20;
+//	_bufferrx[6] = 0x7E;
+//	_bufferrx[7] = 0x7F;
+
+
 	_buffertx[0] = 0x3A;
 	_bufferrx[1] = 0x3B;
-	_bufferrx[2] = 0x11;
-	_bufferrx[3] = 0x12;
-	_bufferrx[4] = 0x12;
-	_bufferrx[5] = 0x20;
+	_bufferrx[2] = tran_angle.angle_char[0];
+	_bufferrx[3] = tran_angle.angle_char[1];
+	_bufferrx[4] = tran_angle.angle_char[2];
+	_bufferrx[5] = tran_angle.angle_char[3];
 	_bufferrx[6] = 0x7E;
 	_bufferrx[7] = 0x7F;
+	
 //	int i = 0;
 //	while(i < 8){
 //		hal.uartD->write(_buffertx[i]);
