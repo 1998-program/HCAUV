@@ -303,12 +303,17 @@ private:
         uint8_t compass     : 1;    // true if compass is healthy
     } sensor_health;
 
-	union transmit
+	union send
 	{
 		 float angleX;
          unsigned char angle_char[4];
 	}tran_angle;
-	
+
+	union recive
+	{
+		 float forceX;
+         unsigned char force_char[4];
+	}tran_force;
 
     // Baro sensor instance index of the external water pressure sensor
     uint8_t depth_sensor_idx;

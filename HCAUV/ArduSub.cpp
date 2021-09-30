@@ -119,7 +119,7 @@ void Sub::fast_loop()
     // send outputs to the motors library
     motors_output();
 	
-//	cal_ciscrea_angle();
+	cal_ciscrea_angle();
 ////	hal.uartD->printf("real_angle:%f\n",real_angle);
 
 	send_to_rasp();
@@ -377,20 +377,19 @@ void Sub::init_mod_ciscrea(){
     f_h_flag = 0;                           // 接收到帧头标志位
     f_t1_flag = 0;                          // 接收到帧尾的第一个字节标志位
     
-	
 }
 void Sub::cal_ciscrea_angle(){
 	X1_N_1 = CIS_A[0] * X1_N + CIS_A[1] * X2_N + 0.0;
 	X2_N_1 = CIS_A[2] * X1_N + CIS_A[3] * X2_N + CIS_B[1] * torque;
-//	real_angle = X1_N;
-//	X1_N = X1_N_1;
-//	X2_N = X2_N_1;
+	real_angle = CIS_C[0] * X1_N;
+	X1_N = X1_N_1;
+	X2_N = X2_N_1;
 }
 
 
 void Sub::send_to_rasp(){
 //	float code_torque = 0.0;
-	real_angle = 456.12378;
+//	real_angle = 456.12378;
 //	code_torque = real_angle;
 	tran_angle.angleX = real_angle;
 	
@@ -442,6 +441,8 @@ void Sub::send_to_rasp(){
 	_bufferrx[6] = 0x00;
 	_bufferrx[7] = 0x00;
 
+	hal.uartC->printf("real_angle:%f\n",real_angle);
+
 
 }
 void Sub::receive_from_rasp(){
@@ -464,13 +465,13 @@ void Sub::receive_from_rasp(){
 					if(_bufferrx[tnum] == Frame_Tail2){
 						int i = 0;
 						for(i = 2;i < (tnum -1);i++){
-							_bufferrx[i] += 0x01;
+							tran_force.force_char[i-2] = _bufferrx[i];
 						}
-                        for (i = 2; i < (tnum - 1); i++)
-                        {
-                            hal.uartC->write(_bufferrx[i]);	// 通过串口发送字节
-                        }
-						
+						torque = tran_force.forceX;
+//                        for (i = 2; i < (tnum - 1); i++)
+//                        {
+//                            hal.uartC->write(_bufferrx[i]);	// 通过串口发送字节
+//                        }
 						
 						tnum = 0;						
 
