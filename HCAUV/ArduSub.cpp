@@ -446,7 +446,7 @@ void Sub::receive_from_rasp(){
 					if(_bufferrx[i] == Frame_Tail2){
 						int l = 0;
 						for(l = 2;l < (i -1);i++){
-							_bufferrx[i] += 0x01;
+							_bufferrx[i] += 0x02;
 						}
 						i = 0;
 					}
@@ -490,18 +490,20 @@ void Sub::receive_from_rasp(){
 			
 		}
 	}
-	i = 0;
 //	if(hc_decode(numc)){}	
-//	hal.uartD->printf("receive_real_angle:%f\n",real_angle);
+//	hal.uartD->printf("receive_real_angle:%f\n",real																																																																																																																																																						_angle);
 
 	//处理程序
 	
 //	hc_decode(numc);
+	if(_bufferrx[0] != 0x00 && _bufferrx[1] != 0x00 && _bufferrx[6] != 0x00 && _bufferrx[7] != 0x00){
+		hal.uartD->write(_bufferrx[2]);
+		hal.uartD->write(_bufferrx[3]);																																																																																																																																																																																						
+		hal.uartD->write(_bufferrx[4]);
+		hal.uartD->write(_bufferrx[5]);
+	}
 	
-	hal.uartD->write(_bufferrx[0]);
-	hal.uartD->write(_bufferrx[1]);
-	hal.uartD->write(_bufferrx[2]);
-	hal.uartD->write(_bufferrx[3]);
+
 	
 //	while(i < numc){
 //		_bufferrx[i] = 0;
@@ -510,6 +512,10 @@ void Sub::receive_from_rasp(){
 	_bufferrx[1] = 0x00;
 	_bufferrx[2] = 0x00;
 	_bufferrx[3] = 0x00;
+	_bufferrx[4] = 0x00;
+	_bufferrx[5] = 0x00;
+	_bufferrx[6] = 0x00;
+	_bufferrx[7] = 0x00;
 
 //	hal.uartD->printf("_bufferrx is 0 ?:%d",int(_bufferrx[3]));
 	
