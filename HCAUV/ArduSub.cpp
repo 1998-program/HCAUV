@@ -446,7 +446,7 @@ void Sub::receive_from_rasp(){
 					if(_bufferrx[tnum] == Frame_Tail2){
 						int i = 0;
 						for(i = 2;i < (tnum -1);i++){
-							_bufferrx[i] += 0x02;
+							_bufferrx[i] = 0x02;
 						}
 						tnum = 0;
 					}
@@ -496,7 +496,7 @@ void Sub::receive_from_rasp(){
 	//处理程序
 	
 //	hc_decode(numc);
-	if(_bufferrx[0] != 0x00 && _bufferrx[1] != 0x00 && _bufferrx[6] != 0x00 && _bufferrx[7] != 0x00){
+	if(_bufferrx[0] != Frame_Header1 && _bufferrx[1] != Frame_Header2 && _bufferrx[6] != Frame_Tail1 && _bufferrx[7] != Frame_Tail2){
 		hal.uartD->write(_bufferrx[2]);
 		hal.uartD->write(_bufferrx[3]);																																																																																																																																																																																						
 		hal.uartD->write(_bufferrx[4]);
