@@ -454,9 +454,7 @@ void Sub::receive_from_rasp(){
                             hal.uartD->write(_bufferrx[i]);	// 通过串口发送字节
                         }
 						
-						tnum = 0;
-						hal.uartD->printf("XC");
-						
+						tnum = 0;						
 
 					}
 					else{
