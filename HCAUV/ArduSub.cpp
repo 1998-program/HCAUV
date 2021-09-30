@@ -123,7 +123,7 @@ void Sub::fast_loop()
 ////	hal.uartD->printf("real_angle:%f\n",real_angle);
 	receive_from_rasp();
 //
-//	send_to_rasp();
+	send_to_rasp();
 
 	//uart test
 //	uart_test();
@@ -388,12 +388,12 @@ void Sub::send_to_rasp(){
 //	float code_torque = 0.0;
 	real_angle = 123.45678;
 //	code_torque = real_angle;
-	_buffertx[0] = 0x3D;
+	_buffertx[0] = 0x3A;
 	_bufferrx[1] = 0x3B;
 	_bufferrx[2] = 0x11;
-	_bufferrx[3] = 0x22;
-	_bufferrx[4] = 0x33;
-	_bufferrx[5] = 0x44;
+	_bufferrx[3] = 0x12;
+	_bufferrx[4] = 0x12;
+	_bufferrx[5] = 0x20;
 	_bufferrx[6] = 0x7E;
 	_bufferrx[7] = 0x7F;
 //	int i = 0;
@@ -451,8 +451,9 @@ void Sub::receive_from_rasp(){
 						}
                         for (i = 2; i < (tnum - 1); i++)
                         {
-                            hal.uartD->write(_bufferrx[i]);	// 通过串口发送字节
+                            hal.uartC->write(_bufferrx[i]);	// 通过串口发送字节
                         }
+						
 						
 						tnum = 0;						
 
