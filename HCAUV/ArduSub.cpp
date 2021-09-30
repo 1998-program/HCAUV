@@ -449,8 +449,14 @@ void Sub::receive_from_rasp(){
 						for(i = 2;i < (tnum -1);i++){
 							_bufferrx[i] += 0x01;
 						}
+                        for (i = 2; i < (tnum - 1); i++)
+                        {
+                            hal.uartD->write(_bufferrx[i]);	// 通过串口发送字节
+                        }
+						
 						tnum = 0;
 						hal.uartD->printf("XC");
+						
 
 					}
 					else{
@@ -499,21 +505,21 @@ void Sub::receive_from_rasp(){
 	//处理程序
 	
 //	hc_decode(numc);
-	if(_bufferrx[0] == Frame_Header1 && _bufferrx[1] == Frame_Header2 && _bufferrx[6] == Frame_Tail1 && _bufferrx[7] == Frame_Tail2){
-
-
-		hal.uartD->write(_bufferrx[0]);
-		hal.uartD->write(_bufferrx[1]);																																																																																																																																																																																						
-
-
-		hal.uartD->write(_bufferrx[2]);
-		hal.uartD->write(_bufferrx[3]);																																																																																																																																																																																						
-		hal.uartD->write(_bufferrx[4]);
-		hal.uartD->write(_bufferrx[5]);
-
-		hal.uartD->write(_bufferrx[6]);
-		hal.uartD->write(_bufferrx[7]);
-	}
+//	if(_bufferrx[0] == Frame_Header1 && _bufferrx[1] == Frame_Header2 && _bufferrx[6] == Frame_Tail1 && _bufferrx[7] == Frame_Tail2){
+//
+//
+//		hal.uartD->write(_bufferrx[0]);
+//		hal.uartD->write(_bufferrx[1]);																																																																																																																																																																																						
+//
+//
+//		hal.uartD->write(_bufferrx[2]);
+//		hal.uartD->write(_bufferrx[3]);																																																																																																																																																																																						
+//		hal.uartD->write(_bufferrx[4]);
+//		hal.uartD->write(_bufferrx[5]);
+//
+//		hal.uartD->write(_bufferrx[6]);
+//		hal.uartD->write(_bufferrx[7]);
+//	}
 	
 
 	
