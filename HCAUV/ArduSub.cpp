@@ -120,12 +120,15 @@ void Sub::fast_loop()
     motors_output();
 	
 	cal_ciscrea_angle();
-////	hal.uartD->printf("real_angle:%f\n",real_angle);
+//	hal.uartC->printf("real_angle:%f\n",real_angle);
+	hal.uartC->printf("real_angle:%f\n",real_angle);
 
 	send_to_rasp();
+	hal.uartC->printf("send_to_rasp\n");
 
 	receive_from_rasp();
 //
+	hal.uartC->printf("receive_from_rasp\n");
 
 
 	//uart test
@@ -443,7 +446,7 @@ void Sub::send_to_rasp(){
 	_bufferrx[6] = 0x00;
 	_bufferrx[7] = 0x00;
 
-	hal.uartC->printf("real_angle:%f\n",real_angle);
+//	hal.uartC->printf("real_angle:%f\n",real_angle);
 
 
 }
