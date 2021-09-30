@@ -431,6 +431,7 @@ void Sub::receive_from_rasp(){
 	int16_t numc;
 
 	numc = hal.uartD->available();
+	
 //	hal.uartD->printf("numc:%d\n",numc);
 
 
@@ -446,9 +447,11 @@ void Sub::receive_from_rasp(){
 					if(_bufferrx[tnum] == Frame_Tail2){
 						int i = 0;
 						for(i = 2;i < (tnum -1);i++){
-							_bufferrx[i] = 0x02;
+							_bufferrx[i] += 0x01;
 						}
 						tnum = 0;
+						hal.uartD->printf("XC");
+
 					}
 					else{
 						f_t1_flag = 0;
@@ -496,7 +499,7 @@ void Sub::receive_from_rasp(){
 	//处理程序
 	
 //	hc_decode(numc);
-//	if(_bufferrx[0] == Frame_Header1 && _bufferrx[1] == Frame_Header2 && _bufferrx[6] == Frame_Tail1 && _bufferrx[7] == Frame_Tail2){
+	if(_bufferrx[0] == Frame_Header1 && _bufferrx[1] == Frame_Header2 && _bufferrx[6] == Frame_Tail1 && _bufferrx[7] == Frame_Tail2){
 
 
 		hal.uartD->write(_bufferrx[0]);
@@ -510,7 +513,7 @@ void Sub::receive_from_rasp(){
 
 		hal.uartD->write(_bufferrx[6]);
 		hal.uartD->write(_bufferrx[7]);
-//	}
+	}
 	
 
 	
