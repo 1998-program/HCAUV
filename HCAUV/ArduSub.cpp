@@ -373,6 +373,7 @@ void Sub::init_mod_ciscrea(){
 	X1_N_1 = 0.0;
 	X2_N_1 = 0.0;
 	torque = 0.0;
+	target_angle = 130.0;
 	f_h1_flag = 0;                          // 接收到帧头的第一个字节标志位
     f_h_flag = 0;                           // 接收到帧头标志位
     f_t1_flag = 0;                          // 接收到帧尾的第一个字节标志位
@@ -391,7 +392,8 @@ void Sub::send_to_rasp(){
 //	float code_torque = 0.0;
 //	real_angle = 456.12378;
 //	code_torque = real_angle;
-	tran_angle.angleX = real_angle;
+	float error_angle = target_angle - real_angle;
+	tran_angle.angleX = error_angle;
 	
 //	_buffertx[0] = 0x3A;
 //	_bufferrx[1] = 0x3B;
