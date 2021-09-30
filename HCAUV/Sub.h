@@ -333,6 +333,7 @@ private:
 	float X1_N;
 	float X2_N_1;
 	float X2_N;
+	float target_angle;
 	
 	AP_HAL::UARTDriver *port_D;
 	
