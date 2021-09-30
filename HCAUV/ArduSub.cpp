@@ -445,8 +445,8 @@ void Sub::receive_from_rasp(){
 				if (f_t1_flag == 1){   //有帧头，有帧尾1
 					if(_bufferrx[i] == Frame_Tail2){
 						int l = 0;
-						for(l = 2;l < (i -1);i++){
-							_bufferrx[i] += 0x02;
+						for(l = 2;l < (i -1);l++){
+							_bufferrx[l] += 0x02;
 						}
 						i = 0;
 					}
