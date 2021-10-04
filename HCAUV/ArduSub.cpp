@@ -376,7 +376,7 @@ void Sub::init_mod_ciscrea(){
 	X1_N_1 = 0.0;
 	X2_N_1 = 0.0;
 	torque = 0.0;
-	target_angle = 130.0;
+	target_angle = 5.0;
 	f_h1_flag = 0;                          // 接收到帧头的第一个字节标志位
     f_h_flag = 0;                           // 接收到帧头标志位
     f_t1_flag = 0;                          // 接收到帧尾的第一个字节标志位
