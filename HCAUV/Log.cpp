@@ -289,7 +289,7 @@ const struct LogStructure Sub::log_structure[] = {
     { LOG_DATA_FLOAT_MSG, sizeof(log_Data_Float),         
       "DFLT",  "QBf",         "TimeUS,Id,Value", "s--", "F--" },
     { LOG_HC_MSG, sizeof(log_HC),
-      "HC_ANGLE",  "Qf",      "TimeUS,Value",	  "s--", "F--"},
+      "HC_ANGLE",  "Qf",      "TimeUS,Value",	  "s-", "F-"  },
     { LOG_GUIDEDTARGET_MSG, sizeof(log_GuidedTarget),
       "GUID",  "QBffffff",    "TimeUS,Type,pX,pY,pZ,vX,vY,vZ", "s-mmmnnn", "F-000000" },
 };
