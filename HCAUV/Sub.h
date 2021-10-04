@@ -306,13 +306,13 @@ private:
 	union send
 	{
 		 float angleX;
-         char angle_char[4];
+         unsigned char angle_char[4];
 	}tran_angle;
 
 	union recive
 	{
 		 float forceX;
-         char force_char[4];
+         unsigned char force_char[4];
 	}tran_force;
 
     // Baro sensor instance index of the external water pressure sensor
@@ -328,6 +328,7 @@ private:
 	const float CIS_C[2] = {1,0};
 	const float CIS_D = 0;
 	float torque;
+	float torque_test;
 	float real_angle;
 	float X1_N_1;
 	float X1_N;

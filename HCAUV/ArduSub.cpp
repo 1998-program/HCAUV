@@ -121,7 +121,7 @@ void Sub::fast_loop()
 	
 	cal_ciscrea_angle();
 //	hal.uartC->printf("real_angle:%f\n",real_angle);
-	hal.uartC->printf("real_angle:%f\n",real_angle);
+	hal.uartC->printf("real_angle:%f\n",torque_test);
 
 	send_to_rasp();
 //	hal.uartC->printf("send_to_rasp\n");
@@ -477,7 +477,7 @@ void Sub::receive_from_rasp(){
 						for(i = 2;i < (tnum -1);i++){
 							tran_force.force_char[i-2] = _bufferrx[i];
 						}
-						torque = tran_force.forceX;
+						torque_test = tran_force.forceX;
 //                        for (i = 2; i < (tnum - 1); i++)
 //                        {
 //                            hal.uartC->write(_bufferrx[i]);	// 通过串口发送字节
