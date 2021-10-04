@@ -81,7 +81,7 @@ void Sub::Log_write_HC()
 	struct log_HC pkt ={
 		LOG_PACKET_HEADER_INIT(LOG_HC_MSG),
 		time_us : AP_HAL::micros64(),
-		HC_angle : real_angle;
+		HC_angle : real_angle
 	};
 	logger.WriteBlock(&pkt,sizeof(pkt));
 }
