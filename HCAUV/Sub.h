@@ -306,13 +306,13 @@ private:
 	union send
 	{
 		 float angleX;
-         unsigned char angle_char[4];
+         char angle_char[4];
 	}tran_angle;
 
 	union recive
 	{
 		 float forceX;
-         unsigned char force_char[4];
+         char force_char[4];
 	}tran_force;
 
     // Baro sensor instance index of the external water pressure sensor
@@ -549,6 +549,7 @@ private:
     void Log_Write_Control_Tuning();
     void Log_Write_Performance();
     void Log_Write_Attitude();
+	void Log_write_HC();
     void Log_Write_MotBatt();
     void Log_Write_Event(Log_Event id);
     void Log_Write_Data(uint8_t id, int32_t value);

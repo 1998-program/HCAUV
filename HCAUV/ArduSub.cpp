@@ -180,6 +180,11 @@ void Sub::fifty_hz_loop()
     // Update rc input/output
     rc().read_input();
     SRV_Channels::output_ch_all();
+	
+//	if (should_log(MASK_LOG_HC)) {
+//        Log_write_HC();
+//    }
+	
 }
 
 // update_batt_compass - read battery and compass
