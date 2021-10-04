@@ -549,6 +549,7 @@ private:
     void Log_Write_Control_Tuning();
     void Log_Write_Performance();
     void Log_Write_Attitude();
+	void Log_write_HC();
     void Log_Write_MotBatt();
     void Log_Write_Event(Log_Event id);
     void Log_Write_Data(uint8_t id, int32_t value);
