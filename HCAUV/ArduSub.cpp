@@ -120,8 +120,8 @@ void Sub::fast_loop()
     motors_output();
 	
 	cal_ciscrea_angle();
-//	hal.uartC->printf("real_angle:%f\n",real_angle);
-	hal.uartC->printf("real_angle:%f\n",torque_test);
+	hal.uartC->printf("real_angle:%f\n",real_angle);
+//	hal.uartC->printf("real_angle:%f\n",torque_test);
 
 	send_to_rasp();
 //	hal.uartC->printf("send_to_rasp\n");
@@ -376,7 +376,8 @@ bool Sub::control_check_barometer()
 }
 //CISCREA para init
 void Sub::init_mod_ciscrea(){
-	X1_N = ahrs.yaw_sensor;
+//	X1_N = ahrs.yaw_sensor;
+	X1_N = 0.0;
 	X2_N = 0.0;
 	X1_N_1 = 0.0;
 	X2_N_1 = 0.0;
@@ -385,6 +386,7 @@ void Sub::init_mod_ciscrea(){
 	f_h1_flag = 0;                          // 接收到帧头的第一个字节标志位
     f_h_flag = 0;                           // 接收到帧头标志位
     f_t1_flag = 0;                          // 接收到帧尾的第一个字节标志位
+    real_angle = 0.0;
     
 }
 void Sub::cal_ciscrea_angle(){
@@ -477,7 +479,7 @@ void Sub::receive_from_rasp(){
 						for(i = 2;i < (tnum -1);i++){
 							tran_force.force_char[i-2] = _bufferrx[i];
 						}
-						torque_test = tran_force.forceX;
+						torque = tran_force.forceX;
 //                        for (i = 2; i < (tnum - 1); i++)
 //                        {
 //                            hal.uartC->write(_bufferrx[i]);	// 通过串口发送字节
