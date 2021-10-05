@@ -74,16 +74,18 @@ struct PACKED log_HC
     /* data */
     LOG_PACKET_HEADER;   //日志包头
     uint64_t time_us;    //数据项
+    float HC_target_angle;
     float HC_angle;
 };
 void Sub::Log_write_HC()
 {
-//	struct log_HC pkt ={
-//		LOG_PACKET_HEADER_INIT(LOG_HC_MSG),
-//		time_us : AP_HAL::micros64(),
-//		HC_angle : real_angle
-//	};
-//	logger.WriteBlock(&pkt,sizeof(pkt));
+	struct log_HC pkt ={
+		LOG_PACKET_HEADER_INIT(LOG_HC_MSG),
+		time_us : AP_HAL::micros64(),
+		HC_target_angle : target_angle,
+		HC_angle : real_angle
+	};
+	logger.WriteBlock(&pkt,sizeof(pkt));
 }
 
 
@@ -289,7 +291,7 @@ const struct LogStructure Sub::log_structure[] = {
     { LOG_DATA_FLOAT_MSG, sizeof(log_Data_Float),         
       "DFLT",  "QBf",         "TimeUS,Id,Value", "s--", "F--" },
     { LOG_HC_MSG, sizeof(log_HC),
-      "HC_ANGLE",  "Qf",      "TimeUS,Value",	  "s-", "F-"  },
+      "HC_ANGLE",  "Qff",      "TimeUS,Value,Value",	  "s--", "F--"  },
     { LOG_GUIDEDTARGET_MSG, sizeof(log_GuidedTarget),
       "GUID",  "QBffffff",    "TimeUS,Type,pX,pY,pZ,vX,vY,vZ", "s-mmmnnn", "F-000000" },
 };

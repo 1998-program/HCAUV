@@ -181,9 +181,9 @@ void Sub::fifty_hz_loop()
     rc().read_input();
     SRV_Channels::output_ch_all();
 	
-//	if (should_log(MASK_LOG_HC)) {
-//        Log_write_HC();
-//    }
+	if (should_log(MASK_LOG_HC)) {
+        Log_write_HC();
+    }
 	
 }
 
