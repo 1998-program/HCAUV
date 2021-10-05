@@ -124,12 +124,18 @@ void Sub::fast_loop()
 
     // send outputs to the motors library
     motors_output();
-	if (control_mode != MANUAL && control_mode != MOTOR_DETECT) {
-		cal_ciscrea_angle();
-		
-		send_to_rasp();
-	
-		receive_from_rasp();
+	if (control_mode == ROBUST_TEST) {
+		if(motors.armed())
+		{
+			cal_ciscrea_angle();
+			send_to_rasp();
+			receive_from_rasp();
+		}
+		else{
+			send_to_rasp();	
+			init_disarm_ciscrea();
+		}
+
 	}
 	else{
 		send_to_rasp();	
