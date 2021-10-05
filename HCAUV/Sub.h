@@ -521,6 +521,7 @@ private:
     static const struct LogStructure log_structure[];
 
 	//ciscrea 
+	void init_disarm_ciscrea();
 	void init_mod_ciscrea();
 	void cal_ciscrea_angle();
 	void send_to_rasp();

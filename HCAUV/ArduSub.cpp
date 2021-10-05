@@ -133,6 +133,7 @@ void Sub::fast_loop()
 	}
 	else{
 		send_to_rasp();	
+		init_disarm_ciscrea();
 	}
 	
 //	hal.uartC->printf("real_angle:%f\n",real_angle);
@@ -398,8 +399,17 @@ void Sub::init_mod_ciscrea(){
 	tran_angle.angleX = 0.0;
 	tran_force.forceX = 0.0;
 	IS_ARM = 0x00;
-	
- 
+}
+
+void Sub::init_disarm_ciscrea(){
+	X1_N = 0.0;
+	X2_N = 0.0;
+	X1_N_1 = 0.0;
+	X2_N_1 = 0.0;
+	torque = 0.0;
+	tran_angle.angleX = 0.0;
+	tran_force.forceX = 0.0;
+
 }
 void Sub::cal_ciscrea_angle(){
 	X1_N_1 = CIS_A[0] * X1_N + CIS_A[1] * X2_N + 0.0;
