@@ -92,6 +92,7 @@ void Sub::setup()
 	init_mod_ciscrea();
 //	hal.uartD->printf("ciscrea_A:%f\n",CIS_A[3]);
 //	hal.uartD->printf("X1_N:%f\n",X1_N);
+	
 }
 
 void Sub::loop()
@@ -113,8 +114,12 @@ void Sub::fast_loop()
     //don't run rate controller in manual or motordetection modes
     if (control_mode != MANUAL && control_mode != MOTOR_DETECT) {
         // run low level rate controllers that only require IMU data
+        IS_ARM = 0x01;
         attitude_control.rate_controller_run();
     }
+	else{
+		IS_ARM = 0x00;
+	}
 
 
     // send outputs to the motors library
@@ -126,20 +131,16 @@ void Sub::fast_loop()
 	
 		receive_from_rasp();
 	}
+	else{
+		send_to_rasp();	
+	}
 	
 //	hal.uartC->printf("real_angle:%f\n",real_angle);
 //	hal.uartC->printf("real_angle:%f\n",torque_test);
 
-	
-//	hal.uartC->printf("send_to_rasp\n");
-
-	
-//
-//	hal.uartC->printf("receive_from_rasp\n");
-
-
-	//uart test
 //	uart_test();
+	hal.uartC->printf("real_angle:%f\n",real_angle);
+
 
     // run EKF state estimator (expensive)
     // --------------------
@@ -396,6 +397,7 @@ void Sub::init_mod_ciscrea(){
     real_angle = 0.0;
 	tran_angle.angleX = 0.0;
 	tran_force.forceX = 0.0;
+	IS_ARM = 0x00;
 	
  
 }
@@ -420,7 +422,7 @@ void Sub::send_to_rasp(){
 //	tran_angle.angleX = error_angle;
 	tran_angle.angleX = target_angle - real_angle;
 
-	hal.uartC->printf("real_angle:%f\n",real_angle);
+	
 	
 //	_buffertx[0] = 0x3A;
 //	_bufferrx[1] = 0x3B;
@@ -433,13 +435,23 @@ void Sub::send_to_rasp(){
 
 
 	_buffertx[0] = 0x3A;
-	_bufferrx[1] = 0x3B;
-	_bufferrx[2] = tran_angle.angle_char[0];
-	_bufferrx[3] = tran_angle.angle_char[1];
-	_bufferrx[4] = tran_angle.angle_char[2];
-	_bufferrx[5] = tran_angle.angle_char[3];
-	_bufferrx[6] = 0x7E;
-	_bufferrx[7] = 0x7F;
+	_buffertx[1] = 0x3B;
+	if(IS_ARM){
+		_buffertx[2] = tran_angle.angle_char[0];
+		_buffertx[3] = tran_angle.angle_char[1];
+		_buffertx[4] = tran_angle.angle_char[2];
+		_buffertx[5] = tran_angle.angle_char[3];
+	}
+	else{
+		_buffertx[2] = 0x00;
+		_buffertx[3] = 0x00;
+		_buffertx[4] = 0x00;
+		_buffertx[5] = 0x00;
+	}
+
+	_buffertx[6] = IS_ARM;
+	_buffertx[7] = 0x7E;
+	_buffertx[8] = 0x7F;
 //	hal.uartC->printf("error_angle:%f\n",error_angle);
 	
 //	int i = 0;
@@ -449,13 +461,14 @@ void Sub::send_to_rasp(){
 //		i += 1;
 //	}		
 	hal.uartD->write(_buffertx[0]);
-	hal.uartD->write(_bufferrx[1]);
-	hal.uartD->write(_bufferrx[2]);
-	hal.uartD->write(_bufferrx[3]);
-	hal.uartD->write(_bufferrx[4]);
-	hal.uartD->write(_bufferrx[5]);
-	hal.uartD->write(_bufferrx[6]);
-	hal.uartD->write(_bufferrx[7]);
+	hal.uartD->write(_buffertx[1]);
+	hal.uartD->write(_buffertx[2]);
+	hal.uartD->write(_buffertx[3]);
+	hal.uartD->write(_buffertx[4]);
+	hal.uartD->write(_buffertx[5]);
+	hal.uartD->write(_buffertx[6]);
+	hal.uartD->write(_buffertx[7]);
+	hal.uartD->write(_buffertx[8]);
 //	for(int j = 0; j < 8; j++){
 //		hal.uartD->printf("%c\n",_buffertx[i]);
 //		hal.scheduler->delay(10);
@@ -463,13 +476,14 @@ void Sub::send_to_rasp(){
 //	hal.uartD->write(const uint8_t * buffer, size_t size)
 
 	_buffertx[0] = 0x00;
-	_bufferrx[1] = 0x00;
-	_bufferrx[2] = 0x00;
-	_bufferrx[3] = 0x00;
-	_bufferrx[4] = 0x00;
-	_bufferrx[5] = 0x00;
-	_bufferrx[6] = 0x00;
-	_bufferrx[7] = 0x00;
+	_buffertx[1] = 0x00;
+	_buffertx[2] = 0x00;
+	_buffertx[3] = 0x00;
+	_buffertx[4] = 0x00;
+	_buffertx[5] = 0x00;
+	_buffertx[6] = 0x00;
+	_buffertx[7] = 0x00;
+	_buffertx[8] = 0x00;
 
 //	hal.uartC->printf("real_angle:%f\n",real_angle);
 
@@ -482,9 +496,6 @@ void Sub::receive_from_rasp(){
 	
 //	hal.uartD->printf("numc:%d\n",numc);
 
-
-
-
 	int tnum = 0;
 	if(numc){
 		while (tnum < numc){
@@ -493,6 +504,7 @@ void Sub::receive_from_rasp(){
 			if(f_h_flag == 1){     //有帧头，判断帧尾，接收消息
 				if (f_t1_flag == 1){   //有帧头，有帧尾1
 					if(_bufferrx[tnum] == Frame_Tail2){
+						
 						int i = 0;
 						for(i = 2;i < (tnum -1);i++){
 							tran_force.force_char[i-2] = _bufferrx[i];
@@ -504,7 +516,6 @@ void Sub::receive_from_rasp(){
 //                        }
 						
 						tnum = 0;						
-
 					}
 					else{
 						f_t1_flag = 0;

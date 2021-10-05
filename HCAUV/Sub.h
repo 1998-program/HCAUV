@@ -333,7 +333,7 @@ private:
 	float CIS_B[2] = {0,0.01};
 	float CIS_C[2] = {1,0};
 	float CIS_D = 0;
-	
+	char  IS_ARM;
 	
 	float torque;
 	float torque_test;
