@@ -392,6 +392,7 @@ void Sub::init_mod_ciscrea(){
 void Sub::cal_ciscrea_angle(){
 	X1_N_1 = CIS_A[0] * X1_N + CIS_A[1] * X2_N + 0.0;
 	X2_N_1 = CIS_A[2] * X1_N + CIS_A[3] * X2_N + CIS_B[1] * torque;
+	hal.uartC->printf("X1_N:%f\n",X1_N);
 	real_angle = CIS_C[0] * X1_N;
 	X1_N = X1_N_1;
 	X2_N = X2_N_1;
@@ -405,6 +406,7 @@ void Sub::send_to_rasp(){
 	float error_angle = target_angle - real_angle;
 	
 	tran_angle.angleX = error_angle;
+	hal.uartC->printf("real_angle:%f\n",real_angle);
 	hal.uartC->printf("error_angle:%f\n",error_angle);
 //	_buffertx[0] = 0x3A;
 //	_bufferrx[1] = 0x3B;
