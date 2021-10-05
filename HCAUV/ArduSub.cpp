@@ -516,7 +516,7 @@ void Sub::receive_from_rasp(){
 					if(_bufferrx[tnum] == Frame_Tail2){
 						
 						int i = 0;
-						for(i = 2;i < (tnum -1);i++){
+						for(i = 2;i < (tnum - 2);i++){
 							tran_force.force_char[i-2] = _bufferrx[i];
 						}
 						torque = tran_force.forceX;
