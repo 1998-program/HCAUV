@@ -120,7 +120,7 @@ void Sub::fast_loop()
     motors_output();
 	
 	cal_ciscrea_angle();
-	hal.uartC->printf("real_angle:%f\n",real_angle);
+//	hal.uartC->printf("real_angle:%f\n",real_angle);
 //	hal.uartC->printf("real_angle:%f\n",torque_test);
 
 	send_to_rasp();
@@ -403,8 +403,9 @@ void Sub::send_to_rasp(){
 //	real_angle = 456.12378;
 //	code_torque = real_angle;
 	float error_angle = target_angle - real_angle;
-	tran_angle.angleX = error_angle;
 	
+	tran_angle.angleX = error_angle;
+	hal.uartC->printf("error_angle:%f\n",error_angle);
 //	_buffertx[0] = 0x3A;
 //	_bufferrx[1] = 0x3B;
 //	_bufferrx[2] = 0x11;
