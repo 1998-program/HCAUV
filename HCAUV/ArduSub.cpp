@@ -390,10 +390,7 @@ void Sub::init_mod_ciscrea(){
 	tran_angle.angleX = 0.0;
 	tran_force.forceX = 0.0;
 	
-    float CIS_A[4] = {1.0,0.005,0,0.9820};
-	float CIS_B[2] = {0,0.01};
-	float CIS_C[2] = {1,0};
-	float CIS_D = 0;
+ 
 }
 void Sub::cal_ciscrea_angle(){
 	X1_N_1 = CIS_A[0] * X1_N + CIS_A[1] * X2_N + 0.0;
