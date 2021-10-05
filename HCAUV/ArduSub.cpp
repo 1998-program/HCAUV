@@ -90,8 +90,8 @@ void Sub::setup()
     // initialise the main loop scheduler
     scheduler.init(&scheduler_tasks[0], ARRAY_SIZE(scheduler_tasks), MASK_LOG_PM);
 	init_mod_ciscrea();
-	hal.uartD->printf("ciscrea_A:%f\n",CIS_A[3]);
-	hal.uartD->printf("X1_N:%f\n",X1_N);
+//	hal.uartD->printf("ciscrea_A:%f\n",CIS_A[3]);
+//	hal.uartD->printf("X1_N:%f\n",X1_N);
 }
 
 void Sub::loop()
@@ -426,7 +426,7 @@ void Sub::send_to_rasp(){
 	_bufferrx[5] = tran_angle.angle_char[3];
 	_bufferrx[6] = 0x7E;
 	_bufferrx[7] = 0x7F;
-	hal.uartC->printf("error_angle:%f\n",error_angle);
+//	hal.uartC->printf("error_angle:%f\n",error_angle);
 	
 //	int i = 0;
 //	while(i < 8){
