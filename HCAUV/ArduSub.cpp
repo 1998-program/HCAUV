@@ -114,16 +114,23 @@ void Sub::fast_loop()
     //don't run rate controller in manual or motordetection modes
     if (control_mode != MANUAL && control_mode != MOTOR_DETECT) {
         // run low level rate controllers that only require IMU data
-        IS_ARM = 0x01;
+        
         attitude_control.rate_controller_run();
     }
-	else{
-		IS_ARM = 0x00;
+
+	if (control_mode == ROBUST_TEST) {
+		if(motors.armed()){
+			IS_ARM = 0x01;
+		}
+		else{IS_ARM = 0x00;}
+
 	}
+	else IS_ARM = 0x00;
 
 
     // send outputs to the motors library
     motors_output();
+	
 	if (control_mode == ROBUST_TEST) {
 		if(motors.armed())
 		{
