@@ -387,6 +387,9 @@ void Sub::init_mod_ciscrea(){
     f_h_flag = 0;                           // 接收到帧头标志位
     f_t1_flag = 0;                          // 接收到帧尾的第一个字节标志位
     real_angle = 0.0;
+	tran_angle.angleX = 0.0;
+	tran_force.forceX = 0.0;
+	
     
 }
 void Sub::cal_ciscrea_angle(){
@@ -403,10 +406,12 @@ void Sub::send_to_rasp(){
 //	float code_torque = 0.0;
 //	real_angle = 456.12378;
 //	code_torque = real_angle;
-	float error_angle = target_angle - real_angle;
+//	float error_angle = target_angle - real_angle;
 	
-	tran_angle.angleX = error_angle;
-	hal.uartC->printf("real_angle:%f\n",real_angle);
+//	tran_angle.angleX = error_angle;
+	tran_angle.angleX = target_angle - real_angle;
+
+	hal.uartC->printf("real_angle:%f\n",tran_angle.angleX);
 	
 //	_buffertx[0] = 0x3A;
 //	_bufferrx[1] = 0x3B;
