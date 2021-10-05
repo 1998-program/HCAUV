@@ -28,6 +28,10 @@ bool Sub::set_mode(control_mode_t mode, mode_reason_t reason)
     case ALT_HOLD:
         success = althold_init();
         break;
+	
+	case ROBUST_TEST:
+		success = robust_test_init();
+		break;
 
     case AUTO:
         success = auto_init();
@@ -115,6 +119,10 @@ void Sub::update_flight_mode()
     case ALT_HOLD:
         althold_run();
         break;
+
+	case ROBUST_TEST:
+		robust_test_run();
+		break;
 
     case AUTO:
         auto_run();

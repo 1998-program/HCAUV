@@ -185,6 +185,9 @@ void Sub::handle_jsbutton_press(uint8_t button, bool shift, bool held)
     case JSButton::button_function_t::k_mode_circle:
         set_mode(CIRCLE, MODE_REASON_TX_COMMAND);
         break;
+	case JSButton::button_function_t::k_mode_robust_test:
+		set_mode(ROBUST_TEST,MODE_REASON_TX_COMMAND);
+		break;
     case JSButton::button_function_t::k_mode_acro:
         set_mode(ACRO, MODE_REASON_TX_COMMAND);
         break;

@@ -646,6 +646,8 @@ private:
     void stabilize_run();
     bool manual_init(void);
     void manual_run();
+	bool robust_test_init();
+	void robust_test_run();	
     void failsafe_sensors_check(void);
     void failsafe_crash_check();
     void failsafe_ekf_check(void);
