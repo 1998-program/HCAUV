@@ -116,17 +116,24 @@ void Sub::fast_loop()
         attitude_control.rate_controller_run();
     }
 
+
     // send outputs to the motors library
     motors_output();
+	if (control_mode != MANUAL && control_mode != MOTOR_DETECT) {
+		cal_ciscrea_angle();
+		
+		send_to_rasp();
 	
-	cal_ciscrea_angle();
+		receive_from_rasp();
+	}
+	
 //	hal.uartC->printf("real_angle:%f\n",real_angle);
 //	hal.uartC->printf("real_angle:%f\n",torque_test);
 
-	send_to_rasp();
+	
 //	hal.uartC->printf("send_to_rasp\n");
 
-	receive_from_rasp();
+	
 //
 //	hal.uartC->printf("receive_from_rasp\n");
 
