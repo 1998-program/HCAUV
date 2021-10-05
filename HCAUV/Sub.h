@@ -324,16 +324,16 @@ private:
 	float Pm;
 	float Pd;
 	//400
-    float CIS_A[4] = {1.0,0.0025,0,0.9910};
-    float CIS_B[2] = {0,0.005};
-    float CIS_C[2] = {1,0};
-    float CIS_D = 0;
+//    float CIS_A[4] = {1.0,0.0025,0,0.9910};
+//    float CIS_B[2] = {0,0.005};
+//    float CIS_C[2] = {1,0};
+//    float CIS_D = 0;
 	//200
-	float CIS_A[4];
-	float CIS_B[2];
-	float CIS_C[2];
-	float CIS_D;
-
+	float CIS_A[4] = {1.0,0.005,0,0.9820};
+	float CIS_B[2] = {0,0.01};
+	float CIS_C[2] = {1,0};
+	float CIS_D = 0;
+	
 	
 	float torque;
 	float torque_test;
