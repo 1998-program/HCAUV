@@ -79,13 +79,13 @@ struct PACKED log_HC
 };
 void Sub::Log_write_HC()
 {
-	struct log_HC pkt ={
+	struct log_HC pkt_hc ={
 		LOG_PACKET_HEADER_INIT(LOG_HC_MSG),
 		time_us : AP_HAL::micros64(),
 		HC_target_angle : target_angle,
 		HC_angle : real_angle
 	};
-	logger.WriteBlock(&pkt,sizeof(pkt));
+	logger.WriteBlock(&pkt_hc,sizeof(pkt_hc));
 }
 
 

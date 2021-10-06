@@ -185,8 +185,18 @@ void Sub::fast_loop()
     if (should_log(MASK_LOG_ANY)) {
         Log_Sensor_Health();
     }
+	if(should_log(MASK_LOG_RCIN)){
+		Log_write_HC();
+	}
 }
 
+// 200 Hz tasks
+
+//void Sub::twohundred_hz_logging(){
+//
+//
+//
+//}
 // 50 Hz tasks
 void Sub::fifty_hz_loop()
 {
@@ -202,11 +212,7 @@ void Sub::fifty_hz_loop()
     // Update rc input/output
     rc().read_input();
     SRV_Channels::output_ch_all();
-	
-	if (should_log(MASK_LOG_HC)) {
-        Log_write_HC();
-    }
-	
+		
 }
 
 // update_batt_compass - read battery and compass
