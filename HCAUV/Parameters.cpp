@@ -406,6 +406,8 @@ const AP_Param::Info Sub::var_info[] = {
     // @User: Advanced
     GSCALAR(acro_expo,  "ACRO_EXPO",    ACRO_EXPO_DEFAULT),
 
+	
+
     // variables not in the g class which contain EEPROM saved variables
 
 #if CAMERA == ENABLED
@@ -598,6 +600,8 @@ const AP_Param::Info Sub::var_info[] = {
     // @Group:
     // @Path: Parameters.cpp
     GOBJECT(g2, "",  ParametersG2),
+
+	GSCALAR(cis_heading,  "CIS_HEADING",   CIS_HEADING),
 
     AP_VAREND
 };

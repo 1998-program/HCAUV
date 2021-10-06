@@ -425,6 +425,8 @@ void Sub::init_disarm_ciscrea(){
 
 }
 void Sub::cal_ciscrea_angle(){
+	target_angle = g.cis_heading;
+	
 	X1_N_1 = CIS_A[0] * X1_N + CIS_A[1] * X2_N + 0.0;
 	X2_N_1 = CIS_A[2] * X1_N + CIS_A[3] * X2_N + CIS_B[1] * torque;
 //	hal.uartC->printf("X1_N:%f\n",X1_N);
@@ -433,6 +435,7 @@ void Sub::cal_ciscrea_angle(){
 	real_angle = CIS_C[0] * X1_N;
 	X1_N = X1_N_1;
 	X2_N = X2_N_1;
+	
 }
 
 

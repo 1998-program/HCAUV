@@ -175,6 +175,10 @@
 #define ACRO_EXPO_DEFAULT          0.3f
 #endif
 
+#ifndef CIS_HEADING
+#define CIS_HEADING            5
+#endif
+
 // AUTO Mode
 #ifndef WP_YAW_BEHAVIOR_DEFAULT
 # define WP_YAW_BEHAVIOR_DEFAULT   WP_YAW_BEHAVIOR_CORRECT_XTRACK
