@@ -130,6 +130,8 @@ void Sub::fast_loop()
 
     // send outputs to the motors library
     motors_output();
+
+    //test vscode 123
 	
 	if (control_mode == ROBUST_TEST) {
 		if(motors.armed())
