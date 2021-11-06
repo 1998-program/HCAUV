@@ -1,4 +1,4 @@
-#include "Sub.h"
+#include "HC.h"
 
 
 /*
@@ -6,7 +6,7 @@
  */
 
 // althold_init - initialise althold controller
-bool Sub::althold_init()
+bool HC::althold_init()
 {
     if(!control_check_barometer()) {
         return false;
@@ -35,7 +35,7 @@ bool Sub::althold_init()
 }
 
 
-void Sub::handle_attitude()
+void HC::handle_attitude()
 {
     uint32_t tnow = AP_HAL::millis();
 
@@ -45,7 +45,7 @@ void Sub::handle_attitude()
     float target_roll, target_pitch, target_yaw;
 
     // Check if set_attitude_target_no_gps is valid
-    if (tnow - sub.set_attitude_target_no_gps.last_message_ms < 5000) {
+    if (tnow - hc.set_attitude_target_no_gps.last_message_ms < 5000) {
         Quaternion(
             set_attitude_target_no_gps.packet.q
         ).to_euler(
@@ -89,12 +89,12 @@ void Sub::handle_attitude()
 
 // althold_run - runs the althold controller
 // should be called at 100hz or more
-void Sub::althold_run()
+void HC::althold_run()
 {
     // When unarmed, disable motors and stabilization
     if (!motors.armed()) {
         motors.set_desired_spool_state(AP_Motors::DesiredSpoolState::GROUND_IDLE);
-        // Sub vehicles do not stabilize roll/pitch/yaw when not auto-armed (i.e. on the ground, pilot has never raised throttle)
+        // HC vehicles do not stabilize roll/pitch/yaw when not auto-armed (i.e. on the ground, pilot has never raised throttle)
         attitude_control.set_throttle_out(0.5 ,true, g.throttle_filt);
         attitude_control.relax_attitude_controllers();
         pos_control.relax_alt_hold_controllers();

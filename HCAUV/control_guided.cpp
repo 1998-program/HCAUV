@@ -1,4 +1,4 @@
-#include "Sub.h"
+#include "HC.h"
 
 /*
  * Init and run calls for guided flight mode
@@ -34,7 +34,7 @@ struct Guided_Limit {
 } guided_limit;
 
 // guided_init - initialise guided controller
-bool Sub::guided_init(bool ignore_checks)
+bool HC::guided_init(bool ignore_checks)
 {
     if (!position_ok() && !ignore_checks) {
         return false;
@@ -47,7 +47,7 @@ bool Sub::guided_init(bool ignore_checks)
 }
 
 // initialise guided mode's position controller
-void Sub::guided_pos_control_start()
+void HC::guided_pos_control_start()
 {
     // set to position control mode
     guided_mode = Guided_WP;
@@ -70,7 +70,7 @@ void Sub::guided_pos_control_start()
 }
 
 // initialise guided mode's velocity controller
-void Sub::guided_vel_control_start()
+void HC::guided_vel_control_start()
 {
     // set guided_mode to velocity controller
     guided_mode = Guided_Velocity;
@@ -84,7 +84,7 @@ void Sub::guided_vel_control_start()
 }
 
 // initialise guided mode's posvel controller
-void Sub::guided_posvel_control_start()
+void HC::guided_posvel_control_start()
 {
     // set guided_mode to velocity controller
     guided_mode = Guided_PosVel;
@@ -111,7 +111,7 @@ void Sub::guided_posvel_control_start()
 }
 
 // initialise guided mode's angle controller
-void Sub::guided_angle_control_start()
+void HC::guided_angle_control_start()
 {
     // set guided_mode to velocity controller
     guided_mode = Guided_Angle;
@@ -138,7 +138,7 @@ void Sub::guided_angle_control_start()
 // guided_set_destination - sets guided mode's target destination
 // Returns true if the fence is enabled and guided waypoint is within the fence
 // else return false if the waypoint is outside the fence
-bool Sub::guided_set_destination(const Vector3f& destination)
+bool HC::guided_set_destination(const Vector3f& destination)
 {
     // ensure we are in position control mode
     if (guided_mode != Guided_WP) {
@@ -166,7 +166,7 @@ bool Sub::guided_set_destination(const Vector3f& destination)
 // sets guided mode's target from a Location object
 // returns false if destination could not be set (probably caused by missing terrain data)
 // or if the fence is enabled and guided waypoint is outside the fence
-bool Sub::guided_set_destination(const Location& dest_loc)
+bool HC::guided_set_destination(const Location& dest_loc)
 {
     // ensure we are in position control mode
     if (guided_mode != Guided_WP) {
@@ -196,7 +196,7 @@ bool Sub::guided_set_destination(const Location& dest_loc)
 }
 
 // guided_set_velocity - sets guided mode's target velocity
-void Sub::guided_set_velocity(const Vector3f& velocity)
+void HC::guided_set_velocity(const Vector3f& velocity)
 {
     // check we are in velocity control mode
     if (guided_mode != Guided_Velocity) {
@@ -210,7 +210,7 @@ void Sub::guided_set_velocity(const Vector3f& velocity)
 }
 
 // set guided mode posvel target
-bool Sub::guided_set_destination_posvel(const Vector3f& destination, const Vector3f& velocity)
+bool HC::guided_set_destination_posvel(const Vector3f& destination, const Vector3f& velocity)
 {
     // check we are in velocity control mode
     if (guided_mode != Guided_PosVel) {
@@ -239,7 +239,7 @@ bool Sub::guided_set_destination_posvel(const Vector3f& destination, const Vecto
 }
 
 // set guided mode angle target
-void Sub::guided_set_angle(const Quaternion &q, float climb_rate_cms)
+void HC::guided_set_angle(const Quaternion &q, float climb_rate_cms)
 {
     // check we are in velocity control mode
     if (guided_mode != Guided_Angle) {
@@ -258,7 +258,7 @@ void Sub::guided_set_angle(const Quaternion &q, float climb_rate_cms)
 
 // guided_run - runs the guided controller
 // should be called at 100hz or more
-void Sub::guided_run()
+void HC::guided_run()
 {
     // call the correct auto controller
     switch (guided_mode) {
@@ -287,12 +287,12 @@ void Sub::guided_run()
 
 // guided_pos_control_run - runs the guided position controller
 // called from guided_run
-void Sub::guided_pos_control_run()
+void HC::guided_pos_control_run()
 {
     // if motors not enabled set throttle to zero and exit immediately
     if (!motors.armed()) {
         motors.set_desired_spool_state(AP_Motors::DesiredSpoolState::GROUND_IDLE);
-        // Sub vehicles do not stabilize roll/pitch/yaw when disarmed
+        // HC vehicles do not stabilize roll/pitch/yaw when disarmed
         attitude_control.set_throttle_out(0,true,g.throttle_filt);
         attitude_control.relax_attitude_controllers();
         return;
@@ -336,14 +336,14 @@ void Sub::guided_pos_control_run()
 
 // guided_vel_control_run - runs the guided velocity controller
 // called from guided_run
-void Sub::guided_vel_control_run()
+void HC::guided_vel_control_run()
 {
     // ifmotors not enabled set throttle to zero and exit immediately
     if (!motors.armed()) {
         // initialise velocity controller
         pos_control.init_vel_controller_xyz();
         motors.set_desired_spool_state(AP_Motors::DesiredSpoolState::GROUND_IDLE);
-        // Sub vehicles do not stabilize roll/pitch/yaw when disarmed
+        // HC vehicles do not stabilize roll/pitch/yaw when disarmed
         attitude_control.set_throttle_out(0,true,g.throttle_filt);
         attitude_control.relax_attitude_controllers();
         return;
@@ -390,7 +390,7 @@ void Sub::guided_vel_control_run()
 
 // guided_posvel_control_run - runs the guided spline controller
 // called from guided_run
-void Sub::guided_posvel_control_run()
+void HC::guided_posvel_control_run()
 {
     // if motors not enabled set throttle to zero and exit immediately
     if (!motors.armed()) {
@@ -398,7 +398,7 @@ void Sub::guided_posvel_control_run()
         pos_control.set_pos_target(inertial_nav.get_position());
         pos_control.set_desired_velocity(Vector3f(0,0,0));
         motors.set_desired_spool_state(AP_Motors::DesiredSpoolState::GROUND_IDLE);
-        // Sub vehicles do not stabilize roll/pitch/yaw when disarmed
+        // HC vehicles do not stabilize roll/pitch/yaw when disarmed
         attitude_control.set_throttle_out(0,true,g.throttle_filt);
         attitude_control.relax_attitude_controllers();
         return;
@@ -463,12 +463,12 @@ void Sub::guided_posvel_control_run()
 
 // guided_angle_control_run - runs the guided angle controller
 // called from guided_run
-void Sub::guided_angle_control_run()
+void HC::guided_angle_control_run()
 {
     // if motors not enabled set throttle to zero and exit immediately
     if (!motors.armed()) {
         motors.set_desired_spool_state(AP_Motors::DesiredSpoolState::GROUND_IDLE);
-        // Sub vehicles do not stabilize roll/pitch/yaw when disarmed
+        // HC vehicles do not stabilize roll/pitch/yaw when disarmed
         attitude_control.set_throttle_out(0.0f,true,g.throttle_filt);
         attitude_control.relax_attitude_controllers();
         pos_control.relax_alt_hold_controllers(motors.get_throttle_hover());
@@ -514,7 +514,7 @@ void Sub::guided_angle_control_run()
 // Guided Limit code
 
 // guided_limit_clear - clear/turn off guided limits
-void Sub::guided_limit_clear()
+void HC::guided_limit_clear()
 {
     guided_limit.timeout_ms = 0;
     guided_limit.alt_min_cm = 0.0f;
@@ -523,7 +523,7 @@ void Sub::guided_limit_clear()
 }
 
 // guided_limit_set - set guided timeout and movement limits
-void Sub::guided_limit_set(uint32_t timeout_ms, float alt_min_cm, float alt_max_cm, float horiz_max_cm)
+void HC::guided_limit_set(uint32_t timeout_ms, float alt_min_cm, float alt_max_cm, float horiz_max_cm)
 {
     guided_limit.timeout_ms = timeout_ms;
     guided_limit.alt_min_cm = alt_min_cm;
@@ -533,7 +533,7 @@ void Sub::guided_limit_set(uint32_t timeout_ms, float alt_min_cm, float alt_max_
 
 // guided_limit_init_time_and_pos - initialise guided start time and position as reference for limit checking
 //  only called from AUTO mode's auto_nav_guided_start function
-void Sub::guided_limit_init_time_and_pos()
+void HC::guided_limit_init_time_and_pos()
 {
     // initialise start time
     guided_limit.start_time = AP_HAL::millis();
@@ -544,7 +544,7 @@ void Sub::guided_limit_init_time_and_pos()
 
 // guided_limit_check - returns true if guided mode has breached a limit
 //  used when guided is invoked from the NAV_GUIDED_ENABLE mission command
-bool Sub::guided_limit_check()
+bool HC::guided_limit_check()
 {
     // check if we have passed the timeout
     if ((guided_limit.timeout_ms > 0) && (AP_HAL::millis() - guided_limit.start_time >= guided_limit.timeout_ms)) {

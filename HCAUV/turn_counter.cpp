@@ -1,9 +1,9 @@
 // Code by Rustom Jehangir: rusty@bluerobotics.com
 
-#include "Sub.h"
+#include "HC.h"
 
 // Count total vehicle turns to avoid tangling tether
-void Sub::update_turn_counter()
+void HC::update_turn_counter()
 {
     // Determine state
     // 0: 0-90 deg, 1: 90-180 deg, 2: -180--90 deg, 3: -90--0 deg

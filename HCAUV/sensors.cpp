@@ -1,7 +1,7 @@
-#include "Sub.h"
+#include "HC.h"
 
 // return barometric altitude in centimeters
-void Sub::read_barometer()
+void HC::read_barometer()
 {
     barometer.update();
     // If we are reading a positive altitude, the sensor needs calibration
@@ -15,7 +15,7 @@ void Sub::read_barometer()
     }
 }
 
-void Sub::init_rangefinder()
+void HC::init_rangefinder()
 {
 #if RANGEFINDER_ENABLED == ENABLED
     rangefinder.init(ROTATION_PITCH_270);
@@ -25,7 +25,7 @@ void Sub::init_rangefinder()
 }
 
 // return rangefinder altitude in centimeters
-void Sub::read_rangefinder()
+void HC::read_rangefinder()
 {
 #if RANGEFINDER_ENABLED == ENABLED
     rangefinder.update();
@@ -65,7 +65,7 @@ void Sub::read_rangefinder()
 }
 
 // return true if rangefinder_alt can be used
-bool Sub::rangefinder_alt_ok()
+bool HC::rangefinder_alt_ok()
 {
     return (rangefinder_state.enabled && rangefinder_state.alt_healthy);
 }
@@ -74,7 +74,7 @@ bool Sub::rangefinder_alt_ok()
   update RPM sensors
  */
 #if RPM_ENABLED == ENABLED
-void Sub::rpm_update(void)
+void HC::rpm_update(void)
 {
     rpm_sensor.update();
     if (rpm_sensor.enabled(0) || rpm_sensor.enabled(1)) {
@@ -85,16 +85,8 @@ void Sub::rpm_update(void)
 }
 #endif
 
-// initialise optical flow sensor
-#if OPTFLOW == ENABLED
-void Sub::init_optflow()
-{
-    // initialise optical flow sensor
-    optflow.init(MASK_LOG_OPTFLOW);
-}
-#endif      // OPTFLOW == ENABLED
 
-void Sub::accel_cal_update()
+void HC::accel_cal_update()
 {
     if (hal.util->get_soft_armed()) {
         return;

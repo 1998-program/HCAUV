@@ -1,7 +1,7 @@
-#include "Sub.h"
+#include "HC.h"
 
 // read_inertia - read inertia in from accelerometers
-void Sub::read_inertia()
+void HC::read_inertia()
 {
     // inertial altitude estimates
     inertial_nav.update();

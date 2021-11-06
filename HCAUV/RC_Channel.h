@@ -2,7 +2,7 @@
 
 #include <RC_Channel/RC_Channel.h>
 
-class RC_Channel_Sub : public RC_Channel
+class RC_Channel_HC : public RC_Channel
 {
 
 public:
@@ -13,12 +13,12 @@ private:
 
 };
 
-class RC_Channels_Sub : public RC_Channels
+class RC_Channels_HC : public RC_Channels
 {
 public:
 
-    RC_Channel_Sub obj_channels[NUM_RC_CHANNELS];
-    RC_Channel_Sub *channel(const uint8_t chan) override {
+    RC_Channel_HC obj_channels[NUM_RC_CHANNELS];
+    RC_Channel_HC *channel(const uint8_t chan) override {
         if (chan > NUM_RC_CHANNELS) {
             return nullptr;
         }

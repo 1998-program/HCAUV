@@ -1,7 +1,7 @@
-#include "Sub.h"
+#include "HC.h"
 
 // stabilize_init - initialise stabilize controller
-bool Sub::stabilize_init()
+bool HC::stabilize_init()
 {
     // set target altitude to zero for reporting
     pos_control.set_alt_target(0);
@@ -19,7 +19,7 @@ bool Sub::stabilize_init()
 
 // stabilize_run - runs the main stabilize controller
 // should be called at 100hz or more
-void Sub::stabilize_run()
+void HC::stabilize_run()
 {
     // if not armed set throttle to zero and exit immediately
     if (!motors.armed()) {

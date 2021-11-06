@@ -1,7 +1,7 @@
-#include "Sub.h"
+#include "HC.h"
 
 
-bool Sub::surface_init()
+bool HC::surface_init()
 {
     if(!control_check_barometer()) {
         return false;
@@ -19,7 +19,7 @@ bool Sub::surface_init()
 
 }
 
-void Sub::surface_run()
+void HC::surface_run()
 {
     float target_roll, target_pitch;
     float target_yaw_rate;

@@ -12,7 +12,7 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "Sub.h"
+#include "HC.h"
 
 #define FORCE_VERSION_H_INCLUDE
 #include "version.h"
@@ -21,9 +21,9 @@
 const AP_HAL::HAL& hal = AP_HAL::get_HAL();
 
 /*
-  constructor for main Sub class
+  constructor for main HC class
  */
-Sub::Sub()
+HC::HC()
     : logger(g.log_bitmask),
           control_mode(MANUAL),
           motors(MAIN_LOOP_RATE),
@@ -50,4 +50,4 @@ Sub::Sub()
 #endif
 }
 
-Sub sub;
+HC hc;

@@ -1,13 +1,13 @@
-#include "Sub.h"
+#include "HC.h"
 
 // enable_motor_output() - enable and output lowest possible value to motors
-void Sub::enable_motor_output()
+void HC::enable_motor_output()
 {
     motors.output_min();
 }
 
 // motors_output - send output to motors library which will adjust and send to ESCs and servos
-void Sub::motors_output()
+void HC::motors_output()
 {
     // Motor detection mode controls the thrusters directly
     if (control_mode == MOTOR_DETECT){
@@ -25,7 +25,7 @@ void Sub::motors_output()
 // Initialize new style motor test
 // Perform checks to see if it is ok to begin the motor test
 // Returns true if motor test has begun
-bool Sub::init_motor_test()
+bool HC::init_motor_test()
 {
     uint32_t tnow = AP_HAL::millis();
 
@@ -58,7 +58,7 @@ bool Sub::init_motor_test()
 // The motor test will fail if the interval between received
 // MAV_CMD_DO_SET_MOTOR requests exceeds a timeout period
 // Returns true if it is ok to proceed with new style motor test
-bool Sub::verify_motor_test()
+bool HC::verify_motor_test()
 {
     bool pass = true;
 
@@ -78,7 +78,7 @@ bool Sub::verify_motor_test()
     return true;
 }
 
-bool Sub::handle_do_motor_test(mavlink_command_long_t command) {
+bool HC::handle_do_motor_test(mavlink_command_long_t command) {
     last_do_motor_test_ms = AP_HAL::millis();
 
     // If we are not already testing motors, initialize test
@@ -131,7 +131,7 @@ bool Sub::handle_do_motor_test(mavlink_command_long_t command) {
 
 
 // translate wpnav roll/pitch outputs to lateral/forward
-void Sub::translate_wpnav_rp(float &lateral_out, float &forward_out)
+void HC::translate_wpnav_rp(float &lateral_out, float &forward_out)
 {
     // get roll and pitch targets in centidegrees
     int32_t lateral = wp_nav.get_roll();
@@ -148,7 +148,7 @@ void Sub::translate_wpnav_rp(float &lateral_out, float &forward_out)
 }
 
 // translate wpnav roll/pitch outputs to lateral/forward
-void Sub::translate_circle_nav_rp(float &lateral_out, float &forward_out)
+void HC::translate_circle_nav_rp(float &lateral_out, float &forward_out)
 {
     // get roll and pitch targets in centidegrees
     int32_t lateral = circle_nav.get_roll();
@@ -164,7 +164,7 @@ void Sub::translate_circle_nav_rp(float &lateral_out, float &forward_out)
 }
 
 // translate pos_control roll/pitch outputs to lateral/forward
-void Sub::translate_pos_control_rp(float &lateral_out, float &forward_out)
+void HC::translate_pos_control_rp(float &lateral_out, float &forward_out)
 {
     // get roll and pitch targets in centidegrees
     int32_t lateral = pos_control.get_roll();

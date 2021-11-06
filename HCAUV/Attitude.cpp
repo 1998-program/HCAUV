@@ -1,8 +1,8 @@
-#include "Sub.h"
+#include "HC.h"
 
 // get_pilot_desired_angle - transform pilot's roll or pitch input into a desired lean angle
 // returns desired angle in centi-degrees
-void Sub::get_pilot_desired_lean_angles(float roll_in, float pitch_in, float &roll_out, float &pitch_out, float angle_max)
+void HC::get_pilot_desired_lean_angles(float roll_in, float pitch_in, float &roll_out, float &pitch_out, float angle_max)
 {
     // sanity check angle max parameter
     aparm.angle_max = constrain_int16(aparm.angle_max,1000,8000);
@@ -34,14 +34,14 @@ void Sub::get_pilot_desired_lean_angles(float roll_in, float pitch_in, float &ro
 // get_pilot_desired_heading - transform pilot's yaw input into a
 // desired yaw rate
 // returns desired yaw rate in centi-degrees per second
-float Sub::get_pilot_desired_yaw_rate(int16_t stick_angle)
+float HC::get_pilot_desired_yaw_rate(int16_t stick_angle)
 {
     // convert pilot input to the desired yaw rate
     return stick_angle * g.acro_yaw_p;
 }
 
 // check for ekf yaw reset and adjust target heading
-void Sub::check_ekf_yaw_reset()
+void HC::check_ekf_yaw_reset()
 {
     float yaw_angle_change_rad;
     uint32_t new_ekfYawReset_ms = ahrs.getLastYawResetAngle(yaw_angle_change_rad);
@@ -57,7 +57,7 @@ void Sub::check_ekf_yaw_reset()
 
 // get_roi_yaw - returns heading towards location held in roi_WP
 // should be called at 100hz
-float Sub::get_roi_yaw()
+float HC::get_roi_yaw()
 {
     static uint8_t roi_yaw_counter = 0;     // used to reduce update rate to 100hz
 
@@ -70,7 +70,7 @@ float Sub::get_roi_yaw()
     return yaw_look_at_WP_bearing;
 }
 
-float Sub::get_look_ahead_yaw()
+float HC::get_look_ahead_yaw()
 {
     const Vector3f& vel = inertial_nav.get_velocity();
     float speed = norm(vel.x,vel.y);
@@ -87,7 +87,7 @@ float Sub::get_look_ahead_yaw()
 
 // get_pilot_desired_climb_rate - transform pilot's throttle input to climb rate in cm/s
 // without any deadzone at the bottom
-float Sub::get_pilot_desired_climb_rate(float throttle_control)
+float HC::get_pilot_desired_climb_rate(float throttle_control)
 {
     // throttle failsafe check
     if (failsafe.pilot_input) {
@@ -125,7 +125,7 @@ float Sub::get_pilot_desired_climb_rate(float throttle_control)
 
 // get_surface_tracking_climb_rate - hold vehicle at the desired distance above the ground
 //      returns climb rate (in cm/s) which should be passed to the position controller
-float Sub::get_surface_tracking_climb_rate(int16_t target_rate, float current_alt_target, float dt)
+float HC::get_surface_tracking_climb_rate(int16_t target_rate, float current_alt_target, float dt)
 {
 #if RANGEFINDER_ENABLED == ENABLED
     static uint32_t last_call_ms = 0;
@@ -163,7 +163,7 @@ float Sub::get_surface_tracking_climb_rate(int16_t target_rate, float current_al
 }
 
 // updates position controller's maximum altitude using fence and EKF limits
-void Sub::update_poscon_alt_max()
+void HC::update_poscon_alt_max()
 {
     // minimum altitude, ie. maximum depth
     // interpreted as no limit if left as zero
@@ -186,7 +186,7 @@ void Sub::update_poscon_alt_max()
 }
 
 // rotate vector from vehicle's perspective to North-East frame
-void Sub::rotate_body_frame_to_NE(float &x, float &y)
+void HC::rotate_body_frame_to_NE(float &x, float &y)
 {
     float ne_x = x*ahrs.cos_yaw() - y*ahrs.sin_yaw();
     float ne_y = x*ahrs.sin_yaw() + y*ahrs.cos_yaw();
@@ -195,7 +195,7 @@ void Sub::rotate_body_frame_to_NE(float &x, float &y)
 }
 
 // It will return the PILOT_SPEED_DN value if non zero, otherwise if zero it returns the PILOT_SPEED_UP value.
-uint16_t Sub::get_pilot_speed_dn()
+uint16_t HC::get_pilot_speed_dn()
 {
     if (g.pilot_speed_dn == 0) {
         return abs(g.pilot_speed_up);

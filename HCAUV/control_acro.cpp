@@ -1,4 +1,4 @@
-#include "Sub.h"
+#include "HC.h"
 
 
 /*
@@ -6,7 +6,7 @@
  */
 
 // acro_init - initialise acro controller
-bool Sub::acro_init()
+bool HC::acro_init()
 {
     // set target altitude to zero for reporting
     pos_control.set_alt_target(0);
@@ -20,7 +20,7 @@ bool Sub::acro_init()
 
 // acro_run - runs the acro controller
 // should be called at 100hz or more
-void Sub::acro_run()
+void HC::acro_run()
 {
     float target_roll, target_pitch, target_yaw;
 
@@ -52,7 +52,7 @@ void Sub::acro_run()
 
 // get_pilot_desired_angle_rates - transform pilot's roll pitch and yaw input into a desired lean angle rates
 // returns desired angle rates in centi-degrees-per-second
-void Sub::get_pilot_desired_angle_rates(int16_t roll_in, int16_t pitch_in, int16_t yaw_in, float &roll_out, float &pitch_out, float &yaw_out)
+void HC::get_pilot_desired_angle_rates(int16_t roll_in, int16_t pitch_in, int16_t yaw_in, float &roll_out, float &pitch_out, float &yaw_out)
 {
     float rate_limit;
     Vector3f rate_ef_level, rate_bf_level, rate_bf_request;

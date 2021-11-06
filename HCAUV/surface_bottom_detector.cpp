@@ -1,6 +1,6 @@
 // Jacob Walser: jacob@bluerobotics.com
 
-#include "Sub.h"
+#include "HC.h"
 
 // counter to verify contact with bottom
 static uint32_t bottom_detector_count = 0;
@@ -10,7 +10,7 @@ static float current_depth = 0;
 // checks if we have have hit bottom or surface and updates the ap.at_bottom and ap.at_surface flags
 // called at MAIN_LOOP_RATE
 // ToDo: doesn't need to be called this fast
-void Sub::update_surface_and_bottom_detector()
+void HC::update_surface_and_bottom_detector()
 {
     if (!motors.armed()) { // only update when armed
         set_surfaced(false);
@@ -77,7 +77,7 @@ void Sub::update_surface_and_bottom_detector()
     }
 }
 
-void Sub::set_surfaced(bool at_surface)
+void HC::set_surfaced(bool at_surface)
 {
 
 
@@ -96,7 +96,7 @@ void Sub::set_surfaced(bool at_surface)
     }
 }
 
-void Sub::set_bottomed(bool at_bottom)
+void HC::set_bottomed(bool at_bottom)
 {
 
     if (ap.at_bottom == at_bottom) { // do nothing if state unchanged

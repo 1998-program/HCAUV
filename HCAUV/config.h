@@ -9,7 +9,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #ifndef CONFIG_HAL_BOARD
-#error CONFIG_HAL_BOARD must be defined to build ArduSub
+#error CONFIG_HAL_BOARD must be defined to build HCAUV
 #endif
 
 // run at 400Hz on all systems

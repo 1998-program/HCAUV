@@ -2,7 +2,7 @@
 
 #include <GCS_MAVLink/GCS.h>
 
-class GCS_MAVLINK_Sub : public GCS_MAVLINK {
+class GCS_MAVLINK_HC : public GCS_MAVLINK {
 
 public:
 

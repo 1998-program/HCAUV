@@ -1,4 +1,4 @@
-#include "Sub.h"
+#include "HC.h"
 #include "stdio.h"
 
 /*
@@ -45,7 +45,7 @@ namespace {
     static int16_t current_direction;
 }
 
-bool Sub::motordetect_init()
+bool HC::motordetect_init()
 {
     current_motor = 0;
     md_state = STANDBY;
@@ -53,7 +53,7 @@ bool Sub::motordetect_init()
     return true;
 }
 
-void Sub::motordetect_run()
+void HC::motordetect_run()
 {
     // if not armed set throttle to zero and exit immediately
     if (!motors.armed()) {
@@ -77,7 +77,7 @@ void Sub::motordetect_run()
         md_state = SETTLING;
         break;
 
-    // Wait until sub stays for 500ms not spinning and leveled.
+    // Wait until HC stays for 500ms not spinning and leveled.
     case SETTLING:
         // Force all motors to stop
         for (uint8_t i=0; i <AP_MOTORS_MAX_NUM_MOTORS; i++) {

@@ -1,11 +1,11 @@
-#include "Sub.h"
+#include "HC.h"
 
 #include <AP_RTC/AP_RTC.h>
 
 static enum AutoSurfaceState auto_surface_state = AUTO_SURFACE_STATE_GO_TO_LOCATION;
 
 // start_command - this function will be called when the ap_mission lib wishes to start a new command
-bool Sub::start_command(const AP_Mission::Mission_Command& cmd)
+bool HC::start_command(const AP_Mission::Mission_Command& cmd)
 {
     // To-Do: logging when new commands start/end
     if (should_log(MASK_LOG_CMD)) {
@@ -126,7 +126,7 @@ bool Sub::start_command(const AP_Mission::Mission_Command& cmd)
 
 // check to see if current command goal has been achieved
 // called by mission library in mission.update()
-bool Sub::verify_command_callback(const AP_Mission::Mission_Command& cmd)
+bool HC::verify_command_callback(const AP_Mission::Mission_Command& cmd)
 {
     if (control_mode == AUTO) {
         bool cmd_complete = verify_command(cmd);
@@ -143,7 +143,7 @@ bool Sub::verify_command_callback(const AP_Mission::Mission_Command& cmd)
 
 
 // check if current mission command has completed
-bool Sub::verify_command(const AP_Mission::Mission_Command& cmd)
+bool HC::verify_command(const AP_Mission::Mission_Command& cmd)
 {
     switch (cmd.id) {
         //
@@ -209,7 +209,7 @@ bool Sub::verify_command(const AP_Mission::Mission_Command& cmd)
 }
 
 // exit_mission - function that is called once the mission completes
-void Sub::exit_mission()
+void HC::exit_mission()
 {
     // play a tone
     AP_Notify::events.mission_complete = 1;
@@ -225,7 +225,7 @@ void Sub::exit_mission()
 /********************************************************************************/
 
 // do_nav_wp - initiate move to next waypoint
-void Sub::do_nav_wp(const AP_Mission::Mission_Command& cmd)
+void HC::do_nav_wp(const AP_Mission::Mission_Command& cmd)
 {
     Location target_loc(cmd.content.location);
     // use current lat, lon if zero
@@ -260,7 +260,7 @@ void Sub::do_nav_wp(const AP_Mission::Mission_Command& cmd)
 }
 
 // do_surface - initiate surface procedure
-void Sub::do_surface(const AP_Mission::Mission_Command& cmd)
+void HC::do_surface(const AP_Mission::Mission_Command& cmd)
 {
     Location target_location;
 
@@ -295,14 +295,14 @@ void Sub::do_surface(const AP_Mission::Mission_Command& cmd)
     auto_wp_start(target_location);
 }
 
-void Sub::do_RTL()
+void HC::do_RTL()
 {
     auto_wp_start(ahrs.get_home());
 }
 
 // do_loiter_unlimited - start loitering with no end conditions
 // note: caller should set yaw_mode
-void Sub::do_loiter_unlimited(const AP_Mission::Mission_Command& cmd)
+void HC::do_loiter_unlimited(const AP_Mission::Mission_Command& cmd)
 {
     // convert back to location
     Location target_loc(cmd.content.location);
@@ -340,7 +340,7 @@ void Sub::do_loiter_unlimited(const AP_Mission::Mission_Command& cmd)
 }
 
 // do_circle - initiate moving in a circle
-void Sub::do_circle(const AP_Mission::Mission_Command& cmd)
+void HC::do_circle(const AP_Mission::Mission_Command& cmd)
 {
     Location circle_center(cmd.content.location);
 
@@ -373,7 +373,7 @@ void Sub::do_circle(const AP_Mission::Mission_Command& cmd)
 
 // do_loiter_time - initiate loitering at a point for a given time period
 // note: caller should set yaw_mode
-void Sub::do_loiter_time(const AP_Mission::Mission_Command& cmd)
+void HC::do_loiter_time(const AP_Mission::Mission_Command& cmd)
 {
     // re-use loiter unlimited
     do_loiter_unlimited(cmd);
@@ -384,7 +384,7 @@ void Sub::do_loiter_time(const AP_Mission::Mission_Command& cmd)
 }
 
 // do_spline_wp - initiate move to next waypoint
-void Sub::do_spline_wp(const AP_Mission::Mission_Command& cmd)
+void HC::do_spline_wp(const AP_Mission::Mission_Command& cmd)
 {
     Location target_loc(cmd.content.location);
     // use current lat, lon if zero
@@ -458,7 +458,7 @@ void Sub::do_spline_wp(const AP_Mission::Mission_Command& cmd)
 
 #if NAV_GUIDED == ENABLED
 // do_nav_guided_enable - initiate accepting commands from external nav computer
-void Sub::do_nav_guided_enable(const AP_Mission::Mission_Command& cmd)
+void HC::do_nav_guided_enable(const AP_Mission::Mission_Command& cmd)
 {
     if (cmd.p1 > 0) {
         // initialise guided limits
@@ -471,7 +471,7 @@ void Sub::do_nav_guided_enable(const AP_Mission::Mission_Command& cmd)
 #endif  // NAV_GUIDED
 
 // do_nav_delay - Delay the next navigation command
-void Sub::do_nav_delay(const AP_Mission::Mission_Command& cmd)
+void HC::do_nav_delay(const AP_Mission::Mission_Command& cmd)
 {
     nav_delay_time_start_ms = AP_HAL::millis();
 
@@ -487,7 +487,7 @@ void Sub::do_nav_delay(const AP_Mission::Mission_Command& cmd)
 
 #if NAV_GUIDED == ENABLED
 // do_guided_limits - pass guided limits to guided controller
-void Sub::do_guided_limits(const AP_Mission::Mission_Command& cmd)
+void HC::do_guided_limits(const AP_Mission::Mission_Command& cmd)
 {
     guided_limit_set(cmd.p1 * 1000, // convert seconds to ms
                      cmd.content.guided_limits.alt_min * 100.0f,    // convert meters to cm
@@ -501,7 +501,7 @@ void Sub::do_guided_limits(const AP_Mission::Mission_Command& cmd)
 /********************************************************************************/
 
 // verify_nav_wp - check if we have reached the next way point
-bool Sub::verify_nav_wp(const AP_Mission::Mission_Command& cmd)
+bool HC::verify_nav_wp(const AP_Mission::Mission_Command& cmd)
 {
     // check if we have reached the waypoint
     if (!wp_nav.reached_wp_destination()) {
@@ -526,7 +526,7 @@ bool Sub::verify_nav_wp(const AP_Mission::Mission_Command& cmd)
 }
 
 // verify_surface - returns true if surface procedure has been completed
-bool Sub::verify_surface(const AP_Mission::Mission_Command& cmd)
+bool HC::verify_surface(const AP_Mission::Mission_Command& cmd)
 {
     bool retval = false;
 
@@ -562,17 +562,17 @@ bool Sub::verify_surface(const AP_Mission::Mission_Command& cmd)
     return retval;
 }
 
-bool Sub::verify_RTL() {
+bool HC::verify_RTL() {
     return wp_nav.reached_wp_destination();
 }
 
-bool Sub::verify_loiter_unlimited()
+bool HC::verify_loiter_unlimited()
 {
     return false;
 }
 
 // verify_loiter_time - check if we have loitered long enough
-bool Sub::verify_loiter_time()
+bool HC::verify_loiter_time()
 {
     // return immediately if we haven't reached our destination
     if (!wp_nav.reached_wp_destination()) {
@@ -589,7 +589,7 @@ bool Sub::verify_loiter_time()
 }
 
 // verify_circle - check if we have circled the point enough
-bool Sub::verify_circle(const AP_Mission::Mission_Command& cmd)
+bool HC::verify_circle(const AP_Mission::Mission_Command& cmd)
 {
     // check if we've reached the edge
     if (auto_mode == Auto_CircleMoveToEdge) {
@@ -619,7 +619,7 @@ bool Sub::verify_circle(const AP_Mission::Mission_Command& cmd)
 }
 
 // verify_spline_wp - check if we have reached the next way point using spline
-bool Sub::verify_spline_wp(const AP_Mission::Mission_Command& cmd)
+bool HC::verify_spline_wp(const AP_Mission::Mission_Command& cmd)
 {
     // check if we have reached the waypoint
     if (!wp_nav.reached_wp_destination()) {
@@ -642,7 +642,7 @@ bool Sub::verify_spline_wp(const AP_Mission::Mission_Command& cmd)
 
 #if NAV_GUIDED == ENABLED
 // verify_nav_guided - check if we have breached any limits
-bool Sub::verify_nav_guided_enable(const AP_Mission::Mission_Command& cmd)
+bool HC::verify_nav_guided_enable(const AP_Mission::Mission_Command& cmd)
 {
     // if disabling guided mode then immediately return true so we move to next command
     if (cmd.p1 == 0) {
@@ -655,7 +655,7 @@ bool Sub::verify_nav_guided_enable(const AP_Mission::Mission_Command& cmd)
 #endif  // NAV_GUIDED
 
 // verify_nav_delay - check if we have waited long enough
-bool Sub::verify_nav_delay(const AP_Mission::Mission_Command& cmd)
+bool HC::verify_nav_delay(const AP_Mission::Mission_Command& cmd)
 {
     if (AP_HAL::millis() - nav_delay_time_start_ms > nav_delay_time_max_ms) {
         nav_delay_time_max_ms = 0;
@@ -668,18 +668,18 @@ bool Sub::verify_nav_delay(const AP_Mission::Mission_Command& cmd)
 //  Condition (May) commands
 /********************************************************************************/
 
-void Sub::do_wait_delay(const AP_Mission::Mission_Command& cmd)
+void HC::do_wait_delay(const AP_Mission::Mission_Command& cmd)
 {
     condition_start = AP_HAL::millis();
     condition_value = cmd.content.delay.seconds * 1000;     // convert seconds to milliseconds
 }
 
-void Sub::do_within_distance(const AP_Mission::Mission_Command& cmd)
+void HC::do_within_distance(const AP_Mission::Mission_Command& cmd)
 {
     condition_value  = cmd.content.distance.meters * 100;
 }
 
-void Sub::do_yaw(const AP_Mission::Mission_Command& cmd)
+void HC::do_yaw(const AP_Mission::Mission_Command& cmd)
 {
     set_auto_yaw_look_at_heading(
         cmd.content.yaw.angle_deg,
@@ -693,7 +693,7 @@ void Sub::do_yaw(const AP_Mission::Mission_Command& cmd)
 // Verify Condition (May) commands
 /********************************************************************************/
 
-bool Sub::verify_wait_delay()
+bool HC::verify_wait_delay()
 {
     if (AP_HAL::millis() - condition_start > (uint32_t)MAX(condition_value, 0)) {
         condition_value = 0;
@@ -702,7 +702,7 @@ bool Sub::verify_wait_delay()
     return false;
 }
 
-bool Sub::verify_within_distance()
+bool HC::verify_within_distance()
 {
     if (wp_nav.get_wp_distance_to_destination() < (uint32_t)MAX(condition_value,0)) {
         condition_value = 0;
@@ -712,7 +712,7 @@ bool Sub::verify_within_distance()
 }
 
 // verify_yaw - return true if we have reached the desired heading
-bool Sub::verify_yaw()
+bool HC::verify_yaw()
 {
     // set yaw mode if it has been changed (the waypoint controller often retakes control of yaw as it executes a new waypoint command)
     if (auto_yaw_mode != AUTO_YAW_LOOK_AT_HEADING) {
@@ -728,7 +728,7 @@ bool Sub::verify_yaw()
 /********************************************************************************/
 
 // do_guided - start guided mode
-bool Sub::do_guided(const AP_Mission::Mission_Command& cmd)
+bool HC::do_guided(const AP_Mission::Mission_Command& cmd)
 {
     // only process guided waypoint if we are in guided mode
     if (control_mode != GUIDED && !(control_mode == AUTO && auto_mode == Auto_NavGuided)) {
@@ -755,14 +755,14 @@ bool Sub::do_guided(const AP_Mission::Mission_Command& cmd)
     return true;
 }
 
-void Sub::do_change_speed(const AP_Mission::Mission_Command& cmd)
+void HC::do_change_speed(const AP_Mission::Mission_Command& cmd)
 {
     if (cmd.content.speed.target_ms > 0) {
         wp_nav.set_speed_xy(cmd.content.speed.target_ms * 100.0f);
     }
 }
 
-void Sub::do_set_home(const AP_Mission::Mission_Command& cmd)
+void HC::do_set_home(const AP_Mission::Mission_Command& cmd)
 {
     if (cmd.p1 == 1 || (cmd.content.location.lat == 0 && cmd.content.location.lng == 0 && cmd.content.location.alt == 0)) {
         if (!set_home_to_current_location(false)) {
@@ -781,13 +781,13 @@ void Sub::do_set_home(const AP_Mission::Mission_Command& cmd)
 //          this involves either moving the camera to point at the ROI (region of interest)
 //          and possibly rotating the vehicle to point at the ROI if our mount type does not support a yaw feature
 //  TO-DO: add support for other features of MAV_CMD_DO_SET_ROI including pointing at a given waypoint
-void Sub::do_roi(const AP_Mission::Mission_Command& cmd)
+void HC::do_roi(const AP_Mission::Mission_Command& cmd)
 {
     set_auto_yaw_roi(cmd.content.location);
 }
 
 // point the camera to a specified angle
-void Sub::do_mount_control(const AP_Mission::Mission_Command& cmd)
+void HC::do_mount_control(const AP_Mission::Mission_Command& cmd)
 {
 #if MOUNT == ENABLED
     camera_mount.set_angle_targets(cmd.content.mount_control.roll, cmd.content.mount_control.pitch, cmd.content.mount_control.yaw);

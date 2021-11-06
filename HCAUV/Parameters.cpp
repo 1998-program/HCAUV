@@ -1,4 +1,4 @@
-#include "Sub.h"
+#include "HC.h"
 
 /*
    This program is free software: you can redistribute it and/or modify
@@ -16,17 +16,17 @@
  */
 
 /*
- *  ArduSub parameter definitions
+ *  HCAUV parameter definitions
  *
  */
 
-#define GSCALAR(v, name, def) { sub.g.v.vtype, name, Parameters::k_param_ ## v, &sub.g.v, {def_value : def} }
-#define ASCALAR(v, name, def) { sub.aparm.v.vtype, name, Parameters::k_param_ ## v, (const void *)&sub.aparm.v, {def_value : def} }
-#define GGROUP(v, name, class) { AP_PARAM_GROUP, name, Parameters::k_param_ ## v, &sub.g.v, {group_info : class::var_info} }
-#define GOBJECT(v, name, class) { AP_PARAM_GROUP, name, Parameters::k_param_ ## v, (const void *)&sub.v, {group_info : class::var_info} }
-#define GOBJECTN(v, pname, name, class) { AP_PARAM_GROUP, name, Parameters::k_param_ ## pname, (const void *)&sub.v, {group_info : class::var_info} }
+#define GSCALAR(v, name, def) { hc.g.v.vtype, name, Parameters::k_param_ ## v, &hc.g.v, {def_value : def} }
+#define ASCALAR(v, name, def) { hc.aparm.v.vtype, name, Parameters::k_param_ ## v, (const void *)&hc.aparm.v, {def_value : def} }
+#define GGROUP(v, name, class) { AP_PARAM_GROUP, name, Parameters::k_param_ ## v, &hc.g.v, {group_info : class::var_info} }
+#define GOBJECT(v, name, class) { AP_PARAM_GROUP, name, Parameters::k_param_ ## v, (const void *)&hc.v, {group_info : class::var_info} }
+#define GOBJECTN(v, pname, name, class) { AP_PARAM_GROUP, name, Parameters::k_param_ ## pname, (const void *)&hc.v, {group_info : class::var_info} }
 
-const AP_Param::Info Sub::var_info[] = {
+const AP_Param::Info HC::var_info[] = {
 
     // @Param: SURFACE_DEPTH
     // @DisplayName: Depth reading at surface
@@ -80,7 +80,7 @@ const AP_Param::Info Sub::var_info[] = {
 #if RANGEFINDER_ENABLED == ENABLED
     // @Param: RNGFND_GAIN
     // @DisplayName: Rangefinder gain
-    // @Description: Used to adjust the speed with which the target altitude is changed when objects are sensed below the sub
+    // @Description: Used to adjust the speed with which the target altitude is changed when objects are sensed below the hc
     // @Range: 0.01 2.0
     // @Increment: 0.01
     // @User: Standard
@@ -486,7 +486,7 @@ const AP_Param::Info Sub::var_info[] = {
 
     // @Group: ARMING_
     // @Path: AP_Arming_Sub.cpp,../libraries/AP_Arming/AP_Arming.cpp
-    GOBJECT(arming, "ARMING_", AP_Arming_Sub),
+    GOBJECT(arming, "ARMING_", AP_Arming_HC),
 
     // @Group: BRD_
     // @Path: ../libraries/AP_BoardConfig/AP_BoardConfig.cpp
@@ -645,7 +645,7 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
  */
 ParametersG2::ParametersG2()
 #if PROXIMITY_ENABLED == ENABLED
-    : proximity(sub.serial_manager)
+    : proximity(hc.serial_manager)
 #endif
 {
     AP_Param::setup_object_defaults(this, var_info);
@@ -659,7 +659,7 @@ const AP_Param::ConversionInfo conversion_table[] = {
     { Parameters::k_param_arming,            2,     AP_PARAM_INT16,  "ARMING_CHECK" },
 };
 
-void Sub::load_parameters()
+void HC::load_parameters()
 {
     if (!AP_Param::check_var_info()) {
         hal.console->printf("Bad var table\n");
@@ -709,7 +709,7 @@ void Sub::load_parameters()
     AP_Param::set_by_name("MNT_RC_IN_TILT", 8);
 }
 
-void Sub::convert_old_parameters()
+void HC::convert_old_parameters()
 {
     // attitude control filter parameter changes from _FILT to FLTE or FLTD
     const AP_Param::ConversionInfo filt_conversion_info[] = {

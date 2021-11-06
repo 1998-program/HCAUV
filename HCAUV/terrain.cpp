@@ -1,7 +1,7 @@
-#include "Sub.h"
+#include "HC.h"
 
 // update terrain data
-void Sub::terrain_update()
+void HC::terrain_update()
 {
 #if AP_TERRAIN_AVAILABLE && AC_TERRAIN
     terrain.update();
@@ -18,7 +18,7 @@ void Sub::terrain_update()
 }
 
 // log terrain data - should be called at 1hz
-void Sub::terrain_logging()
+void HC::terrain_logging()
 {
 #if AP_TERRAIN_AVAILABLE && AC_TERRAIN
     if (should_log(MASK_LOG_GPS)) {
@@ -28,7 +28,7 @@ void Sub::terrain_logging()
 }
 
 // should we use terrain data for things including the home altitude
-bool Sub::terrain_use()
+bool HC::terrain_use()
 {
 #if AP_TERRAIN_AVAILABLE && AC_TERRAIN
     return (g.terrain_follow > 0);

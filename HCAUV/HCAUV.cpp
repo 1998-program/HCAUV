@@ -13,52 +13,49 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// ArduSub scheduling, originally copied from ArduCopter
+// HCAUV scheduling, originally copied from ArduCopter
 
-#include "Sub.h"
+#include "HC.h"
 
-#define SCHED_TASK(func, rate_hz, max_time_micros) SCHED_TASK_CLASS(Sub, &sub, func, rate_hz, max_time_micros)
+#define SCHED_TASK(func, rate_hz, max_time_micros) SCHED_TASK_CLASS(HC, &hc, func, rate_hz, max_time_micros)
 
 /*
   scheduler table for fast CPUs - all regular tasks apart from the fast_loop()
   should be listed here, along with how often they should be called (in hz)
   and the maximum time they are expected to take (in microseconds)
  */
-const AP_Scheduler::Task Sub::scheduler_tasks[] = {
+const AP_Scheduler::Task HC::scheduler_tasks[] = {
     SCHED_TASK(fifty_hz_loop,         50,     75),
     SCHED_TASK(update_GPS,            50,    200),
-#if OPTFLOW == ENABLED
-    SCHED_TASK_CLASS(OpticalFlow,          &sub.optflow,             update,         200, 160),
-#endif
     SCHED_TASK(update_batt_compass,   10,    120),
     SCHED_TASK(read_rangefinder,      20,    100),
     SCHED_TASK(update_altitude,       10,    100),
     SCHED_TASK(three_hz_loop,          3,     75),
     SCHED_TASK(update_turn_counter,   10,     50),
-    SCHED_TASK_CLASS(AP_Baro,             &sub.barometer,    accumulate,          50,  90),
-    SCHED_TASK_CLASS(AP_Notify,           &sub.notify,       update,              50,  90),
+    SCHED_TASK_CLASS(AP_Baro,             &hc.barometer,    accumulate,          50,  90),
+    SCHED_TASK_CLASS(AP_Notify,           &hc.notify,       update,              50,  90),
     SCHED_TASK(one_hz_loop,            1,    100),
-    SCHED_TASK_CLASS(GCS,                 (GCS*)&sub._gcs,   update_receive,     400, 180),
-    SCHED_TASK_CLASS(GCS,                 (GCS*)&sub._gcs,   update_send,        400, 550),
+    SCHED_TASK_CLASS(GCS,                 (GCS*)&hc._gcs,   update_receive,     400, 180),
+    SCHED_TASK_CLASS(GCS,                 (GCS*)&hc._gcs,   update_send,        400, 550),
 #if MOUNT == ENABLED
-    SCHED_TASK_CLASS(AP_Mount,            &sub.camera_mount, update,              50,  75),
+    SCHED_TASK_CLASS(AP_Mount,            &hc.camera_mount, update,              50,  75),
 #endif
 #if CAMERA == ENABLED
-    SCHED_TASK_CLASS(AP_Camera,           &sub.camera,       update_trigger,      50,  75),
+    SCHED_TASK_CLASS(AP_Camera,           &hc.camera,       update_trigger,      50,  75),
 #endif
     SCHED_TASK(ten_hz_logging_loop,   10,    350),
     SCHED_TASK(twentyfive_hz_logging, 25,    110),
-    SCHED_TASK_CLASS(AP_Logger,     &sub.logger,    periodic_tasks,     400, 300),
-    SCHED_TASK_CLASS(AP_InertialSensor,   &sub.ins,          periodic,           400,  50),
-    SCHED_TASK_CLASS(AP_Scheduler,        &sub.scheduler,    update_logging,     0.1,  75),
+    SCHED_TASK_CLASS(AP_Logger,     &hc.logger,    periodic_tasks,     400, 300),
+    SCHED_TASK_CLASS(AP_InertialSensor,   &hc.ins,          periodic,           400,  50),
+    SCHED_TASK_CLASS(AP_Scheduler,        &hc.scheduler,    update_logging,     0.1,  75),
 #if RPM_ENABLED == ENABLED
     SCHED_TASK(rpm_update,            10,    200),
 #endif
-    SCHED_TASK_CLASS(Compass,          &sub.compass,              cal_update, 100, 100),
+    SCHED_TASK_CLASS(Compass,          &hc.compass,              cal_update, 100, 100),
     SCHED_TASK(accel_cal_update,      10,    100),
     SCHED_TASK(terrain_update,        10,    100),
 #if GRIPPER_ENABLED == ENABLED
-    SCHED_TASK_CLASS(AP_Gripper,          &sub.g2.gripper,       update,              10,  75),
+    SCHED_TASK_CLASS(AP_Gripper,          &hc.g2.gripper,       update,              10,  75),
 #endif
 #ifdef USERHOOK_FASTLOOP
     SCHED_TASK(userhook_FastLoop,    100,     75),
@@ -77,15 +74,15 @@ const AP_Scheduler::Task Sub::scheduler_tasks[] = {
 #endif
 };
 
-constexpr int8_t Sub::_failsafe_priorities[5];
+constexpr int8_t HC::_failsafe_priorities[5];
 
-void Sub::setup()
+void HC::setup()
 {
     // Load the default values of variables listed in var_info[]s
     AP_Param::setup_sketch_defaults();
 
     init_ardupilot();
-//    hal.uartD->printf("Sub::setup");
+//    hal.uartD->printf("HC::setup");
 
     // initialise the main loop scheduler
     scheduler.init(&scheduler_tasks[0], ARRAY_SIZE(scheduler_tasks), MASK_LOG_PM);
@@ -95,7 +92,7 @@ void Sub::setup()
 	
 }
 
-void Sub::loop()
+void HC::loop()
 {
 	//loop运行起来 如何调度？
     scheduler.loop();
@@ -106,7 +103,7 @@ void Sub::loop()
 
 
 // Main loop - 400hz
-void Sub::fast_loop()
+void HC::fast_loop()
 {
     // update INS immediately to get current gyro data populated
     ins.update();
@@ -194,13 +191,13 @@ void Sub::fast_loop()
 
 // 200 Hz tasks
 
-//void Sub::twohundred_hz_logging(){
+//void HC::twohundred_hz_logging(){
 //
 //
 //
 //}
 // 50 Hz tasks
-void Sub::fifty_hz_loop()
+void HC::fifty_hz_loop()
 {
     // check pilot input failsafe
     failsafe_pilot_input_check();
@@ -219,7 +216,7 @@ void Sub::fifty_hz_loop()
 
 // update_batt_compass - read battery and compass
 // should be called at 10hz
-void Sub::update_batt_compass()
+void HC::update_batt_compass()
 {
     // read battery before compass because it may be used for motor interference compensation
     battery.read();
@@ -233,7 +230,7 @@ void Sub::update_batt_compass()
 
 // ten_hz_logging_loop
 // should be run at 10hz
-void Sub::ten_hz_logging_loop()
+void HC::ten_hz_logging_loop()
 {
     // log attitude data if we're not already logging at the higher rate
     if (should_log(MASK_LOG_ATTITUDE_MED) && !should_log(MASK_LOG_ATTITUDE_FAST)) {
@@ -268,7 +265,7 @@ void Sub::ten_hz_logging_loop()
 
 // twentyfive_hz_logging_loop
 // should be run at 25hz
-void Sub::twentyfive_hz_logging()
+void HC::twentyfive_hz_logging()
 {
     if (should_log(MASK_LOG_ATTITUDE_FAST)) {
         Log_Write_Attitude();
@@ -288,7 +285,7 @@ void Sub::twentyfive_hz_logging()
 }
 
 // three_hz_loop - 3.3hz loop
-void Sub::three_hz_loop()
+void HC::three_hz_loop()
 {
     leak_detector.update();
 
@@ -313,7 +310,7 @@ void Sub::three_hz_loop()
 }
 
 // one_hz_loop - runs at 1Hz
-void Sub::one_hz_loop()
+void HC::one_hz_loop()
 {
     bool arm_check = arming.pre_arm_checks(false);
     ap.pre_arm_check = arm_check;
@@ -348,7 +345,7 @@ void Sub::one_hz_loop()
 }
 
 // called at 50hz
-void Sub::update_GPS()
+void HC::update_GPS()
 {
     static uint32_t last_gps_reading[GPS_MAX_INSTANCES];   // time of last gps message
     bool gps_updated = false;
@@ -371,7 +368,7 @@ void Sub::update_GPS()
     }
 }
 
-void Sub::read_AHRS()
+void HC::read_AHRS()
 {
     // Perform IMU calculations and get attitude info
     //-----------------------------------------------
@@ -381,7 +378,7 @@ void Sub::read_AHRS()
 }
 
 // read baro and rangefinder altitude at 10hz
-void Sub::update_altitude()
+void HC::update_altitude()
 {
     // read in baro altitude
     read_barometer();
@@ -391,7 +388,7 @@ void Sub::update_altitude()
     }
 }
 
-bool Sub::control_check_barometer()
+bool HC::control_check_barometer()
 {
 #if CONFIG_HAL_BOARD != HAL_BOARD_SITL
     if (!ap.depth_sensor_present) { // can't hold depth without a depth sensor
@@ -405,7 +402,7 @@ bool Sub::control_check_barometer()
     return true;
 }
 //CISCREA para init
-void Sub::init_mod_ciscrea(){
+void HC::init_mod_ciscrea(){
 //	X1_N = ahrs.yaw_sensor;
 	X1_N = 0.0;
 	X2_N = 0.0;
@@ -422,7 +419,7 @@ void Sub::init_mod_ciscrea(){
 	IS_ARM = 0x00;
 }
 
-void Sub::init_disarm_ciscrea(){
+void HC::init_disarm_ciscrea(){
 	X1_N = 0.0;
 	X2_N = 0.0;
 	X1_N_1 = 0.0;
@@ -432,7 +429,7 @@ void Sub::init_disarm_ciscrea(){
 	tran_force.forceX = 0.0;
 
 }
-void Sub::cal_ciscrea_angle(){
+void HC::cal_ciscrea_angle(){
 	target_angle = g.cis_heading;
 	
 	X1_N_1 = CIS_A[0] * X1_N + CIS_A[1] * X2_N + 0.0;
@@ -447,7 +444,7 @@ void Sub::cal_ciscrea_angle(){
 }
 
 
-void Sub::send_to_rasp(){
+void HC::send_to_rasp(){
 //	float code_torque = 0.0;
 //	real_angle = 456.12378;
 //	code_torque = real_angle;
@@ -523,7 +520,7 @@ void Sub::send_to_rasp(){
 
 
 }
-void Sub::receive_from_rasp(){
+void HC::receive_from_rasp(){
 	int16_t numc;
 
 	numc = hal.uartD->available();
@@ -632,11 +629,11 @@ void Sub::receive_from_rasp(){
 
 }
 
-void Sub::uart_test(){
+void HC::uart_test(){
 //	hal.uartD->printf("123");
 }
 
-void Sub::hc_code(){
+void HC::hc_code(){
 //	float code_torque = 0.0;
 //	_buffertx[0] = '$'; //head
 //	_buffertx[1] = '4'; //LEN
@@ -648,14 +645,14 @@ void Sub::hc_code(){
 //	_bufferrx[7] = '*';
 }
 
-//void Sub::hc_decode(int16_t numc){
+//void HC::hc_decode(int16_t numc){
 //	if(numc > 0){
 //		_bufferrx[tnum] == 
 //	}	
 //
 //}
 
-//bool Sub::hc_decode(int16_t numc){
+//bool HC::hc_decode(int16_t numc){
 //	uint8_t len = 0;
 //	uint8_t ID;
 //	bool flag = false;
@@ -699,4 +696,4 @@ void Sub::hc_code(){
 
 
 
-AP_HAL_MAIN_CALLBACKS(&sub);
+AP_HAL_MAIN_CALLBACKS(&hc);

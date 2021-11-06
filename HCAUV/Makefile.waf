@@ -1,2 +1,2 @@
 all:
-	@$(MAKE) -C ../ -f Makefile.waf sub
+	@$(MAKE) -C ../ -f Makefile.waf hc

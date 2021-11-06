@@ -1,4 +1,4 @@
-#include "Sub.h"
+#include "HC.h"
 
 // position_vector.pde related utility functions
 
@@ -8,7 +8,7 @@
 //    .z = altitude above home in cm
 
 // pv_location_to_vector - convert lat/lon coordinates to a position vector
-Vector3f Sub::pv_location_to_vector(const Location& loc)
+Vector3f HC::pv_location_to_vector(const Location& loc)
 {
     Location origin;
     if (!ahrs.get_origin(origin)) {
@@ -19,7 +19,7 @@ Vector3f Sub::pv_location_to_vector(const Location& loc)
 }
 
 // pv_alt_above_origin - convert altitude above home to altitude above EKF origin
-float Sub::pv_alt_above_origin(float alt_above_home_cm)
+float HC::pv_alt_above_origin(float alt_above_home_cm)
 {
     Location origin;
     if (!ahrs.get_origin(origin)) {

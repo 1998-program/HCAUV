@@ -172,7 +172,7 @@ public:
         k_param_failsafe_pilot_input_timeout,
 
 
-        // Misc Sub settings
+        // Misc hc settings
         k_param_log_bitmask = 165,
         k_param_angle_max = 167,
         k_param_rangefinder_gain,
@@ -332,7 +332,7 @@ public:
 #endif
 
     // RC input channels
-    RC_Channels_Sub rc_channels;
+    RC_Channels_HC rc_channels;
 
     // control over servo output ranges
     SRV_Channels servo_channels;

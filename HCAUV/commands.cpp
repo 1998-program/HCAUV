@@ -1,7 +1,7 @@
-#include "Sub.h"
+#include "HC.h"
 
 // checks if we should update ahrs/RTL home position from the EKF
-void Sub::update_home_from_EKF()
+void HC::update_home_from_EKF()
 {
     // exit immediately if home already set
     if (ahrs.home_is_set()) {
@@ -20,7 +20,7 @@ void Sub::update_home_from_EKF()
 }
 
 // set_home_to_current_location_inflight - set home to current GPS location (horizontally) and EKF origin vertically
-void Sub::set_home_to_current_location_inflight()
+void HC::set_home_to_current_location_inflight()
 {
     // get current location from EKF
     Location temp_loc;
@@ -34,7 +34,7 @@ void Sub::set_home_to_current_location_inflight()
 }
 
 // set_home_to_current_location - set home to current GPS location
-bool Sub::set_home_to_current_location(bool lock)
+bool HC::set_home_to_current_location(bool lock)
 {
     // get current location from EKF
     Location temp_loc;
@@ -53,7 +53,7 @@ bool Sub::set_home_to_current_location(bool lock)
 // set_home - sets ahrs home (used for RTL) to specified location
 //  initialises inertial nav and compass on first call
 //  returns true if home location set successfully
-bool Sub::set_home(const Location& loc, bool lock)
+bool HC::set_home(const Location& loc, bool lock)
 {
     // check if EKF origin has been set
     Location ekf_origin;
@@ -95,7 +95,7 @@ bool Sub::set_home(const Location& loc, bool lock)
 
 // far_from_EKF_origin - checks if a location is too far from the EKF origin
 //  returns true if too far
-bool Sub::far_from_EKF_origin(const Location& loc)
+bool HC::far_from_EKF_origin(const Location& loc)
 {
     // check distance to EKF origin
     Location ekf_origin;

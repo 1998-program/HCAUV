@@ -1,11 +1,11 @@
-#include "Sub.h"
+#include "HC.h"
 
 /*
  * control_circle.pde - init and run calls for circle flight mode
  */
 
 // circle_init - initialise circle controller flight mode
-bool Sub::circle_init()
+bool HC::circle_init()
 {
     if (!position_ok()) {
         return false;
@@ -27,7 +27,7 @@ bool Sub::circle_init()
 
 // circle_run - runs the circle flight mode
 // should be called at 100hz or more
-void Sub::circle_run()
+void HC::circle_run()
 {
     float target_yaw_rate = 0;
     float target_climb_rate = 0;
@@ -42,7 +42,7 @@ void Sub::circle_run()
     if (!motors.armed()) {
         // To-Do: add some initialisation of position controllers
         motors.set_desired_spool_state(AP_Motors::DesiredSpoolState::GROUND_IDLE);
-        // Sub vehicles do not stabilize roll/pitch/yaw when disarmed
+        // HC vehicles do not stabilize roll/pitch/yaw when disarmed
         attitude_control.set_throttle_out(0,true,g.throttle_filt);
         attitude_control.relax_attitude_controllers();
         pos_control.set_alt_target_to_current_alt();

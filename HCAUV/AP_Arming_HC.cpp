@@ -1,23 +1,23 @@
-#include "AP_Arming_Sub.h"
-#include "Sub.h"
+#include "AP_Arming_HC.h"
+#include "HC.h"
 
-bool AP_Arming_Sub::rc_calibration_checks(bool display_failure)
+bool AP_Arming_HC::rc_calibration_checks(bool display_failure)
 {
     const RC_Channel *channels[] = {
-        sub.channel_roll,
-        sub.channel_pitch,
-        sub.channel_throttle,
-        sub.channel_yaw
+        hc.channel_roll,
+        hc.channel_pitch,
+        hc.channel_throttle,
+        hc.channel_yaw
     };
     return rc_checks_copter_sub(display_failure, channels);
 }
 
-bool AP_Arming_Sub::has_disarm_function() const {
+bool AP_Arming_HC::has_disarm_function() const {
     bool has_shift_function = false;
     // make sure the craft has a disarm button assigned before it is armed
     // check all the standard btn functions
     for (uint8_t i = 0; i < 16; i++) {
-        switch (sub.get_button(i)->function(false)) {
+        switch (hc.get_button(i)->function(false)) {
             case JSButton::k_shift :
                 has_shift_function = true;
                 break;
@@ -31,7 +31,7 @@ bool AP_Arming_Sub::has_disarm_function() const {
     // check all the shift functions if there's shift assigned
     if (has_shift_function) {
         for (uint8_t i = 0; i < 16; i++) {
-            switch (sub.get_button(i)->function(true)) {
+            switch (hc.get_button(i)->function(true)) {
                 case JSButton::k_arm_toggle :
                 case JSButton::k_disarm :
                     return true;
@@ -41,7 +41,7 @@ bool AP_Arming_Sub::has_disarm_function() const {
     return false;
 }
 
-bool AP_Arming_Sub::pre_arm_checks(bool display_failure)
+bool AP_Arming_HC::pre_arm_checks(bool display_failure)
 {
     if (armed) {
         return true;
@@ -55,14 +55,14 @@ bool AP_Arming_Sub::pre_arm_checks(bool display_failure)
     return AP_Arming::pre_arm_checks(display_failure);
 }
 
-bool AP_Arming_Sub::ins_checks(bool display_failure)
+bool AP_Arming_HC::ins_checks(bool display_failure)
 {
     // call parent class checks
     if (!AP_Arming::ins_checks(display_failure)) {
         return false;
     }
 
-    // additional sub-specific checks
+    // additional hc-specific checks
     if ((checks_to_perform & ARMING_CHECK_ALL) ||
         (checks_to_perform & ARMING_CHECK_INS)) {
         if (!AP::ahrs().prearm_healthy()) {
@@ -78,7 +78,7 @@ bool AP_Arming_Sub::ins_checks(bool display_failure)
     return true;
 }
 
-bool AP_Arming_Sub::arm(AP_Arming::Method method, bool do_arming_checks)
+bool AP_Arming_HC::arm(AP_Arming::Method method, bool do_arming_checks)
 {
     static bool in_arm_motors = false;
 
@@ -99,7 +99,7 @@ bool AP_Arming_Sub::arm(AP_Arming::Method method, bool do_arming_checks)
     AP::logger().set_vehicle_armed(true);
 
     // disable cpu failsafe because initialising everything takes a while
-    sub.mainloop_failsafe_disable();
+    hc.mainloop_failsafe_disable();
 
     // notify that arming will occur (we do this early to give plenty of warning)
     AP_Notify::flags.armed = true;
@@ -114,7 +114,7 @@ bool AP_Arming_Sub::arm(AP_Arming::Method method, bool do_arming_checks)
 
     AP_AHRS &ahrs = AP::ahrs();
 
-    sub.initial_armed_bearing = ahrs.yaw_sensor;
+    hc.initial_armed_bearing = ahrs.yaw_sensor;
 
     if (!ahrs.home_is_set()) {
         // Reset EKF altitude if home hasn't been set yet (we use EKF altitude as substitute for alt above home)
@@ -124,7 +124,7 @@ bool AP_Arming_Sub::arm(AP_Arming::Method method, bool do_arming_checks)
         // Log_Write_Event(DATA_EKF_ALT_RESET);
     } else if (ahrs.home_is_set() && !ahrs.home_is_locked()) {
         // Reset home position if it has already been set before (but not locked)
-        if (!sub.set_home_to_current_location(false)) {
+        if (!hc.set_home_to_current_location(false)) {
             // ignore this failure
         }
     }
@@ -134,18 +134,18 @@ bool AP_Arming_Sub::arm(AP_Arming::Method method, bool do_arming_checks)
     hal.util->set_soft_armed(true);
 
     // enable output to motors
-    sub.enable_motor_output();
+    hc.enable_motor_output();
 
     // finally actually arm the motors
-    sub.motors.armed(true);
+    hc.motors.armed(true);
 
     AP::logger().Write_Event(DATA_ARMED);
 
     // log flight mode in case it was changed while vehicle was disarmed
-    AP::logger().Write_Mode(sub.control_mode, sub.control_mode_reason);
+    AP::logger().Write_Mode(hc.control_mode, hc.control_mode_reason);
 
     // reenable failsafe
-    sub.mainloop_failsafe_enable();
+    hc.mainloop_failsafe_enable();
 
     // perf monitor ignores delay due to arming
     AP::scheduler().perf_info.ignore_this_loop();
@@ -157,10 +157,10 @@ bool AP_Arming_Sub::arm(AP_Arming::Method method, bool do_arming_checks)
     return true;
 }
 
-bool AP_Arming_Sub::disarm()
+bool AP_Arming_HC::disarm()
 {
     // return immediately if we are already disarmed
-    if (!sub.motors.armed()) {
+    if (!hc.motors.armed()) {
         return false;
     }
 
@@ -187,10 +187,10 @@ bool AP_Arming_Sub::disarm()
     AP::logger().Write_Event(DATA_DISARMED);
 
     // send disarm command to motors
-    sub.motors.armed(false);
+    hc.motors.armed(false);
 
     // reset the mission
-    sub.mission.reset();
+    hc.mission.reset();
 
     AP::logger().set_vehicle_armed(false);
 
@@ -199,7 +199,7 @@ bool AP_Arming_Sub::disarm()
     hal.util->set_soft_armed(false);
 
     // clear input holds
-    sub.clear_input_hold();
+    hc.clear_input_hold();
 
     return true;
 }

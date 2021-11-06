@@ -1,8 +1,8 @@
-#include "Sub.h"
+#include "HC.h"
 
 // change flight mode and perform any necessary initialisation
 // returns true if mode was successfully set
-bool Sub::set_mode(control_mode_t mode, mode_reason_t reason)
+bool HC::set_mode(control_mode_t mode, mode_reason_t reason)
 {
     // boolean to record if flight mode could be set
     bool success = false;
@@ -105,7 +105,7 @@ bool Sub::set_mode(control_mode_t mode, mode_reason_t reason)
 
 // update_flight_mode - calls the appropriate attitude controllers based on flight mode
 // called at 100hz or more
-void Sub::update_flight_mode()
+void HC::update_flight_mode()
 {
     switch (control_mode) {
     case ACRO:
@@ -160,7 +160,7 @@ void Sub::update_flight_mode()
 }
 
 // exit_mode - high level call to organise cleanup as a flight mode is exited
-void Sub::exit_mode(control_mode_t old_control_mode, control_mode_t new_control_mode)
+void HC::exit_mode(control_mode_t old_control_mode, control_mode_t new_control_mode)
 {
     // stop mission when we leave auto mode
     if (old_control_mode == AUTO) {
@@ -174,7 +174,7 @@ void Sub::exit_mode(control_mode_t old_control_mode, control_mode_t new_control_
 }
 
 // returns true or false whether mode requires GPS
-bool Sub::mode_requires_GPS(control_mode_t mode)
+bool HC::mode_requires_GPS(control_mode_t mode)
 {
     switch (mode) {
     case AUTO:
@@ -190,7 +190,7 @@ bool Sub::mode_requires_GPS(control_mode_t mode)
 }
 
 // mode_has_manual_throttle - returns true if the flight mode has a manual throttle (i.e. pilot directly controls throttle)
-bool Sub::mode_has_manual_throttle(control_mode_t mode)
+bool HC::mode_has_manual_throttle(control_mode_t mode)
 {
     switch (mode) {
     case ACRO:
@@ -206,7 +206,7 @@ bool Sub::mode_has_manual_throttle(control_mode_t mode)
 
 // mode_allows_arming - returns true if vehicle can be armed in the specified mode
 //  arming_from_gcs should be set to true if the arming request comes from the ground station
-bool Sub::mode_allows_arming(control_mode_t mode, bool arming_from_gcs)
+bool HC::mode_allows_arming(control_mode_t mode, bool arming_from_gcs)
 {
     return (mode_has_manual_throttle(mode)
         || mode == ALT_HOLD
@@ -216,7 +216,7 @@ bool Sub::mode_allows_arming(control_mode_t mode, bool arming_from_gcs)
 }
 
 // notify_flight_mode - sets notify object based on flight mode.  Only used for OreoLED notify device
-void Sub::notify_flight_mode(control_mode_t mode)
+void HC::notify_flight_mode(control_mode_t mode)
 {
     switch (mode) {
     case AUTO:

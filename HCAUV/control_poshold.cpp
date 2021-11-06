@@ -1,13 +1,13 @@
-// ArduSub position hold flight mode
+// HCUAV position hold flight mode
 // GPS required
 // Jacob Walser August 2016
 
-#include "Sub.h"
+#include "HC.h"
 
 #if POSHOLD_ENABLED == ENABLED
 
 // poshold_init - initialise PosHold controller
-bool Sub::poshold_init()
+bool HC::poshold_init()
 {
     // fail to initialise PosHold mode if no GPS lock
     if (!position_ok()) {
@@ -34,7 +34,7 @@ bool Sub::poshold_init()
 
 // poshold_run - runs the PosHold controller
 // should be called at 100hz or more
-void Sub::poshold_run()
+void HC::poshold_run()
 {
     uint32_t tnow = AP_HAL::millis();
 
@@ -63,7 +63,7 @@ void Sub::poshold_run()
     float lateral_out = 0;
     float forward_out = 0;
 
-    // Allow pilot to reposition the sub
+    // Allow pilot to reposition the HC
     if (fabsf(pilot_lateral) > 0.1 || fabsf(pilot_forward) > 0.1) {
         lateral_out = pilot_lateral;
         forward_out = pilot_forward;

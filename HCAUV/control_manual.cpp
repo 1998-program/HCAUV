@@ -1,7 +1,7 @@
-#include "Sub.h"
+#include "HC.h"
 
 // manual_init - initialise manual controller
-bool Sub::manual_init()
+bool HC::manual_init()
 {
     // set target altitude to zero for reporting
     pos_control.set_alt_target(0);
@@ -15,7 +15,7 @@ bool Sub::manual_init()
 
 // manual_run - runs the manual (passthrough) controller
 // should be called at 100hz or more
-void Sub::manual_run()
+void HC::manual_run()
 {
     // if not armed set throttle to zero and exit immediately
     if (!motors.armed()) {

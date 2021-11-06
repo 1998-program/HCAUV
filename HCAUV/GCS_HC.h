@@ -3,26 +3,26 @@
 #include <GCS_MAVLink/GCS.h>
 #include "GCS_Mavlink.h"
 
-class GCS_Sub : public GCS
+class GCS_HC : public GCS
 {
-    friend class Sub; // for access to _chan in parameter declarations
+    friend class HC; // for access to _chan in parameter declarations
 
 public:
 
     // return GCS link at offset ofs
-    GCS_MAVLINK_Sub *chan(const uint8_t ofs) override {
+    GCS_MAVLINK_HC *chan(const uint8_t ofs) override {
         if (ofs > _num_gcs) {
             AP::internalerror().error(AP_InternalError::error_t::gcs_offset);
             return nullptr;
         }
-        return (GCS_MAVLINK_Sub*)_chan[ofs];
+        return (GCS_MAVLINK_HC*)_chan[ofs];
     }
-    const GCS_MAVLINK_Sub *chan(const uint8_t ofs) const override {
+    const GCS_MAVLINK_HC *chan(const uint8_t ofs) const override {
         if (ofs > _num_gcs) {
             AP::internalerror().error(AP_InternalError::error_t::gcs_offset);
             return nullptr;
         }
-        return (GCS_MAVLINK_Sub*)_chan[ofs];
+        return (GCS_MAVLINK_HC*)_chan[ofs];
     }
 
     void update_vehicle_sensor_status_flags() override;
@@ -42,9 +42,9 @@ protected:
         return 250;
     }
 
-    GCS_MAVLINK_Sub *new_gcs_mavlink_backend(GCS_MAVLINK_Parameters &params,
+    GCS_MAVLINK_HC *new_gcs_mavlink_backend(GCS_MAVLINK_Parameters &params,
                                              AP_HAL::UARTDriver &uart) override {
-        return new GCS_MAVLINK_Sub(params, uart);
+        return new GCS_MAVLINK_HC(params, uart);
     }
 
 };

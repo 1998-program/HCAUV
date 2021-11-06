@@ -1,4 +1,4 @@
-#include "Sub.h"
+#include "HC.h"
 
 /*
  * failsafe.cpp
@@ -11,7 +11,7 @@ static uint32_t failsafe_last_timestamp;
 static bool in_failsafe;
 
 // Enable mainloop lockup failsafe
-void Sub::mainloop_failsafe_enable()
+void HC::mainloop_failsafe_enable()
 {
     failsafe_enabled = true;
     failsafe_last_timestamp = AP_HAL::micros();
@@ -19,14 +19,14 @@ void Sub::mainloop_failsafe_enable()
 
 // Disable mainloop lockup failsafe
 // Used when we know we are going to delay the mainloop significantly.
-void Sub::mainloop_failsafe_disable()
+void HC::mainloop_failsafe_disable()
 {
     failsafe_enabled = false;
 }
 
 // This function is called from the core timer interrupt at 1kHz.
 // This checks that the mainloop is running, and has not locked up.
-void Sub::mainloop_failsafe_check()
+void HC::mainloop_failsafe_check()
 {
     uint32_t tnow = AP_HAL::micros();
 
@@ -64,7 +64,7 @@ void Sub::mainloop_failsafe_check()
     }
 }
 
-void Sub::failsafe_sensors_check()
+void HC::failsafe_sensors_check()
 {
     if (!ap.depth_sensor_present) {
         return;
@@ -97,7 +97,7 @@ void Sub::failsafe_sensors_check()
     }
 }
 
-void Sub::failsafe_ekf_check()
+void HC::failsafe_ekf_check()
 {
     static uint32_t last_ekf_good_ms = 0;
 
@@ -151,7 +151,7 @@ void Sub::failsafe_ekf_check()
 }
 
 // Battery failsafe handler
-void Sub::handle_battery_failsafe(const char* type_str, const int8_t action)
+void HC::handle_battery_failsafe(const char* type_str, const int8_t action)
 {
     AP::logger().Write_Error(LogErrorSubsystem::FAILSAFE_BATT, LogErrorCode::FAILSAFE_OCCURRED);
 
@@ -169,7 +169,7 @@ void Sub::handle_battery_failsafe(const char* type_str, const int8_t action)
 }
 
 // Make sure that we are receiving pilot input at an appropriate interval
-void Sub::failsafe_pilot_input_check()
+void HC::failsafe_pilot_input_check()
 {
 #if CONFIG_HAL_BOARD != HAL_BOARD_SITL
     if (g.failsafe_pilot_input == FS_PILOT_INPUT_DISABLED) {
@@ -202,7 +202,7 @@ void Sub::failsafe_pilot_input_check()
 // Internal pressure failsafe check
 // Check if the internal pressure of the watertight electronics enclosure
 // has exceeded the maximum specified by the FS_PRESS_MAX parameter
-void Sub::failsafe_internal_pressure_check()
+void HC::failsafe_internal_pressure_check()
 {
 
     if (g.failsafe_pressure == FS_PRESS_DISABLED) {
@@ -234,7 +234,7 @@ void Sub::failsafe_internal_pressure_check()
 // Internal temperature failsafe check
 // Check if the internal temperature of the watertight electronics enclosure
 // has exceeded the maximum specified by the FS_TEMP_MAX parameter
-void Sub::failsafe_internal_temperature_check()
+void HC::failsafe_internal_temperature_check()
 {
 
     if (g.failsafe_temperature == FS_TEMP_DISABLED) {
@@ -264,7 +264,7 @@ void Sub::failsafe_internal_temperature_check()
 }
 
 // Check if we are leaking and perform appropriate action
-void Sub::failsafe_leak_check()
+void HC::failsafe_leak_check()
 {
     bool status = leak_detector.get_status();
 
@@ -305,7 +305,7 @@ void Sub::failsafe_leak_check()
 }
 
 // failsafe_gcs_check - check for ground station failsafe
-void Sub::failsafe_gcs_check()
+void HC::failsafe_gcs_check()
 {
     // return immediately if we have never had contact with a gcs, or if gcs failsafe action is disabled
     // this also checks to see if we have a GCS failsafe active, if we do, then must continue to process the logic for recovery from this state.
@@ -362,7 +362,7 @@ void Sub::failsafe_gcs_check()
 
 // Check for a crash
 // The vehicle is considered crashed if the angle error exceeds a specified limit for more than 2 seconds
-void Sub::failsafe_crash_check()
+void HC::failsafe_crash_check()
 {
     static uint32_t last_crash_check_pass_ms;
     uint32_t tnow = AP_HAL::millis();
@@ -417,7 +417,7 @@ void Sub::failsafe_crash_check()
 
 // executes terrain failsafe if data is missing for longer than a few seconds
 //  missing_data should be set to true if the vehicle failed to navigate because of missing data, false if navigation is proceeding successfully
-void Sub::failsafe_terrain_check()
+void HC::failsafe_terrain_check()
 {
     // trigger with 5 seconds of failures while in AUTO mode
     bool valid_mode = (control_mode == AUTO || control_mode == GUIDED);
@@ -439,7 +439,7 @@ void Sub::failsafe_terrain_check()
 // This gets called if mission items are in ALT_ABOVE_TERRAIN frame
 // Terrain failure occurs when terrain data is not found, or rangefinder is not enabled or healthy
 // set terrain data status (found or not found)
-void Sub::failsafe_terrain_set_status(bool data_ok)
+void HC::failsafe_terrain_set_status(bool data_ok)
 {
     uint32_t now = AP_HAL::millis();
 
@@ -459,7 +459,7 @@ void Sub::failsafe_terrain_set_status(bool data_ok)
 }
 
 // terrain failsafe action
-void Sub::failsafe_terrain_on_event()
+void HC::failsafe_terrain_on_event()
 {
     failsafe.terrain = true;
     AP::logger().Write_Error(LogErrorSubsystem::FAILSAFE_TERRAIN, LogErrorCode::FAILSAFE_OCCURRED);
@@ -473,7 +473,7 @@ void Sub::failsafe_terrain_on_event()
 }
 
 // Recovery failed, take action
-void Sub::failsafe_terrain_act()
+void HC::failsafe_terrain_act()
 {
     switch (g.failsafe_terrain) {
     case FS_TERRAIN_HOLD:

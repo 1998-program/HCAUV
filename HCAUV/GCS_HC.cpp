@@ -1,8 +1,8 @@
-#include "GCS_Sub.h"
+#include "GCS_HC.h"
 
-#include "Sub.h"
+#include "HC.h"
 
-void GCS_Sub::update_vehicle_sensor_status_flags()
+void GCS_HC::update_vehicle_sensor_status_flags()
 {
     control_sensors_present |=
         MAV_SYS_STATUS_SENSOR_ANGULAR_RATE_CONTROL |
@@ -20,7 +20,7 @@ void GCS_Sub::update_vehicle_sensor_status_flags()
         MAV_SYS_STATUS_SENSOR_YAW_POSITION;
 
     // first what sensors/controllers we have
-    if (sub.ap.depth_sensor_present) {
+    if (hc.ap.depth_sensor_present) {
         control_sensors_present |= MAV_SYS_STATUS_SENSOR_ABSOLUTE_PRESSURE;
         control_sensors_enabled |= MAV_SYS_STATUS_SENSOR_ABSOLUTE_PRESSURE;
     }
@@ -41,7 +41,7 @@ void GCS_Sub::update_vehicle_sensor_status_flags()
         MAV_SYS_STATUS_SENSOR_Z_ALTITUDE_CONTROL |
         MAV_SYS_STATUS_SENSOR_XY_POSITION_CONTROL;
 
-    switch (sub.control_mode) {
+    switch (hc.control_mode) {
     case ALT_HOLD:
     case AUTO:
     case GUIDED:
@@ -58,7 +58,7 @@ void GCS_Sub::update_vehicle_sensor_status_flags()
     }
 
     control_sensors_health &= ~MAV_SYS_STATUS_SENSOR_ABSOLUTE_PRESSURE; // check the internal barometer only
-    if (sub.sensor_health.depth) {
+    if (hc.sensor_health.depth) {
         control_sensors_health |= MAV_SYS_STATUS_SENSOR_ABSOLUTE_PRESSURE;
     }
     if (gps.is_healthy()) {
@@ -71,11 +71,11 @@ void GCS_Sub::update_vehicle_sensor_status_flags()
 #endif
 
 #if AP_TERRAIN_AVAILABLE && AC_TERRAIN
-    switch (sub.terrain.status()) {
+    switch (hc.terrain.status()) {
     case AP_Terrain::TerrainStatusDisabled:
         break;
     case AP_Terrain::TerrainStatusUnhealthy:
-        // To-Do: restore unhealthy terrain status reporting once terrain is used in Sub
+        // To-Do: restore unhealthy terrain status reporting once terrain is used in hc
         //control_sensors_present |= MAV_SYS_STATUS_TERRAIN;
         //control_sensors_enabled |= MAV_SYS_STATUS_TERRAIN;
         //break;
@@ -89,7 +89,7 @@ void GCS_Sub::update_vehicle_sensor_status_flags()
 
 #if RANGEFINDER_ENABLED == ENABLED
     const RangeFinder *rangefinder = RangeFinder::get_singleton();
-    if (sub.rangefinder_state.enabled) {
+    if (hc.rangefinder_state.enabled) {
         control_sensors_present |= MAV_SYS_STATUS_SENSOR_LASER_POSITION;
         control_sensors_enabled |= MAV_SYS_STATUS_SENSOR_LASER_POSITION;
         if (rangefinder && rangefinder->has_data_orient(ROTATION_PITCH_270)) {

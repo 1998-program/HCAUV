@@ -1,4 +1,4 @@
-#include "Sub.h"
+#include "HC.h"
 
 // Functions that will handle joystick/gamepad input
 // ----------------------------------------------------------------------------
@@ -28,7 +28,7 @@ uint8_t roll_pitch_flag = false; // Flag to adjust roll/pitch instead of forward
 bool controls_reset_since_input_hold = true;
 }
 
-void Sub::init_joystick()
+void HC::init_joystick()
 {
     default_js_buttons();
 
@@ -51,7 +51,7 @@ void Sub::init_joystick()
     gain = constrain_float(gain, 0.1, 1.0);
 }
 
-void Sub::transform_manual_control_to_rc_override(int16_t x, int16_t y, int16_t z, int16_t r, uint16_t buttons)
+void HC::transform_manual_control_to_rc_override(int16_t x, int16_t y, int16_t z, int16_t r, uint16_t buttons)
 {
 
     float rpyScale = 0.4*gain; // Scale -1000-1000 to -400-400 with gain
@@ -139,7 +139,7 @@ void Sub::transform_manual_control_to_rc_override(int16_t x, int16_t y, int16_t 
     z_last = z;
 }
 
-void Sub::handle_jsbutton_press(uint8_t button, bool shift, bool held)
+void HC::handle_jsbutton_press(uint8_t button, bool shift, bool held)
 {
     // Used for trimming level in vehicle frame
     Quaternion attitudeTarget;
@@ -617,7 +617,7 @@ void Sub::handle_jsbutton_press(uint8_t button, bool shift, bool held)
     }
 }
 
-void Sub::handle_jsbutton_release(uint8_t button, bool shift) {
+void HC::handle_jsbutton_release(uint8_t button, bool shift) {
 
     // Act based on the function assigned to this button
     switch (get_button(button)->function(shift)) {
@@ -657,7 +657,7 @@ void Sub::handle_jsbutton_release(uint8_t button, bool shift) {
     }
 }
 
-JSButton* Sub::get_button(uint8_t index)
+JSButton* HC::get_button(uint8_t index)
 {
     // Help to access appropriate parameter
     switch (index) {
@@ -698,7 +698,7 @@ JSButton* Sub::get_button(uint8_t index)
     }
 }
 
-void Sub::default_js_buttons()
+void HC::default_js_buttons()
 {
     JSButton::button_function_t defaults[16][2] = {
         {JSButton::button_function_t::k_none,                   JSButton::button_function_t::k_none},
@@ -727,7 +727,7 @@ void Sub::default_js_buttons()
     }
 }
 
-void Sub::set_neutral_controls()
+void HC::set_neutral_controls()
 {
     uint32_t tnow = AP_HAL::millis();
 
@@ -740,7 +740,7 @@ void Sub::set_neutral_controls()
     rollTrim  = 0;
 }
 
-void Sub::clear_input_hold()
+void HC::clear_input_hold()
 {
     xTrim = 0;
     yTrim = 0;

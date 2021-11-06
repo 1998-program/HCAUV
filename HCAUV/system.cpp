@@ -1,4 +1,4 @@
-#include "Sub.h"
+#include "HC.h"
 
 /*****************************************************************************
 *   The init_ardupilot function processes everything we need for an in - air restart
@@ -9,15 +9,15 @@
 
 static void mavlink_delay_cb_static()
 {
-    sub.mavlink_delay_cb();
+    hc.mavlink_delay_cb();
 }
 
 static void failsafe_check_static()
 {
-    sub.mainloop_failsafe_check();
+    hc.mainloop_failsafe_check();
 }
 
-void Sub::init_ardupilot()
+void HC::init_ardupilot()
 {
     // initialise serial port
     serial_manager.init_console();
@@ -184,7 +184,7 @@ void Sub::init_ardupilot()
 
     // initialise AP_Logger library
 #if LOGGING_ENABLED == ENABLED
-    logger.setVehicle_Startup_Writer(FUNCTOR_BIND(&sub, &Sub::Log_Write_Vehicle_Startup_Messages, void));
+    logger.setVehicle_Startup_Writer(FUNCTOR_BIND(&hc, &HC::Log_Write_Vehicle_Startup_Messages, void));
 #endif
 
     startup_INS_ground();
@@ -222,7 +222,7 @@ void Sub::init_ardupilot()
 //******************************************************************************
 //This function does all the calibrations, etc. that we need during a ground start
 //******************************************************************************
-void Sub::startup_INS_ground()
+void HC::startup_INS_ground()
 {
     // initialise ahrs (may push imu calibration into the mpu6000 if using that device).
     ahrs.init();
@@ -237,7 +237,7 @@ void Sub::startup_INS_ground()
 
 // calibrate gyros - returns true if successfully calibrated
 // position_ok - returns true if the horizontal absolute position is ok and home position is set
-bool Sub::position_ok()
+bool HC::position_ok()
 {
     // return false if ekf failsafe has triggered
     if (failsafe.ekf) {
@@ -249,7 +249,7 @@ bool Sub::position_ok()
 }
 
 // ekf_position_ok - returns true if the ekf claims it's horizontal absolute position estimate is ok and home position is set
-bool Sub::ekf_position_ok()
+bool HC::ekf_position_ok()
 {
     if (!ahrs.have_inertial_nav()) {
         // do not allow navigation with dcm position
@@ -269,7 +269,7 @@ bool Sub::ekf_position_ok()
 }
 
 // optflow_position_ok - returns true if optical flow based position estimate is ok
-bool Sub::optflow_position_ok()
+bool HC::optflow_position_ok()
 {
 #if OPTFLOW != ENABLED
     return false;
@@ -293,7 +293,7 @@ bool Sub::optflow_position_ok()
 /*
   should we log a message type now?
  */
-bool Sub::should_log(uint32_t mask)
+bool HC::should_log(uint32_t mask)
 {
 #if LOGGING_ENABLED == ENABLED
     ap.logging_started = logger.logging_started();

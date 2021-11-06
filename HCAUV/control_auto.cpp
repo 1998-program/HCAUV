@@ -1,4 +1,4 @@
-#include "Sub.h"
+#include "HC.h"
 
 /*
  * control_auto.cpp
@@ -9,7 +9,7 @@
  */
 
 // auto_init - initialise auto controller
-bool Sub::auto_init()
+bool HC::auto_init()
 {
     if (!position_ok() || mission.num_commands() < 2) {
         return false;
@@ -37,7 +37,7 @@ bool Sub::auto_init()
 // auto_run - runs the appropriate auto controller
 // according to the current auto_mode
 // should be called at 100hz or more
-void Sub::auto_run()
+void HC::auto_run()
 {
     mission.update();
 
@@ -74,7 +74,7 @@ void Sub::auto_run()
 }
 
 // auto_wp_start - initialises waypoint controller to implement flying to a particular destination
-void Sub::auto_wp_start(const Vector3f& destination)
+void HC::auto_wp_start(const Vector3f& destination)
 {
     auto_mode = Auto_WP;
 
@@ -89,7 +89,7 @@ void Sub::auto_wp_start(const Vector3f& destination)
 }
 
 // auto_wp_start - initialises waypoint controller to implement flying to a particular destination
-void Sub::auto_wp_start(const Location& dest_loc)
+void HC::auto_wp_start(const Location& dest_loc)
 {
     auto_mode = Auto_WP;
 
@@ -109,14 +109,14 @@ void Sub::auto_wp_start(const Location& dest_loc)
 
 // auto_wp_run - runs the auto waypoint controller
 //      called by auto_run at 100hz or more
-void Sub::auto_wp_run()
+void HC::auto_wp_run()
 {
     // if not armed set throttle to zero and exit immediately
     if (!motors.armed()) {
         // To-Do: reset waypoint origin to current location because vehicle is probably on the ground so we don't want it lurching left or right on take-off
         //    (of course it would be better if people just used take-off)
         // call attitude controller
-        // Sub vehicles do not stabilize roll/pitch/yaw when disarmed
+        // HC vehicles do not stabilize roll/pitch/yaw when disarmed
         motors.set_desired_spool_state(AP_Motors::DesiredSpoolState::GROUND_IDLE);
         attitude_control.set_throttle_out(0,true,g.throttle_filt);
         attitude_control.relax_attitude_controllers();
@@ -174,7 +174,7 @@ void Sub::auto_wp_run()
 
 // auto_spline_start - initialises waypoint controller to implement flying to a particular destination using the spline controller
 //  seg_end_type can be SEGMENT_END_STOP, SEGMENT_END_STRAIGHT or SEGMENT_END_SPLINE.  If Straight or Spline the next_destination should be provided
-void Sub::auto_spline_start(const Location& destination, bool stopped_at_start,
+void HC::auto_spline_start(const Location& destination, bool stopped_at_start,
                             AC_WPNav::spline_segment_end_type seg_end_type,
                             const Location& next_destination)
 {
@@ -196,13 +196,13 @@ void Sub::auto_spline_start(const Location& destination, bool stopped_at_start,
 
 // auto_spline_run - runs the auto spline controller
 //      called by auto_run at 100hz or more
-void Sub::auto_spline_run()
+void HC::auto_spline_run()
 {
     // if not armed set throttle to zero and exit immediately
     if (!motors.armed()) {
         // To-Do: reset waypoint origin to current location because vehicle is probably on the ground so we don't want it lurching left or right on take-off
         //    (of course it would be better if people just used take-off)
-        // Sub vehicles do not stabilize roll/pitch/yaw when disarmed
+        // HC vehicles do not stabilize roll/pitch/yaw when disarmed
         motors.set_desired_spool_state(AP_Motors::DesiredSpoolState::GROUND_IDLE);
         attitude_control.set_throttle_out(0,true,g.throttle_filt);
         attitude_control.relax_attitude_controllers();
@@ -252,7 +252,7 @@ void Sub::auto_spline_run()
 // auto_circle_movetoedge_start - initialise waypoint controller to move to edge of a circle with it's center at the specified location
 //  we assume the caller has set the circle's circle with circle_nav.set_center()
 //  we assume the caller has performed all required GPS_ok checks
-void Sub::auto_circle_movetoedge_start(const Location &circle_center, float radius_m)
+void HC::auto_circle_movetoedge_start(const Location &circle_center, float radius_m)
 {
     // convert location to vector from ekf origin
     Vector3f circle_center_neu;
@@ -306,7 +306,7 @@ void Sub::auto_circle_movetoedge_start(const Location &circle_center, float radi
 
 // auto_circle_start - initialises controller to fly a circle in AUTO flight mode
 //   assumes that circle_nav object has already been initialised with circle center and radius
-void Sub::auto_circle_start()
+void HC::auto_circle_start()
 {
     auto_mode = Auto_Circle;
 
@@ -316,7 +316,7 @@ void Sub::auto_circle_start()
 
 // auto_circle_run - circle in AUTO flight mode
 //      called by auto_run at 100hz or more
-void Sub::auto_circle_run()
+void HC::auto_circle_run()
 {
     // call circle controller
     circle_nav.update();
@@ -337,7 +337,7 @@ void Sub::auto_circle_run()
 
 #if NAV_GUIDED == ENABLED
 // auto_nav_guided_start - hand over control to external navigation controller in AUTO mode
-void Sub::auto_nav_guided_start()
+void HC::auto_nav_guided_start()
 {
     auto_mode = Auto_NavGuided;
 
@@ -350,7 +350,7 @@ void Sub::auto_nav_guided_start()
 
 // auto_nav_guided_run - allows control by external navigation controller
 //      called by auto_run at 100hz or more
-void Sub::auto_nav_guided_run()
+void HC::auto_nav_guided_run()
 {
     // call regular guided flight mode run function
     guided_run();
@@ -359,7 +359,7 @@ void Sub::auto_nav_guided_run()
 
 // auto_loiter_start - initialises loitering in auto mode
 //  returns success/failure because this can be called by exit_mission
-bool Sub::auto_loiter_start()
+bool HC::auto_loiter_start()
 {
     // return failure if GPS is bad
     if (!position_ok()) {
@@ -385,12 +385,12 @@ bool Sub::auto_loiter_start()
 
 // auto_loiter_run - loiter in AUTO flight mode
 //      called by auto_run at 100hz or more
-void Sub::auto_loiter_run()
+void HC::auto_loiter_run()
 {
     // if not armed set throttle to zero and exit immediately
     if (!motors.armed()) {
         motors.set_desired_spool_state(AP_Motors::DesiredSpoolState::GROUND_IDLE);
-        // Sub vehicles do not stabilize roll/pitch/yaw when disarmed
+        // HC vehicles do not stabilize roll/pitch/yaw when disarmed
         attitude_control.set_throttle_out(0,true,g.throttle_filt);
         attitude_control.relax_attitude_controllers();
 
@@ -431,7 +431,7 @@ void Sub::auto_loiter_run()
 
 // get_default_auto_yaw_mode - returns auto_yaw_mode based on WP_YAW_BEHAVIOR parameter
 // set rtl parameter to true if this is during an RTL
-uint8_t Sub::get_default_auto_yaw_mode(bool rtl)
+uint8_t HC::get_default_auto_yaw_mode(bool rtl)
 {
     switch (g.wp_yaw_behavior) {
 
@@ -463,7 +463,7 @@ uint8_t Sub::get_default_auto_yaw_mode(bool rtl)
 }
 
 // set_auto_yaw_mode - sets the yaw mode for auto
-void Sub::set_auto_yaw_mode(uint8_t yaw_mode)
+void HC::set_auto_yaw_mode(uint8_t yaw_mode)
 {
     // return immediately if no change
     if (auto_yaw_mode == yaw_mode) {
@@ -500,7 +500,7 @@ void Sub::set_auto_yaw_mode(uint8_t yaw_mode)
 }
 
 // set_auto_yaw_look_at_heading - sets the yaw look at heading for auto mode
-void Sub::set_auto_yaw_look_at_heading(float angle_deg, float turn_rate_dps, int8_t direction, uint8_t relative_angle)
+void HC::set_auto_yaw_look_at_heading(float angle_deg, float turn_rate_dps, int8_t direction, uint8_t relative_angle)
 {
     // get current yaw target
     int32_t curr_yaw_target = attitude_control.get_att_target_euler_cd().z;
@@ -535,7 +535,7 @@ void Sub::set_auto_yaw_look_at_heading(float angle_deg, float turn_rate_dps, int
 }
 
 // set_auto_yaw_roi - sets the yaw to look at roi for auto mode
-void Sub::set_auto_yaw_roi(const Location &roi_location)
+void HC::set_auto_yaw_roi(const Location &roi_location)
 {
     // if location is zero lat, lon and altitude turn off ROI
     if (roi_location.alt == 0 && roi_location.lat == 0 && roi_location.lng == 0) {
@@ -573,7 +573,7 @@ void Sub::set_auto_yaw_roi(const Location &roi_location)
 
 // get_auto_heading - returns target heading depending upon auto_yaw_mode
 // 100hz update rate
-float Sub::get_auto_heading()
+float HC::get_auto_heading()
 {
     switch (auto_yaw_mode) {
 
@@ -621,7 +621,7 @@ float Sub::get_auto_heading()
 }
 
 // Return true if it is possible to recover from a rangefinder failure
-bool Sub::auto_terrain_recover_start()
+bool HC::auto_terrain_recover_start()
 {
     // Check rangefinder status to see if recovery is possible
     switch (rangefinder.status_orient(ROTATION_PITCH_270)) {
@@ -668,7 +668,7 @@ bool Sub::auto_terrain_recover_start()
 // Attempt recovery from terrain failsafe
 // If recovery is successful resume mission
 // If recovery fails revert to failsafe action
-void Sub::auto_terrain_recover_run()
+void HC::auto_terrain_recover_run()
 {
     float target_climb_rate = 0;
     static uint32_t rangefinder_recovery_ms = 0;

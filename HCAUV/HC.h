@@ -14,7 +14,7 @@
  */
 #pragma once
 /*
-  This is the main Sub class
+  This is the main HC class
  */
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -92,14 +92,10 @@
 #include "GCS_Mavlink.h"
 #include "RC_Channel.h"         // RC Channel Library
 #include "Parameters.h"
-#include "AP_Arming_Sub.h"
-#include "GCS_Sub.h"
+#include "AP_Arming_HC.h"
+#include "GCS_HC.h"
 
 // libraries which are dependent on #defines in defines.h and/or config.h
-#if OPTFLOW == ENABLED
-#include <AP_OpticalFlow/AP_OpticalFlow.h>     // Optical Flow library
-#endif
-
 #if RCMAP_ENABLED == ENABLED
 #include <AP_RCMapper/AP_RCMapper.h>        // RC input mapping library
 #endif
@@ -136,16 +132,16 @@
 #include <SITL/SITL.h>
 #endif
 
-class Sub : public AP_HAL::HAL::Callbacks {
+class HC : public AP_HAL::HAL::Callbacks {
 public:
-    friend class GCS_MAVLINK_Sub;
-    friend class GCS_Sub;
+    friend class GCS_MAVLINK_HC;
+    friend class GCS_HC;
     friend class Parameters;
     friend class ParametersG2;
-    friend class AP_Arming_Sub;
-    friend class RC_Channels_Sub;
+    friend class AP_Arming_HC;
+    friend class RC_Channels_HC;
 
-    Sub(void);
+    HC(void);
 
     // HAL::Callbacks implementation.
     void setup() override;
@@ -162,7 +158,7 @@ private:
     ParametersG2 g2;
 
     // main loop scheduler
-    AP_Scheduler scheduler{FUNCTOR_BIND_MEMBER(&Sub::fast_loop, void)};
+    AP_Scheduler scheduler{FUNCTOR_BIND_MEMBER(&HC::fast_loop, void)};
 
     // AP_Notify instance
     AP_Notify notify;
@@ -210,9 +206,9 @@ private:
 
     // Mission library
     AP_Mission mission{
-            FUNCTOR_BIND_MEMBER(&Sub::start_command, bool, const AP_Mission::Mission_Command &),
-            FUNCTOR_BIND_MEMBER(&Sub::verify_command_callback, bool, const AP_Mission::Mission_Command &),
-            FUNCTOR_BIND_MEMBER(&Sub::exit_mission, void)};
+            FUNCTOR_BIND_MEMBER(&HC::start_command, bool, const AP_Mission::Mission_Command &),
+            FUNCTOR_BIND_MEMBER(&HC::verify_command_callback, bool, const AP_Mission::Mission_Command &),
+            FUNCTOR_BIND_MEMBER(&HC::exit_mission, void)};
 
     // Optical flow sensor
 #if OPTFLOW == ENABLED
@@ -225,8 +221,8 @@ private:
     AP_SerialManager serial_manager;
 
     // GCS selection
-    GCS_Sub _gcs; // avoid using this; use gcs()
-    GCS_Sub &gcs() { return _gcs; }
+    GCS_HC _gcs; // avoid using this; use gcs()
+    GCS_HC &gcs() { return _gcs; }
 
     // User variables
 #ifdef USERHOOK_VARIABLES
@@ -378,10 +374,10 @@ private:
 
     // Battery Sensors
     AP_BattMonitor battery{MASK_LOG_CURRENT,
-                           FUNCTOR_BIND_MEMBER(&Sub::handle_battery_failsafe, void, const char*, const int8_t),
+                           FUNCTOR_BIND_MEMBER(&HC::handle_battery_failsafe, void, const char*, const int8_t),
                            _failsafe_priorities};
 
-    AP_Arming_Sub arming;
+    AP_Arming_HC arming;
 
     // Altitude
     // The cm/s we are moving up or down based on filtered data - Positive = UP
@@ -400,7 +396,7 @@ private:
     bool input_hold_engaged;
 
     // 3D Location vectors
-    // Current location of the Sub (altitude is relative to home)
+    // Current location of the HC (altitude is relative to home)
     Location current_loc;
 
     // Navigation Yaw control
@@ -530,7 +526,7 @@ private:
 	void hc_code();
 	void uart_test();
 
-	//ardusub
+	//HCAUV
     void fast_loop();
     void fifty_hz_loop();
     void update_batt_compass(void);
@@ -793,4 +789,4 @@ public:
 };
 
 extern const AP_HAL::HAL& hal;
-extern Sub sub;
+extern HC hc;

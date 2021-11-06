@@ -1,4 +1,4 @@
-#include "Sub.h"
+#include "HC.h"
 
 #if LOGGING_ENABLED == ENABLED
 
@@ -26,7 +26,7 @@ struct PACKED log_Control_Tuning {
 
 
 // Write a control tuning packet
-void Sub::Log_Write_Control_Tuning()
+void HC::Log_Write_Control_Tuning()
 {
     // get terrain altitude
     float terr_alt = 0.0f;
@@ -54,7 +54,7 @@ void Sub::Log_Write_Control_Tuning()
 }
 
 // Write an attitude packet
-void Sub::Log_Write_Attitude()
+void HC::Log_Write_Attitude()
 {
     Vector3f targets = attitude_control.get_att_target_euler_cd();
     targets.z = wrap_360_cd(targets.z);
@@ -77,7 +77,7 @@ struct PACKED log_HC
     float HC_target_angle;
     float HC_angle;
 };
-void Sub::Log_write_HC()
+void HC::Log_write_HC()
 {
 	struct log_HC pkt_hc ={
 		LOG_PACKET_HEADER_INIT(LOG_HC_MSG),
@@ -99,7 +99,7 @@ struct PACKED log_MotBatt {
 };
 
 // Write an rate packet
-void Sub::Log_Write_MotBatt()
+void HC::Log_Write_MotBatt()
 {
     struct log_MotBatt pkt_mot = {
         LOG_PACKET_HEADER_INIT(LOG_MOTBATT_MSG),
@@ -113,7 +113,7 @@ void Sub::Log_Write_MotBatt()
 }
 
 // Wrote an event packet
-void Sub::Log_Write_Event(Log_Event id)
+void HC::Log_Write_Event(Log_Event id)
 {
     logger.Write_Event(id);
 }
@@ -127,7 +127,7 @@ struct PACKED log_Data_Int16t {
 
 // Write an int16_t data packet
 UNUSED_FUNCTION
-void Sub::Log_Write_Data(uint8_t id, int16_t value)
+void HC::Log_Write_Data(uint8_t id, int16_t value)
 {
     if (should_log(MASK_LOG_ANY)) {
         struct log_Data_Int16t pkt = {
@@ -149,7 +149,7 @@ struct PACKED log_Data_UInt16t {
 
 // Write an uint16_t data packet
 UNUSED_FUNCTION
-void Sub::Log_Write_Data(uint8_t id, uint16_t value)
+void HC::Log_Write_Data(uint8_t id, uint16_t value)
 {
     if (should_log(MASK_LOG_ANY)) {
         struct log_Data_UInt16t pkt = {
@@ -170,7 +170,7 @@ struct PACKED log_Data_Int32t {
 };
 
 // Write an int32_t data packet
-void Sub::Log_Write_Data(uint8_t id, int32_t value)
+void HC::Log_Write_Data(uint8_t id, int32_t value)
 {
     if (should_log(MASK_LOG_ANY)) {
         struct log_Data_Int32t pkt = {
@@ -191,7 +191,7 @@ struct PACKED log_Data_UInt32t {
 };
 
 // Write a uint32_t data packet
-void Sub::Log_Write_Data(uint8_t id, uint32_t value)
+void HC::Log_Write_Data(uint8_t id, uint32_t value)
 {
     if (should_log(MASK_LOG_ANY)) {
         struct log_Data_UInt32t pkt = {
@@ -213,7 +213,7 @@ struct PACKED log_Data_Float {
 
 // Write a float data packet
 UNUSED_FUNCTION
-void Sub::Log_Write_Data(uint8_t id, float value)
+void HC::Log_Write_Data(uint8_t id, float value)
 {
     if (should_log(MASK_LOG_ANY)) {
         struct log_Data_Float pkt = {
@@ -227,7 +227,7 @@ void Sub::Log_Write_Data(uint8_t id, float value)
 }
 
 // logs when baro or compass becomes unhealthy
-void Sub::Log_Sensor_Health()
+void HC::Log_Sensor_Health()
 {
     // check baro
     if (sensor_health.baro != barometer.healthy()) {
@@ -255,7 +255,7 @@ struct PACKED log_GuidedTarget {
 };
 
 // Write a Guided mode target
-void Sub::Log_Write_GuidedTarget(uint8_t target_type, const Vector3f& pos_target, const Vector3f& vel_target)
+void HC::Log_Write_GuidedTarget(uint8_t target_type, const Vector3f& pos_target, const Vector3f& vel_target)
 {
     struct log_GuidedTarget pkt = {
         LOG_PACKET_HEADER_INIT(LOG_GUIDEDTARGET_MSG),
@@ -274,7 +274,7 @@ void Sub::Log_Write_GuidedTarget(uint8_t target_type, const Vector3f& pos_target
 // type and unit information can be found in
 // libraries/AP_Logger/Logstructure.h; search for "log_Units" for
 // units and "Format characters" for field type information
-const struct LogStructure Sub::log_structure[] = {
+const struct LogStructure HC::log_structure[] = {
     LOG_COMMON_STRUCTURES,
     { LOG_CONTROL_TUNING_MSG, sizeof(log_Control_Tuning),
       "CTUN", "Qfffffffccfhh", "TimeUS,ThI,ABst,ThO,ThH,DAlt,Alt,BAlt,DSAlt,SAlt,TAlt,DCRt,CRt", "s----mmmmmmnn", "F----00BBBBBB" },
@@ -296,7 +296,7 @@ const struct LogStructure Sub::log_structure[] = {
       "GUID",  "QBffffff",    "TimeUS,Type,pX,pY,pZ,vX,vY,vZ", "s-mmmnnn", "F-000000" },
 };
 
-void Sub::Log_Write_Vehicle_Startup_Messages()
+void HC::Log_Write_Vehicle_Startup_Messages()
 {
     // only 200(?) bytes are guaranteed by AP_Logger
     logger.Write_Mode(control_mode, control_mode_reason);
@@ -305,27 +305,27 @@ void Sub::Log_Write_Vehicle_Startup_Messages()
 }
 
 
-void Sub::log_init()
+void HC::log_init()
 {
     logger.Init(log_structure, ARRAY_SIZE(log_structure));
 }
 
 #else // LOGGING_ENABLED
 
-void Sub::Log_Write_Control_Tuning() {}
-void Sub::Log_Write_Performance() {}
-void Sub::Log_Write_Attitude(void) {}
-void Sub::Log_Write_MotBatt() {}
-void Sub::Log_Write_Event(Log_Event id) {}
-void Sub::Log_Write_Data(uint8_t id, int32_t value) {}
-void Sub::Log_Write_Data(uint8_t id, uint32_t value) {}
-void Sub::Log_Write_Data(uint8_t id, int16_t value) {}
-void Sub::Log_Write_Data(uint8_t id, uint16_t value) {}
-void Sub::Log_Write_Data(uint8_t id, float value) {}
-void Sub::Log_Sensor_Health() {}
-void Sub::Log_Write_GuidedTarget(uint8_t target_type, const Vector3f& pos_target, const Vector3f& vel_target) {}
-void Sub::Log_Write_Vehicle_Startup_Messages() {}
+void HC::Log_Write_Control_Tuning() {}
+void HC::Log_Write_Performance() {}
+void HC::Log_Write_Attitude(void) {}
+void HC::Log_Write_MotBatt() {}
+void HC::Log_Write_Event(Log_Event id) {}
+void HC::Log_Write_Data(uint8_t id, int32_t value) {}
+void HC::Log_Write_Data(uint8_t id, uint32_t value) {}
+void HC::Log_Write_Data(uint8_t id, int16_t value) {}
+void HC::Log_Write_Data(uint8_t id, uint16_t value) {}
+void HC::Log_Write_Data(uint8_t id, float value) {}
+void HC::Log_Sensor_Health() {}
+void HC::Log_Write_GuidedTarget(uint8_t target_type, const Vector3f& pos_target, const Vector3f& vel_target) {}
+void HC::Log_Write_Vehicle_Startup_Messages() {}
 
-void Sub::log_init(void) {}
+void HC::log_init(void) {}
 
 #endif // LOGGING_ENABLED

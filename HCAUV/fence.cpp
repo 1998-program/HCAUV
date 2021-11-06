@@ -1,12 +1,12 @@
-#include "Sub.h"
+#include "HC.h"
 
-// Code to integrate AC_Fence library with main ArduSub code
+// Code to integrate AC_Fence library with main HCAUV code
 
 #if AC_FENCE == ENABLED
 
 // fence_check - ask fence library to check for breaches and initiate the response
 // called at 1hz
-void Sub::fence_check()
+void HC::fence_check()
 {
     // ignore any fence activity when not armed
     if (!motors.armed()) {

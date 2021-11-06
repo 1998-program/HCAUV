@@ -1,6 +1,6 @@
-#include "Sub.h"
+#include "HC.h"
 
-void Sub::init_rc_in()
+void HC::init_rc_in()
 {
     channel_pitch    = RC_Channels::rc_channel(0);
     channel_roll     = RC_Channels::rc_channel(1);
@@ -47,7 +47,7 @@ void Sub::init_rc_in()
 }
 
 // init_rc_out -- initialise motors and check if pilot wants to perform ESC calibration
-void Sub::init_rc_out()
+void HC::init_rc_out()
 {
     motors.set_update_rate(g.rc_speed);
     motors.set_loop_rate(scheduler.get_loop_rate_hz());
