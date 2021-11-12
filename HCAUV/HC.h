@@ -594,9 +594,11 @@ private:
     void handle_attitude();
     bool auto_init(void);
     void auto_run();
+    void hc_auto_run();
     void auto_wp_start(const Vector3f& destination);
     void auto_wp_start(const Location& dest_loc);
     void auto_wp_run();
+    void hc_auto_wp_run();
     void auto_spline_run();
     void auto_circle_movetoedge_start(const Location &circle_center, float radius_m);
     void auto_circle_start();

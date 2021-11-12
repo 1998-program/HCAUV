@@ -11,7 +11,8 @@
 // auto_init - initialise auto controller
 bool HC::auto_init()
 {
-    if (!position_ok() || mission.num_commands() < 2) {
+    if (!position_ok() || mission.num_commands() < 2)
+    {
         return false;
     }
 
@@ -19,7 +20,8 @@ bool HC::auto_init()
 
     // stop ROI from carrying over from previous runs of the mission
     // To-Do: reset the yaw as part of auto_wp_start when the previous command was not a wp command to remove the need for this special ROI check
-    if (auto_yaw_mode == AUTO_YAW_ROI) {
+    if (auto_yaw_mode == AUTO_YAW_ROI)
+    {
         set_auto_yaw_mode(AUTO_YAW_HOLD);
     }
 
@@ -42,11 +44,12 @@ void HC::auto_run()
     mission.update();
 
     // call the correct auto controller
-    switch (auto_mode) {
+    switch (auto_mode)
+    {
 
     case Auto_WP:
     case Auto_CircleMoveToEdge:
-        auto_wp_run();
+        hc_auto_wp_run();
         break;
 
     case Auto_Circle:
@@ -74,7 +77,7 @@ void HC::auto_run()
 }
 
 // auto_wp_start - initialises waypoint controller to implement flying to a particular destination
-void HC::auto_wp_start(const Vector3f& destination)
+void HC::auto_wp_start(const Vector3f &destination)
 {
     auto_mode = Auto_WP;
 
@@ -83,18 +86,20 @@ void HC::auto_wp_start(const Vector3f& destination)
 
     // initialise yaw
     // To-Do: reset the yaw only when the previous navigation command is not a WP.  this would allow removing the special check for ROI
-    if (auto_yaw_mode != AUTO_YAW_ROI) {
+    if (auto_yaw_mode != AUTO_YAW_ROI)
+    {
         set_auto_yaw_mode(get_default_auto_yaw_mode(false));
     }
 }
 
 // auto_wp_start - initialises waypoint controller to implement flying to a particular destination
-void HC::auto_wp_start(const Location& dest_loc)
+void HC::auto_wp_start(const Location &dest_loc)
 {
     auto_mode = Auto_WP;
 
     // send target to waypoint controller
-    if (!wp_nav.set_wp_destination(dest_loc)) {
+    if (!wp_nav.set_wp_destination(dest_loc))
+    {
         // failure to set destination can only be because of missing terrain data
         failsafe_terrain_on_event();
         return;
@@ -102,7 +107,8 @@ void HC::auto_wp_start(const Location& dest_loc)
 
     // initialise yaw
     // To-Do: reset the yaw only when the previous navigation command is not a WP.  this would allow removing the special check for ROI
-    if (auto_yaw_mode != AUTO_YAW_ROI) {
+    if (auto_yaw_mode != AUTO_YAW_ROI)
+    {
         set_auto_yaw_mode(get_default_auto_yaw_mode(false));
     }
 }
@@ -112,23 +118,26 @@ void HC::auto_wp_start(const Location& dest_loc)
 void HC::auto_wp_run()
 {
     // if not armed set throttle to zero and exit immediately
-    if (!motors.armed()) {
+    if (!motors.armed())
+    {
         // To-Do: reset waypoint origin to current location because vehicle is probably on the ground so we don't want it lurching left or right on take-off
         //    (of course it would be better if people just used take-off)
         // call attitude controller
         // HC vehicles do not stabilize roll/pitch/yaw when disarmed
         motors.set_desired_spool_state(AP_Motors::DesiredSpoolState::GROUND_IDLE);
-        attitude_control.set_throttle_out(0,true,g.throttle_filt);
+        attitude_control.set_throttle_out(0, true, g.throttle_filt);
         attitude_control.relax_attitude_controllers();
         return;
     }
 
     // process pilot's yaw input
     float target_yaw_rate = 0;
-    if (!failsafe.pilot_input) {
+    if (!failsafe.pilot_input)
+    {
         // get pilot's desired yaw rate
         target_yaw_rate = get_pilot_desired_yaw_rate(channel_yaw->get_control_in());
-        if (!is_zero(target_yaw_rate)) {
+        if (!is_zero(target_yaw_rate))
+        {
             set_auto_yaw_mode(AUTO_YAW_HOLD);
         }
     }
@@ -163,25 +172,97 @@ void HC::auto_wp_run()
     get_pilot_desired_lean_angles(channel_roll->get_control_in(), channel_pitch->get_control_in(), target_roll, target_pitch, aparm.angle_max);
 
     // call attitude controller
-    if (auto_yaw_mode == AUTO_YAW_HOLD) {
+    if (auto_yaw_mode == AUTO_YAW_HOLD)
+    {
         // roll & pitch from waypoint controller, yaw rate from pilot
         attitude_control.input_euler_angle_roll_pitch_euler_rate_yaw(target_roll, target_pitch, target_yaw_rate);
-    } else {
+    }
+    else
+    {
         // roll, pitch from waypoint controller, yaw heading from auto_heading()
         attitude_control.input_euler_angle_roll_pitch_yaw(target_roll, target_pitch, get_auto_heading(), true);
     }
 }
 
+//HCUAV runs in auto mode
+void HC::hc_auto_wp_run()
+{
+    // if not armed set throttle to zero and exit immediately
+    if (!motors.armed())
+    {
+        // To-Do: reset waypoint origin to current location because vehicle is probably on the ground so we don't want it lurching left or right on take-off
+        //    (of course it would be better if people just used take-off)
+        // call attitude controller
+        // HC vehicles do not stabilize roll/pitch/yaw when disarmed
+        motors.set_desired_spool_state(AP_Motors::DesiredSpoolState::GROUND_IDLE);
+        attitude_control.set_throttle_out(0, true, g.throttle_filt);
+        attitude_control.relax_attitude_controllers();
+        return;
+    }
+
+    // process pilot's yaw input
+    float target_yaw_rate = 0;
+    if (!failsafe.pilot_input)
+    {
+        // get pilot's desired yaw rate
+        target_yaw_rate = get_pilot_desired_yaw_rate(channel_yaw->get_control_in());
+        if (!is_zero(target_yaw_rate))
+        {
+            set_auto_yaw_mode(AUTO_YAW_HOLD);
+        }
+    }
+
+    // set motors to full range
+    motors.set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
+
+    // run waypoint controller
+    // TODO logic for terrain tracking target going below fence limit
+    // TODO implement waypoint radius individually for each waypoint based on cmd.p2
+    // TODO fix auto yaw heading to switch to something appropriate when mission complete and switches to loiter
+
+    failsafe_terrain_set_status(wp_nav.update_wpnav());
+
+    ///////////////////////
+    // update xy outputs //
+
+    float lateral_out, forward_out;
+    translate_wpnav_rp(lateral_out, forward_out);
+
+    // Send to forward/lateral outputs
+    motors.set_lateral(lateral_out);
+    motors.set_forward(forward_out);
+
+    // call z-axis position controller (wpnav should have already updated it's alt target)
+    pos_control.update_z_controller();
+
+    ////////////////////////////
+    // update attitude output //
+
+    // get pilot desired lean angles
+    float target_roll = 0, target_pitch = 0;
+    // get_pilot_desired_lean_angles(channel_roll->get_control_in(), channel_pitch->get_control_in(), target_roll, target_pitch, aparm.angle_max);
+
+    // call attitude controller
+    // if (auto_yaw_mode == AUTO_YAW_HOLD) {
+    //     // roll & pitch from waypoint controller, yaw rate from pilot
+    //     attitude_control.input_euler_angle_roll_pitch_euler_rate_yaw(target_roll, target_pitch, target_yaw_rate);
+    // } else {
+    //     // roll, pitch from waypoint controller, yaw heading from auto_heading()
+    attitude_control.hc_input_euler_angle_roll_pitch_yaw(target_roll, target_pitch, wp_nav.get_yaw(), true);
+    // }
+}
+
 // auto_spline_start - initialises waypoint controller to implement flying to a particular destination using the spline controller
 //  seg_end_type can be SEGMENT_END_STOP, SEGMENT_END_STRAIGHT or SEGMENT_END_SPLINE.  If Straight or Spline the next_destination should be provided
-void HC::auto_spline_start(const Location& destination, bool stopped_at_start,
-                            AC_WPNav::spline_segment_end_type seg_end_type,
-                            const Location& next_destination)
+void HC::auto_spline_start(const Location &destination, bool stopped_at_start,
+                           AC_WPNav::spline_segment_end_type seg_end_type,
+                           const Location &next_destination)
 {
     auto_mode = Auto_Spline;
 
     // initialise wpnav
-    if (!wp_nav.set_spline_destination(destination, stopped_at_start, seg_end_type, next_destination)) {
+    if (!wp_nav.set_spline_destination(destination, stopped_at_start, seg_end_type, next_destination))
+    {
         // failure to set destination can only be because of missing terrain data
         failsafe_terrain_on_event();
         return;
@@ -189,7 +270,8 @@ void HC::auto_spline_start(const Location& destination, bool stopped_at_start,
 
     // initialise yaw
     // To-Do: reset the yaw only when the previous navigation command is not a WP.  this would allow removing the special check for ROI
-    if (auto_yaw_mode != AUTO_YAW_ROI) {
+    if (auto_yaw_mode != AUTO_YAW_ROI)
+    {
         set_auto_yaw_mode(get_default_auto_yaw_mode(false));
     }
 }
@@ -199,22 +281,25 @@ void HC::auto_spline_start(const Location& destination, bool stopped_at_start,
 void HC::auto_spline_run()
 {
     // if not armed set throttle to zero and exit immediately
-    if (!motors.armed()) {
+    if (!motors.armed())
+    {
         // To-Do: reset waypoint origin to current location because vehicle is probably on the ground so we don't want it lurching left or right on take-off
         //    (of course it would be better if people just used take-off)
         // HC vehicles do not stabilize roll/pitch/yaw when disarmed
         motors.set_desired_spool_state(AP_Motors::DesiredSpoolState::GROUND_IDLE);
-        attitude_control.set_throttle_out(0,true,g.throttle_filt);
+        attitude_control.set_throttle_out(0, true, g.throttle_filt);
         attitude_control.relax_attitude_controllers();
         return;
     }
 
     // process pilot's yaw input
     float target_yaw_rate = 0;
-    if (!failsafe.pilot_input) {
+    if (!failsafe.pilot_input)
+    {
         // get pilot's desired yaw rat
         target_yaw_rate = get_pilot_desired_yaw_rate(channel_yaw->get_control_in());
-        if (!is_zero(target_yaw_rate)) {
+        if (!is_zero(target_yaw_rate))
+        {
             set_auto_yaw_mode(AUTO_YAW_HOLD);
         }
     }
@@ -240,10 +325,13 @@ void HC::auto_spline_run()
     get_pilot_desired_lean_angles(channel_roll->get_control_in(), channel_pitch->get_control_in(), target_roll, target_pitch, aparm.angle_max);
 
     // call attitude controller
-    if (auto_yaw_mode == AUTO_YAW_HOLD) {
+    if (auto_yaw_mode == AUTO_YAW_HOLD)
+    {
         // roll & pitch from waypoint controller, yaw rate from pilot
         attitude_control.input_euler_angle_roll_pitch_euler_rate_yaw(target_roll, target_pitch, target_yaw_rate);
-    } else {
+    }
+    else
+    {
         // roll, pitch from waypoint controller, yaw heading from auto_heading()
         attitude_control.input_euler_angle_roll_pitch_yaw(target_roll, target_pitch, get_auto_heading(), true);
     }
@@ -256,7 +344,8 @@ void HC::auto_circle_movetoedge_start(const Location &circle_center, float radiu
 {
     // convert location to vector from ekf origin
     Vector3f circle_center_neu;
-    if (!circle_center.get_vector_from_origin_NEU(circle_center_neu)) {
+    if (!circle_center.get_vector_from_origin_NEU(circle_center_neu))
+    {
         // default to current position and log error
         circle_center_neu = inertial_nav.get_position();
         AP::logger().Write_Error(LogErrorSubsystem::NAVIGATION, LogErrorCode::FAILED_CIRCLE_INIT);
@@ -264,7 +353,8 @@ void HC::auto_circle_movetoedge_start(const Location &circle_center, float radiu
     circle_nav.set_center(circle_center_neu);
 
     // set circle radius
-    if (!is_zero(radius_m)) {
+    if (!is_zero(radius_m))
+    {
         circle_nav.set_radius(radius_m * 100.0f);
     }
 
@@ -274,7 +364,8 @@ void HC::auto_circle_movetoedge_start(const Location &circle_center, float radiu
     float dist_to_edge = (inertial_nav.get_position() - circle_edge_neu).length();
 
     // if more than 3m then fly to edge
-    if (dist_to_edge > 300.0f) {
+    if (dist_to_edge > 300.0f)
+    {
         // set the state to move to the edge of the circle
         auto_mode = Auto_CircleMoveToEdge;
 
@@ -285,7 +376,8 @@ void HC::auto_circle_movetoedge_start(const Location &circle_center, float radiu
         circle_edge.set_alt_cm(circle_center.alt, circle_center.get_alt_frame());
 
         // initialise wpnav to move to edge of circle
-        if (!wp_nav.set_wp_destination(circle_edge)) {
+        if (!wp_nav.set_wp_destination(circle_edge))
+        {
             // failure to set destination can only be because of missing terrain data
             failsafe_terrain_on_event();
         }
@@ -293,13 +385,18 @@ void HC::auto_circle_movetoedge_start(const Location &circle_center, float radiu
         // if we are outside the circle, point at the edge, otherwise hold yaw
         const Vector3f &curr_pos = inertial_nav.get_position();
         float dist_to_center = norm(circle_center_neu.x - curr_pos.x, circle_center_neu.y - curr_pos.y);
-        if (dist_to_center > circle_nav.get_radius() && dist_to_center > 500) {
+        if (dist_to_center > circle_nav.get_radius() && dist_to_center > 500)
+        {
             set_auto_yaw_mode(get_default_auto_yaw_mode(false));
-        } else {
+        }
+        else
+        {
             // vehicle is within circle so hold yaw to avoid spinning as we move to edge of circle
             set_auto_yaw_mode(AUTO_YAW_HOLD);
         }
-    } else {
+    }
+    else
+    {
         auto_circle_start();
     }
 }
@@ -355,14 +452,15 @@ void HC::auto_nav_guided_run()
     // call regular guided flight mode run function
     guided_run();
 }
-#endif  // NAV_GUIDED
+#endif // NAV_GUIDED
 
 // auto_loiter_start - initialises loitering in auto mode
 //  returns success/failure because this can be called by exit_mission
 bool HC::auto_loiter_start()
 {
     // return failure if GPS is bad
-    if (!position_ok()) {
+    if (!position_ok())
+    {
         return false;
     }
     auto_mode = Auto_Loiter;
@@ -388,10 +486,11 @@ bool HC::auto_loiter_start()
 void HC::auto_loiter_run()
 {
     // if not armed set throttle to zero and exit immediately
-    if (!motors.armed()) {
+    if (!motors.armed())
+    {
         motors.set_desired_spool_state(AP_Motors::DesiredSpoolState::GROUND_IDLE);
         // HC vehicles do not stabilize roll/pitch/yaw when disarmed
-        attitude_control.set_throttle_out(0,true,g.throttle_filt);
+        attitude_control.set_throttle_out(0, true, g.throttle_filt);
         attitude_control.relax_attitude_controllers();
 
         return;
@@ -399,7 +498,8 @@ void HC::auto_loiter_run()
 
     // accept pilot input of yaw
     float target_yaw_rate = 0;
-    if (!failsafe.pilot_input) {
+    if (!failsafe.pilot_input)
+    {
         target_yaw_rate = get_pilot_desired_yaw_rate(channel_yaw->get_control_in());
     }
 
@@ -433,16 +533,20 @@ void HC::auto_loiter_run()
 // set rtl parameter to true if this is during an RTL
 uint8_t HC::get_default_auto_yaw_mode(bool rtl)
 {
-    switch (g.wp_yaw_behavior) {
+    switch (g.wp_yaw_behavior)
+    {
 
     case WP_YAW_BEHAVIOR_NONE:
         return AUTO_YAW_HOLD;
         break;
 
     case WP_YAW_BEHAVIOR_LOOK_AT_NEXT_WP_EXCEPT_RTL:
-        if (rtl) {
+        if (rtl)
+        {
             return AUTO_YAW_HOLD;
-        } else {
+        }
+        else
+        {
             return AUTO_YAW_LOOK_AT_NEXT_WP;
         }
         break;
@@ -466,13 +570,15 @@ uint8_t HC::get_default_auto_yaw_mode(bool rtl)
 void HC::set_auto_yaw_mode(uint8_t yaw_mode)
 {
     // return immediately if no change
-    if (auto_yaw_mode == yaw_mode) {
+    if (auto_yaw_mode == yaw_mode)
+    {
         return;
     }
     auto_yaw_mode = yaw_mode;
 
     // perform initialisation
-    switch (auto_yaw_mode) {
+    switch (auto_yaw_mode)
+    {
 
     case AUTO_YAW_LOOK_AT_NEXT_WP:
         // wpnav will initialise heading when wpnav's set_destination method is called
@@ -506,26 +612,33 @@ void HC::set_auto_yaw_look_at_heading(float angle_deg, float turn_rate_dps, int8
     int32_t curr_yaw_target = attitude_control.get_att_target_euler_cd().z;
 
     // get final angle, 1 = Relative, 0 = Absolute
-    if (relative_angle == 0) {
+    if (relative_angle == 0)
+    {
         // absolute angle
         yaw_look_at_heading = wrap_360_cd(angle_deg * 100);
-    } else {
+    }
+    else
+    {
         // relative angle
-        if (direction < 0) {
+        if (direction < 0)
+        {
             angle_deg = -angle_deg;
         }
-        yaw_look_at_heading = wrap_360_cd((angle_deg*100+curr_yaw_target));
+        yaw_look_at_heading = wrap_360_cd((angle_deg * 100 + curr_yaw_target));
     }
 
     // get turn speed
     // TODO actually implement this, right now, yaw_look_at_heading_slew is unused
     // see AP_Float _slew_yaw in AC_AttitudeControl
-    if (is_zero(turn_rate_dps)) {
+    if (is_zero(turn_rate_dps))
+    {
         // default to regular auto slew rate
         yaw_look_at_heading_slew = AUTO_YAW_SLEW_RATE;
-    } else {
+    }
+    else
+    {
         int32_t turn_rate = (wrap_180_cd(yaw_look_at_heading - curr_yaw_target) / 100) / turn_rate_dps;
-        yaw_look_at_heading_slew = constrain_int32(turn_rate, 1, 360);    // deg / sec
+        yaw_look_at_heading_slew = constrain_int32(turn_rate, 1, 360); // deg / sec
     }
 
     // set yaw mode
@@ -538,19 +651,24 @@ void HC::set_auto_yaw_look_at_heading(float angle_deg, float turn_rate_dps, int8
 void HC::set_auto_yaw_roi(const Location &roi_location)
 {
     // if location is zero lat, lon and altitude turn off ROI
-    if (roi_location.alt == 0 && roi_location.lat == 0 && roi_location.lng == 0) {
+    if (roi_location.alt == 0 && roi_location.lat == 0 && roi_location.lng == 0)
+    {
         // set auto yaw mode back to default assuming the active command is a waypoint command.  A more sophisticated method is required to ensure we return to the proper yaw control for the active command
         set_auto_yaw_mode(get_default_auto_yaw_mode(false));
 #if MOUNT == ENABLED
         // switch off the camera tracking if enabled
-        if (camera_mount.get_mode() == MAV_MOUNT_MODE_GPS_POINT) {
+        if (camera_mount.get_mode() == MAV_MOUNT_MODE_GPS_POINT)
+        {
             camera_mount.set_mode_to_default();
         }
-#endif  // MOUNT == ENABLED
-    } else {
+#endif // MOUNT == ENABLED
+    }
+    else
+    {
 #if MOUNT == ENABLED
         // check if mount type requires us to rotate the quad
-        if (!camera_mount.has_pan_control()) {
+        if (!camera_mount.has_pan_control())
+        {
             roi_WP = pv_location_to_vector(roi_location);
             set_auto_yaw_mode(AUTO_YAW_ROI);
         }
@@ -567,7 +685,7 @@ void HC::set_auto_yaw_roi(const Location &roi_location)
         // if we have no camera mount aim the quad at the location
         roi_WP = pv_location_to_vector(roi_location);
         set_auto_yaw_mode(AUTO_YAW_ROI);
-#endif  // MOUNT == ENABLED
+#endif // MOUNT == ENABLED
     }
 }
 
@@ -575,7 +693,8 @@ void HC::set_auto_yaw_roi(const Location &roi_location)
 // 100hz update rate
 float HC::get_auto_heading()
 {
-    switch (auto_yaw_mode) {
+    switch (auto_yaw_mode)
+    {
 
     case AUTO_YAW_ROI:
         // point towards a location held in roi_WP
@@ -597,7 +716,8 @@ float HC::get_auto_heading()
         return initial_armed_bearing;
         break;
 
-    case AUTO_YAW_CORRECT_XTRACK: {
+    case AUTO_YAW_CORRECT_XTRACK:
+    {
         // TODO return current yaw if not in appropriate mode
         // Bearing of current track (centidegrees)
         float track_bearing = get_bearing_cd(wp_nav.get_wp_origin(), wp_nav.get_wp_destination());
@@ -624,7 +744,8 @@ float HC::get_auto_heading()
 bool HC::auto_terrain_recover_start()
 {
     // Check rangefinder status to see if recovery is possible
-    switch (rangefinder.status_orient(ROTATION_PITCH_270)) {
+    switch (rangefinder.status_orient(ROTATION_PITCH_270))
+    {
 
     case RangeFinder::RangeFinder_OutOfRangeLow:
     case RangeFinder::RangeFinder_OutOfRangeHigh:
@@ -674,14 +795,16 @@ void HC::auto_terrain_recover_run()
     static uint32_t rangefinder_recovery_ms = 0;
 
     // if not armed set throttle to zero and exit immediately
-    if (!motors.armed()) {
+    if (!motors.armed())
+    {
         motors.set_desired_spool_state(AP_Motors::DesiredSpoolState::GROUND_IDLE);
-        attitude_control.set_throttle_out(0,true,g.throttle_filt);
+        attitude_control.set_throttle_out(0, true, g.throttle_filt);
         attitude_control.relax_attitude_controllers();
         return;
     }
 
-    switch (rangefinder.status_orient(ROTATION_PITCH_270)) {
+    switch (rangefinder.status_orient(ROTATION_PITCH_270))
+    {
 
     case RangeFinder::RangeFinder_OutOfRangeLow:
         target_climb_rate = wp_nav.get_default_speed_up();
@@ -697,24 +820,26 @@ void HC::auto_terrain_recover_run()
 
         target_climb_rate = 0; // Attempt to hold current depth
 
-        if (rangefinder_state.alt_healthy) {
+        if (rangefinder_state.alt_healthy)
+        {
 
             // Start timer as soon as rangefinder is healthy
-            if (rangefinder_recovery_ms == 0) {
+            if (rangefinder_recovery_ms == 0)
+            {
                 rangefinder_recovery_ms = AP_HAL::millis();
                 pos_control.relax_alt_hold_controllers(motors.get_throttle_hover()); // Reset alt hold targets
             }
 
             // 1.5 seconds of healthy rangefinder means we can resume mission with terrain enabled
-            if (AP_HAL::millis() > rangefinder_recovery_ms + 1500) {
+            if (AP_HAL::millis() > rangefinder_recovery_ms + 1500)
+            {
                 gcs().send_text(MAV_SEVERITY_INFO, "Terrain failsafe recovery successful!");
                 failsafe_terrain_set_status(true); // Reset failsafe timers
-                failsafe.terrain = false; // Clear flag
-                auto_mode = Auto_Loiter; // Switch back to loiter for next iteration
-                mission.resume(); // Resume mission
-                rangefinder_recovery_ms = 0; // Reset for subsequent recoveries
+                failsafe.terrain = false;          // Clear flag
+                auto_mode = Auto_Loiter;           // Switch back to loiter for next iteration
+                mission.resume();                  // Resume mission
+                rangefinder_recovery_ms = 0;       // Reset for subsequent recoveries
             }
-
         }
         break;
 
@@ -729,7 +854,8 @@ void HC::auto_terrain_recover_run()
     }
 
     // exit on failure (timeout)
-    if (AP_HAL::millis() > fs_terrain_recover_start_ms + FS_TERRAIN_RECOVER_TIMEOUT_MS) {
+    if (AP_HAL::millis() > fs_terrain_recover_start_ms + FS_TERRAIN_RECOVER_TIMEOUT_MS)
+    {
         // Recovery has failed, revert to failsafe action
         gcs().send_text(MAV_SEVERITY_CRITICAL, "Terrain failsafe recovery timeout!");
         failsafe_terrain_act();

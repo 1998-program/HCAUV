@@ -134,6 +134,8 @@ public:
     // Command an euler roll, pitch and yaw angle with angular velocity feedforward and smoothing
     virtual void input_euler_angle_roll_pitch_yaw(float euler_roll_angle_cd, float euler_pitch_angle_cd, float euler_yaw_angle_cd, bool slew_yaw);
 
+
+    virtual void hc_input_euler_angle_roll_pitch_yaw(float euler_roll_angle_cd, float euler_pitch_angle_cd, float euler_yaw_angle_cd, bool slew_yaw);
     // Command euler yaw rate and pitch angle with roll angle specified in body frame with multicopter style controls
     // (used only by tailsitter quadplanes)
     virtual void input_euler_rate_yaw_euler_angle_pitch_bf_roll_m(float euler_roll_angle_cd, float euler_pitch_angle_cd, float euler_yaw_rate_cds);
@@ -159,7 +161,7 @@ public:
 
     // Run angular velocity controller and send outputs to the motors
     virtual void rate_controller_run() = 0;
-
+    virtual void hc_rate_controller_run() = 0;
     // Convert a 321-intrinsic euler angle derivative to an angular velocity vector
     void euler_rate_to_ang_vel(const Vector3f& euler_rad, const Vector3f& euler_rate_rads, Vector3f& ang_vel_rads);
 
@@ -269,9 +271,10 @@ public:
     // thrust_heading_rotation_angles - calculates two ordered rotations to move the att_from_quat quaternion to the att_to_quat quaternion.
     // The first rotation corrects the thrust vector and the second rotation corrects the heading vector.
     void thrust_heading_rotation_angles(Quaternion& att_to_quat, const Quaternion& att_from_quat, Vector3f& att_diff_angle, float& thrust_vec_dot);
-
+    void hc_thrust_heading_rotation_angles(Quaternion& att_to_quat, const Quaternion& att_from_quat, Vector3f& att_diff_angle, float& thrust_vec_dot);
     // Calculates the body frame angular velocities to follow the target attitude
     void attitude_controller_run_quat();
+    void hc_attitude_controller_run_quat();
 
     // sanity check parameters.  should be called once before take-off
     virtual void parameter_sanity_check() {}

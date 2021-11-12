@@ -335,6 +335,19 @@ void AC_AttitudeControl_Sub::rate_controller_run()
     control_monitor_update();
 }
 
+void AC_AttitudeControl_Sub::hc_rate_controller_run()
+{
+    // move throttle vs attitude mixing towards desired (called from here because this is conveniently called on every iteration)
+    update_throttle_rpy_mix();
+
+    Vector3f gyro_latest = _ahrs.get_gyro_latest();
+    _motors.set_roll(get_rate_roll_pid().hc_update_all(_rate_target_ang_vel.x, gyro_latest.x, _motors.limit.roll));
+    _motors.set_pitch(get_rate_pitch_pid().hc_update_all(_rate_target_ang_vel.y, gyro_latest.y, _motors.limit.pitch));
+    _motors.set_yaw(get_rate_yaw_pid().hc_update_all(_rate_target_ang_vel.z, gyro_latest.z, _motors.limit.yaw));
+
+    control_monitor_update();
+}
+
 // sanity check parameters.  should be called once before takeoff
 void AC_AttitudeControl_Sub::parameter_sanity_check()
 {

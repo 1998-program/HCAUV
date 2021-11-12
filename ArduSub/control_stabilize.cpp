@@ -33,13 +33,14 @@ void Sub::stabilize_run()
     }
     motors.set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
 
-    handle_attitude();
+//    handle_attitude();
 
     // output pilot's throttle
-    attitude_control.set_throttle_out(channel_throttle->norm_input(), false, g.throttle_filt);
+//   attitude_control.set_throttle_out(channel_throttle->norm_input(), false, g.throttle_filt);
 
     //control_in is range -1000-1000
     //radio_in is raw pwm value
     motors.set_forward(channel_forward->norm_input());
     motors.set_lateral(channel_lateral->norm_input());
+    attitude_control.hc_input_euler_angle_roll_pitch_yaw(0, 0, 12000, true);
 }

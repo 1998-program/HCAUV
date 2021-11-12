@@ -274,6 +274,23 @@ class VehicleInfo(object):
             },
         },
     },
+    "HCAUV": {
+        "default_frame": "vectored",
+        "frames": {
+            "vectored": {
+                "waf_target": "bin/hcauv",
+                "default_params_filename": "default_params/sub.parm",
+            },
+            "vectored_6dof": {
+                "waf_target": "bin/hcauv",
+                "default_params_filename": "default_params/sub-6dof.parm",
+            },
+            "gazebo-bluerov2": {
+                "waf_target": "bin/hcauv",
+                "default_params_filename": "default_params/sub.parm",
+            },
+        },
+    },
     "AntennaTracker": {
         "default_frame": "tracker",
         "frames": {

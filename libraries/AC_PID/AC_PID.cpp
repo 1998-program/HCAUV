@@ -56,15 +56,13 @@ const AP_Param::GroupInfo AC_PID::var_info[] = {
     // @Units: Hz
     AP_GROUPINFO("FLTD", 11, AC_PID, _filt_D_hz, AC_PID_DFILT_HZ_DEFAULT),
 
-    AP_GROUPEND
-};
+    AP_GROUPEND};
 
 // Constructor
-AC_PID::AC_PID(float initial_p, float initial_i, float initial_d, float initial_ff, float initial_imax, float initial_filt_T_hz, float initial_filt_E_hz, float initial_filt_D_hz, float dt) :
-    _dt(dt),
-    _integrator(0.0f),
-    _error(0.0f),
-    _derivative(0.0f)
+AC_PID::AC_PID(float initial_p, float initial_i, float initial_d, float initial_ff, float initial_imax, float initial_filt_T_hz, float initial_filt_E_hz, float initial_filt_D_hz, float dt) : _dt(dt),
+                                                                                                                                                                                               _integrator(0.0f),
+                                                                                                                                                                                               _error(0.0f),
+                                                                                                                                                                                               _derivative(0.0f)
 {
     // load parameter values from eeprom
     AP_Param::setup_object_defaults(this, var_info);
@@ -116,23 +114,28 @@ void AC_PID::filt_D_hz(float hz)
 float AC_PID::update_all(float target, float measurement, bool limit)
 {
     // don't process inf or NaN
-    if (!isfinite(target) || !isfinite(measurement)) {
+    if (!isfinite(target) || !isfinite(measurement))
+    {
         return 0.0f;
     }
 
     // reset input filter to value received
-    if (_flags._reset_filter) {
+    if (_flags._reset_filter)
+    {
         _flags._reset_filter = false;
         _target = target;
         _error = _target - measurement;
         _derivative = 0.0f;
-    } else {
+    }
+    else
+    {
         float error_last = _error;
         _target += get_filt_T_alpha() * (target - _target);
         _error += get_filt_E_alpha() * ((_target - measurement) - _error);
 
         // calculate and filter derivative
-        if (_dt > 0.0f) {
+        if (_dt > 0.0f)
+        {
             float derivative = (_error - error_last) / _dt;
             _derivative += get_filt_D_alpha() * (derivative - _derivative);
         }
@@ -140,6 +143,62 @@ float AC_PID::update_all(float target, float measurement, bool limit)
 
     // update I term
     update_i(limit);
+
+    float P_out = (_error * _kp);
+    float D_out = (_derivative * _kd);
+
+    _pid_info.target = _target;
+    _pid_info.actual = measurement;
+    _pid_info.error = _error;
+    _pid_info.P = P_out;
+    _pid_info.D = D_out;
+
+    return P_out + _integrator + D_out;
+}
+
+float AC_PID::hc_update_all(float target, float measurement, bool limit)
+{
+    // don't process inf or NaN
+    if (!isfinite(target) || !isfinite(measurement))
+    {
+        return 0.0f;
+    }
+
+    // reset input filter to value received
+    if (_flags._reset_filter)
+    {
+        _flags._reset_filter = false;
+        _target = target;
+        _error = _target - measurement;
+        _derivative = 0.0f;
+    }
+    else
+    {
+        float error_last = _error;
+        //  _target += get_filt_T_alpha() * (target - _target);
+        //  _error += get_filt_E_alpha() * ((_target - measurement) - _error);
+        _error = _target - measurement;
+        // calculate and filter derivative
+        if (_dt > 0.0f)
+        {
+            _derivative = (_error - error_last) / _dt;
+            // _derivative += get_filt_D_alpha() * (derivative - _derivative);
+        }
+    }
+
+    // update I term
+    // update_i(limit);
+    if (!is_zero(_ki) && is_positive(_dt)) {
+        // Ensure that integrator can only be reduced if the output is saturated
+        if (!limit || ((is_positive(_integrator) && is_negative(_error)) || (is_negative(_integrator) && is_positive(_error)))) {
+            _integrator += ((float)_error * _ki) * _dt;
+            _integrator = constrain_float(_integrator, -_kimax, _kimax);
+        }
+    } else {
+        _integrator = 0.0f;
+    }
+    
+    _pid_info.I = _integrator;
 
     float P_out = (_error * _kp);
     float D_out = (_derivative * _kd);
@@ -162,23 +221,28 @@ float AC_PID::update_all(float target, float measurement, bool limit)
 float AC_PID::update_error(float error, bool limit)
 {
     // don't process inf or NaN
-    if (!isfinite(error)) {
+    if (!isfinite(error))
+    {
         return 0.0f;
     }
 
     _target = 0.0f;
 
     // reset input filter to value received
-    if (_flags._reset_filter) {
+    if (_flags._reset_filter)
+    {
         _flags._reset_filter = false;
         _error = error;
         _derivative = 0.0f;
-    } else {
+    }
+    else
+    {
         float error_last = _error;
         _error += get_filt_E_alpha() * (error - _error);
 
         // calculate and filter derivative
-        if (_dt > 0.0f) {
+        if (_dt > 0.0f)
+        {
             float derivative = (_error - error_last) / _dt;
             _derivative += get_filt_D_alpha() * (derivative - _derivative);
         }
@@ -203,13 +267,17 @@ float AC_PID::update_error(float error, bool limit)
 //  If the limit flag is set the integral is only allowed to shrink
 void AC_PID::update_i(bool limit)
 {
-    if (!is_zero(_ki) && is_positive(_dt)) {
+    if (!is_zero(_ki) && is_positive(_dt))
+    {
         // Ensure that integrator can only be reduced if the output is saturated
-        if (!limit || ((is_positive(_integrator) && is_negative(_error)) || (is_negative(_integrator) && is_positive(_error)))) {
+        if (!limit || ((is_positive(_integrator) && is_negative(_error)) || (is_negative(_integrator) && is_positive(_error))))
+        {
             _integrator += ((float)_error * _ki) * _dt;
             _integrator = constrain_float(_integrator, -_kimax, _kimax);
         }
-    } else {
+    }
+    else
+    {
         _integrator = 0.0f;
     }
     _pid_info.I = _integrator;
@@ -310,7 +378,8 @@ float AC_PID::get_filt_D_alpha() const
 // get_filt_alpha - calculate a filter alpha
 float AC_PID::get_filt_alpha(float filt_hz) const
 {
-    if (is_zero(filt_hz)) {
+    if (is_zero(filt_hz))
+    {
         return 1.0f;
     }
 

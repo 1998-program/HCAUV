@@ -46,7 +46,8 @@ void Sub::auto_run()
 
     case Auto_WP:
     case Auto_CircleMoveToEdge:
-        auto_wp_run();
+       hc_auto_wp_run();
+        // auto_wp_run();
         break;
 
     case Auto_Circle:
@@ -106,7 +107,74 @@ void Sub::auto_wp_start(const Location& dest_loc)
         set_auto_yaw_mode(get_default_auto_yaw_mode(false));
     }
 }
+void Sub::hc_auto_wp_run()
+{
+    // if not armed set throttle to zero and exit immediately
+    if (!motors.armed())
+    {
+        // To-Do: reset waypoint origin to current location because vehicle is probably on the ground so we don't want it lurching left or right on take-off
+        //    (of course it would be better if people just used take-off)
+        // call attitude controller
+        // HC vehicles do not stabilize roll/pitch/yaw when disarmed
+        motors.set_desired_spool_state(AP_Motors::DesiredSpoolState::GROUND_IDLE);
+        attitude_control.set_throttle_out(0, true, g.throttle_filt);
+        attitude_control.relax_attitude_controllers();
+        return;
+    }
 
+    // process pilot's yaw input
+    // float target_yaw_rate = 0;
+    // if (!failsafe.pilot_input)
+    // {
+    //     // get pilot's desired yaw rate
+    //     target_yaw_rate = get_pilot_desired_yaw_rate(channel_yaw->get_control_in());
+    //     if (!is_zero(target_yaw_rate))
+    //     {
+    //         set_auto_yaw_mode(AUTO_YAW_HOLD);
+    //     }
+    // }
+
+    // set motors to full range
+    motors.set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
+
+    // run waypoint controller
+    // TODO logic for terrain tracking target going below fence limit
+    // TODO implement waypoint radius individually for each waypoint based on cmd.p2
+    // TODO fix auto yaw heading to switch to something appropriate when mission complete and switches to loiter
+
+//    failsafe_terrain_set_status(wp_nav.update_wpnav());
+    wp_nav.update_wpnav();
+
+    ///////////////////////
+    // update xy outputs //
+
+    float lateral_out, forward_out;
+    translate_wpnav_rp(lateral_out, forward_out);
+
+    // Send to forward/lateral outputs
+    motors.set_lateral(lateral_out);
+    motors.set_forward(forward_out);
+
+    // call z-axis position controller (wpnav should have already updated it's alt target)
+    pos_control.update_z_controller();
+
+    ////////////////////////////
+    // update attitude output //
+
+    // get pilot desired lean angles
+    float target_roll = 0, target_pitch = 0;
+    // get_pilot_desired_lean_angles(channel_roll->get_control_in(), channel_pitch->get_control_in(), target_roll, target_pitch, aparm.angle_max);
+
+    // call attitude controller
+    // if (auto_yaw_mode == AUTO_YAW_HOLD) {
+    //     // roll & pitch from waypoint controller, yaw rate from pilot
+    //     attitude_control.input_euler_angle_roll_pitch_euler_rate_yaw(target_roll, target_pitch, target_yaw_rate);
+    // } else {
+    //     // roll, pitch from waypoint controller, yaw heading from auto_heading()
+    // attitude_control.hc_input_euler_angle_roll_pitch_yaw(target_roll, target_pitch, wp_nav.get_yaw(), true);
+    // }
+   attitude_control.hc_input_euler_angle_roll_pitch_yaw(target_roll, target_pitch, 3000, true);
+}
 // auto_wp_run - runs the auto waypoint controller
 //      called by auto_run at 100hz or more
 void Sub::auto_wp_run()
@@ -159,17 +227,17 @@ void Sub::auto_wp_run()
     // update attitude output //
 
     // get pilot desired lean angles
-    float target_roll, target_pitch;
-    get_pilot_desired_lean_angles(channel_roll->get_control_in(), channel_pitch->get_control_in(), target_roll, target_pitch, aparm.angle_max);
+    float target_roll = 0.0, target_pitch =0.0;
+//    get_pilot_desired_lean_angles(channel_roll->get_control_in(), channel_pitch->get_control_in(), target_roll, target_pitch, aparm.angle_max);
 
     // call attitude controller
-    if (auto_yaw_mode == AUTO_YAW_HOLD) {
-        // roll & pitch from waypoint controller, yaw rate from pilot
-        attitude_control.input_euler_angle_roll_pitch_euler_rate_yaw(target_roll, target_pitch, target_yaw_rate);
-    } else {
+//    if (auto_yaw_mode == AUTO_YAW_HOLD) {
+//         // roll & pitch from waypoint controller, yaw rate from pilot
+//        attitude_control.input_euler_angle_roll_pitch_euler_rate_yaw(target_roll, target_pitch, target_yaw_rate);
+//    } else {
         // roll, pitch from waypoint controller, yaw heading from auto_heading()
-        attitude_control.input_euler_angle_roll_pitch_yaw(target_roll, target_pitch, get_auto_heading(), true);
-    }
+        attitude_control.hc_input_euler_angle_roll_pitch_yaw(target_roll, target_pitch, get_auto_heading(), true);
+    // }
 }
 
 // auto_spline_start - initialises waypoint controller to implement flying to a particular destination using the spline controller

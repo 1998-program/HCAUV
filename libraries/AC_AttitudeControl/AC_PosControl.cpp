@@ -968,12 +968,12 @@ void AC_PosControl::desired_vel_to_pos(float nav_dt)
 ///     converts desired accelerations provided in lat/lon frame to roll/pitch angles
 void AC_PosControl::run_xy_controller(float dt)
 {
-    float ekfGndSpdLimit, ekfNavVelGainScaler;
-    AP::ahrs_navekf().getEkfControlLimits(ekfGndSpdLimit, ekfNavVelGainScaler);
+    // float ekfGndSpdLimit, ekfNavVelGainScaler;
+    // AP::ahrs_navekf().getEkfControlLimits(ekfGndSpdLimit, ekfNavVelGainScaler);
 
     Vector3f curr_pos = _inav.get_position();
-    float kP = ekfNavVelGainScaler * _p_pos_xy.kP(); // scale gains to compensate for noisy optical flow measurement in the EKF
-
+    // float kP = ekfNavVelGainScaler * _p_pos_xy.kP(); // scale gains to compensate for noisy optical flow measurement in the EKF
+    float kP = _p_pos_xy.kP();    
     // avoid divide by zero
     if (kP <= 0.0f) {
         _vel_target.x = 0.0f;
@@ -986,17 +986,17 @@ void AC_PosControl::run_xy_controller(float dt)
         // Constrain _pos_error and target position
         // Constrain the maximum length of _vel_target to the maximum position correction velocity
         // TODO: replace the leash length with a user definable maximum position correction
-        if (limit_vector_length(_pos_error.x, _pos_error.y, _leash)) {
-            _pos_target.x = curr_pos.x + _pos_error.x;
-            _pos_target.y = curr_pos.y + _pos_error.y;
-        }
+        // if (limit_vector_length(_pos_error.x, _pos_error.y, _leash)) {
+        //     _pos_target.x = curr_pos.x + _pos_error.x;
+        //     _pos_target.y = curr_pos.y + _pos_error.y;
+        // }
 
         _vel_target = sqrt_controller(_pos_error, kP, _accel_cms);
     }
 
     // add velocity feed-forward
-    _vel_target.x += _vel_desired.x;
-    _vel_target.y += _vel_desired.y;
+    // _vel_target.x += _vel_desired.x;
+    // _vel_target.y += _vel_desired.y;
 
     // the following section converts desired velocities in lat/lon directions to accelerations in lat/lon frame
 
@@ -1023,36 +1023,37 @@ void AC_PosControl::run_xy_controller(float dt)
 
     // update i term if we have not hit the accel or throttle limits OR the i term will reduce
     // TODO: move limit handling into the PI and PID controller
-    if (!_limit.accel_xy && !_motors.limit.throttle_upper) {
-        vel_xy_i = _pid_vel_xy.get_i();
-    } else {
-        vel_xy_i = _pid_vel_xy.get_i_shrink();
-    }
-
+    // if (!_limit.accel_xy && !_motors.limit.throttle_upper) {
+    //     vel_xy_i = _pid_vel_xy.get_i();
+    // } else {
+    //     vel_xy_i = _pid_vel_xy.get_i_shrink();
+    // }
+    vel_xy_i = _pid_vel_xy.get_i();
     // get d
     vel_xy_d = _pid_vel_xy.get_d();
 
     // acceleration to correct for velocity error and scale PID output to compensate for optical flow measurement induced EKF noise
-    accel_target.x = (vel_xy_p.x + vel_xy_i.x + vel_xy_d.x) * ekfNavVelGainScaler;
-    accel_target.y = (vel_xy_p.y + vel_xy_i.y + vel_xy_d.y) * ekfNavVelGainScaler;
-
+    // accel_target.x = (vel_xy_p.x + vel_xy_i.x + vel_xy_d.x) * ekfNavVelGainScaler;
+    // accel_target.y = (vel_xy_p.y + vel_xy_i.y + vel_xy_d.y) * ekfNavVelGainScaler;
+    accel_target.x = (vel_xy_p.x + vel_xy_i.x + vel_xy_d.x);
+    accel_target.y = (vel_xy_p.y + vel_xy_i.y + vel_xy_d.y);
     // reset accel to current desired acceleration
-    if (_flags.reset_accel_to_lean_xy) {
-        _accel_target_filter.reset(Vector2f(accel_target.x, accel_target.y));
-        _flags.reset_accel_to_lean_xy = false;
-    }
+    // if (_flags.reset_accel_to_lean_xy) {
+    //     _accel_target_filter.reset(Vector2f(accel_target.x, accel_target.y));
+    //     _flags.reset_accel_to_lean_xy = false;
+    // }
 
     // filter correction acceleration
-    _accel_target_filter.set_cutoff_frequency(MIN(_accel_xy_filt_hz, 5.0f * ekfNavVelGainScaler));
-    _accel_target_filter.apply(accel_target, dt);
+    // _accel_target_filter.set_cutoff_frequency(MIN(_accel_xy_filt_hz, 5.0f * ekfNavVelGainScaler));
+    // _accel_target_filter.apply(accel_target, dt);
 
     // pass the correction acceleration to the target acceleration output
-    _accel_target.x = _accel_target_filter.get().x;
-    _accel_target.y = _accel_target_filter.get().y;
+    // _accel_target.x = _accel_target_filter.get().x;
+    // _accel_target.y = _accel_target_filter.get().y;
 
     // Add feed forward into the target acceleration output
-    _accel_target.x += _accel_desired.x;
-    _accel_target.y += _accel_desired.y;
+    // _accel_target.x += _accel_desired.x;
+    // _accel_target.y += _accel_desired.y;
 
     // the following section converts desired accelerations provided in lat/lon frame to roll/pitch angles
 
