@@ -552,7 +552,7 @@ bool AC_WPNav::update_wpnav()
     bool ret = true;
 
     // get dt from pos controller
-    // float dt = _pos_control.get_dt();
+    //  float dt = _pos_control.get_dt();
 
     // allow the accel and speed values to be set without changing
     // out of auto mode. This makes it easier to tune auto flight
@@ -564,7 +564,7 @@ bool AC_WPNav::update_wpnav()
     //     // To-Do: handle inability to advance along track (probably because of missing terrain data)
     //     ret = false;
     // }
-    hc_wp_target();
+     hc_wp_target();
 
     // freeze feedforwards during known discontinuities
     if (_flags.new_wp_destination)

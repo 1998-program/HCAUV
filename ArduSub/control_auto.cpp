@@ -156,7 +156,7 @@ void Sub::hc_auto_wp_run()
     motors.set_forward(forward_out);
 
     // call z-axis position controller (wpnav should have already updated it's alt target)
-    pos_control.update_z_controller();
+    // pos_control.update_z_controller();
 
     ////////////////////////////
     // update attitude output //
@@ -173,7 +173,8 @@ void Sub::hc_auto_wp_run()
     //     // roll, pitch from waypoint controller, yaw heading from auto_heading()
     // attitude_control.hc_input_euler_angle_roll_pitch_yaw(target_roll, target_pitch, wp_nav.get_yaw(), true);
     // }
-   attitude_control.hc_input_euler_angle_roll_pitch_yaw(target_roll, target_pitch, 3000, true);
+   attitude_control.hc_input_euler_angle_roll_pitch_yaw(target_roll, target_pitch, pos_control.get_bearing_to_target(), true);
+    // gcs().send_text(MAV_SEVERITY_WARNING, "wp_nav.get_yaw():%d",wp_nav.get_yaw());
 }
 // auto_wp_run - runs the auto waypoint controller
 //      called by auto_run at 100hz or more
@@ -228,16 +229,16 @@ void Sub::auto_wp_run()
 
     // get pilot desired lean angles
     float target_roll = 0.0, target_pitch =0.0;
-//    get_pilot_desired_lean_angles(channel_roll->get_control_in(), channel_pitch->get_control_in(), target_roll, target_pitch, aparm.angle_max);
+    get_pilot_desired_lean_angles(channel_roll->get_control_in(), channel_pitch->get_control_in(), target_roll, target_pitch, aparm.angle_max);
 
     // call attitude controller
-//    if (auto_yaw_mode == AUTO_YAW_HOLD) {
-//         // roll & pitch from waypoint controller, yaw rate from pilot
-//        attitude_control.input_euler_angle_roll_pitch_euler_rate_yaw(target_roll, target_pitch, target_yaw_rate);
-//    } else {
+    if (auto_yaw_mode == AUTO_YAW_HOLD) {
+         // roll & pitch from waypoint controller, yaw rate from pilot
+        attitude_control.input_euler_angle_roll_pitch_euler_rate_yaw(target_roll, target_pitch, target_yaw_rate);
+    } else {
         // roll, pitch from waypoint controller, yaw heading from auto_heading()
-        attitude_control.hc_input_euler_angle_roll_pitch_yaw(target_roll, target_pitch, get_auto_heading(), true);
-    // }
+        attitude_control.input_euler_angle_roll_pitch_yaw(target_roll, target_pitch, get_auto_heading(), true);
+     }
 }
 
 // auto_spline_start - initialises waypoint controller to implement flying to a particular destination using the spline controller
@@ -638,6 +639,11 @@ void Sub::set_auto_yaw_roi(const Location &roi_location)
 #endif  // MOUNT == ENABLED
     }
 }
+
+// float Sub::hc_get_yaw(){
+//     float yaw;
+//     yaw = get_bearing_cd(ahrs, wp_nav.get_wp_destination());
+// }
 
 // get_auto_heading - returns target heading depending upon auto_yaw_mode
 // 100hz update rate

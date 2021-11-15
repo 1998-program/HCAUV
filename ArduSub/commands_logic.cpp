@@ -134,6 +134,7 @@ bool Sub::start_command(const AP_Mission::Mission_Command &cmd)
 // called by mission library in mission.update()
 bool Sub::verify_command_callback(const AP_Mission::Mission_Command &cmd)
 {
+    // gcs().send_text(MAV_SEVERITY_WARNING, "verify_command_callback");
     if (control_mode == AUTO)
     {
         bool cmd_complete = verify_command(cmd);
@@ -152,6 +153,7 @@ bool Sub::verify_command_callback(const AP_Mission::Mission_Command &cmd)
 // check if current mission command has completed
 bool Sub::verify_command(const AP_Mission::Mission_Command &cmd)
 {
+    // gcs().send_text(MAV_SEVERITY_WARNING, "verify_command");
     switch (cmd.id)
     {
         //
@@ -220,6 +222,7 @@ bool Sub::verify_command(const AP_Mission::Mission_Command &cmd)
 void Sub::exit_mission()
 {
     // play a tone
+    gcs().send_text(MAV_SEVERITY_WARNING, "exit_mission");
     AP_Notify::events.mission_complete = 1;
     // Try to enter loiter, if that fails, go to depth hold
     // if (!auto_loiter_start()) {
