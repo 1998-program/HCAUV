@@ -3,6 +3,7 @@
 // return barometric altitude in centimeters
 void HC::read_barometer()
 {
+    hal.uartD->printf("read_barometer");
     barometer.update();
     // If we are reading a positive altitude, the sensor needs calibration
     // Even a few meters above the water we should have no significant depth reading

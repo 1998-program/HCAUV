@@ -179,6 +179,19 @@
 #define CIS_HEADING            5
 #endif
 
+#ifndef TARGET_YAW
+#define TARGET_YAW            120
+#endif
+
+#ifndef TARGET_ROLL
+#define TARGET_ROLL            0
+#endif
+
+#ifndef TARGET_PITCH
+#define TARGET_PITCH            0
+#endif
+
+
 // AUTO Mode
 #ifndef WP_YAW_BEHAVIOR_DEFAULT
 # define WP_YAW_BEHAVIOR_DEFAULT   WP_YAW_BEHAVIOR_CORRECT_XTRACK

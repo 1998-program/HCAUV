@@ -602,7 +602,9 @@ const AP_Param::Info HC::var_info[] = {
     GOBJECT(g2, "",  ParametersG2),
 
 	GSCALAR(cis_heading,  "CIS_HEADING",   CIS_HEADING),
-
+    GSCALAR(target_yaw,  "TARGET_YAW",   TARGET_YAW),
+    GSCALAR(target_roll,  "TARGET_ROLL",   TARGET_ROLL),
+    GSCALAR(target_pitch,  "TARGET_PITCH",   TARGET_PITCH),
     AP_VAREND
 };
 

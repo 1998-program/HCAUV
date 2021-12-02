@@ -28,9 +28,13 @@ bool HC::set_mode(control_mode_t mode, mode_reason_t reason)
     case ALT_HOLD:
         success = althold_init();
         break;
+
+    case YAW:
+        success = yaw_init();
+        break;
 	
-	case ROBUST_TEST:
-		success = robust_test_init();
+	case HC_ROBUST:
+		success = hc_robust_init();
 		break;
 
     case AUTO:
@@ -116,12 +120,16 @@ void HC::update_flight_mode()
         stabilize_run();
         break;
 
+    case YAW:
+        yaw_run();
+        break;
+
     case ALT_HOLD:
         althold_run();
         break;
 
-	case ROBUST_TEST:
-		robust_test_run();
+	case HC_ROBUST:
+		hc_robust_run();
 		break;
 
     case AUTO:

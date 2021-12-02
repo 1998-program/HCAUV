@@ -41,7 +41,8 @@ enum control_mode_t {
     POSHOLD =      16,  // automatic position hold with manual override, with automatic throttle
     MANUAL =       19,  // Pass-through input with no stabilization
     MOTOR_DETECT = 20,   // Automatically detect motors orientation
-    ROBUST_TEST  = 21
+    HC_ROBUST  = 21,
+    YAW = 22
 };
 
 enum mode_reason_t {

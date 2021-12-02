@@ -1,7 +1,7 @@
 #include "HC.h"
 
 
-bool HC::robust_test_init()
+bool HC::hc_robust_init()
 {
     // set target altitude to zero for reporting
     pos_control.set_alt_target(0);
@@ -19,7 +19,7 @@ bool HC::robust_test_init()
 
 // stabilize_run - runs the main stabilize controller
 // should be called at 100hz or more
-void HC::robust_test_run()
+void HC::hc_robust_run()
 {
     // if not armed set throttle to zero and exit immediately
     if (!motors.armed()) {

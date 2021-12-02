@@ -83,7 +83,6 @@
 #include <AP_LeakDetector/AP_LeakDetector.h> // Leak detector
 #include <AP_TemperatureSensor/TSYS01.h>
 #include <AP_Common/AP_FWVersion.h>
-//#include <AC_Eigen/Core>
 
 
 // Local modules
@@ -589,6 +588,8 @@ private:
     void get_pilot_desired_angle_rates(int16_t roll_in, int16_t pitch_in, int16_t yaw_in, float &roll_out, float &pitch_out, float &yaw_out);
     bool althold_init(void);
     void althold_run();
+    bool yaw_init(void);
+    void yaw_run();
 
     // Handles attitude control for stabilize and althold modes
     void handle_attitude();
@@ -644,8 +645,10 @@ private:
     void stabilize_run();
     bool manual_init(void);
     void manual_run();
-	bool robust_test_init();
-	void robust_test_run();	
+	bool hc_robust_init();
+	void hc_robust_run();
+    bool check_robust_arm();
+    void communication_rasp();	
     void failsafe_sensors_check(void);
     void failsafe_crash_check();
     void failsafe_ekf_check(void);

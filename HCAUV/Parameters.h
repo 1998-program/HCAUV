@@ -210,6 +210,9 @@ public:
         k_param_lights_steps,
         k_param_pilot_speed_dn,
         k_param_cis_heading,
+        k_param_target_yaw,    //241
+        k_param_target_roll,
+        k_param_target_pitch,
 
     };
 
@@ -304,6 +307,9 @@ public:
     AP_Int8                 frame_configuration;
 
 	AP_Int16		cis_heading;
+    AP_Int16        target_yaw;
+    AP_Float        target_roll;
+    AP_Float        target_pitch;
 
     // Note: keep initializers here in the same order as they are declared
     // above.
