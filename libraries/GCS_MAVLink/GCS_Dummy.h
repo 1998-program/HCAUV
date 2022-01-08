@@ -46,7 +46,9 @@ protected:
 
     bool set_home_to_current_location(bool lock) override { return false; }
     bool set_home(const Location& loc, bool lock) override { return false; }
-
+    void send_dvl_vel() const override {};
+    void send_dvl_pos() const override {};
+    void send_ms5837() const override {};
     void send_nav_controller_output() const override {};
     void send_pid_tuning() override {};
 };

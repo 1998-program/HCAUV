@@ -1,9 +1,21 @@
 #include "HC.h"
+void HC::read_depth(float depth_m)
+{
+
+
+}
+
+void HC::read_DVL(float vx_cm,float vy_cm,float vz_cm)
+{
+
+    
+}
+
 
 // return barometric altitude in centimeters
 void HC::read_barometer()
 {
-    hal.uartD->printf("read_barometer");
+    // hal.uartD->printf("read_barometer\n");
     barometer.update();
     // If we are reading a positive altitude, the sensor needs calibration
     // Even a few meters above the water we should have no significant depth reading
@@ -12,6 +24,7 @@ void HC::read_barometer()
     }
 
     if (ap.depth_sensor_present) {
+        // hal.uartD->printf("depth_sensor_present \n");
         sensor_health.depth = barometer.healthy(depth_sensor_idx);
     }
 }

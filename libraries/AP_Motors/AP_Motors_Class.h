@@ -93,6 +93,12 @@ public:
     void                set_forward(float forward_in) { _forward_in = forward_in; }; // range -1 ~ +1
     void                set_lateral(float lateral_in) { _lateral_in = lateral_in; };     // range -1 ~ +1
 
+    void                set_yaw_robust_force(float yaw_robust_force){_yaw_robust_force = yaw_robust_force;};
+    void                set_depth_robust_force(float depth_robust_force){_depth_robust_force = depth_robust_force;};
+    void                set_att_robust_force(float att_robust_force){_att_robust_force = att_robust_force;};
+
+    void                set_motor_mode(int motor_mode){_motor_mode = motor_mode;};
+
     // accessors for roll, pitch, yaw and throttle inputs to motors
     float               get_roll() const { return _roll_in; }
     float               get_pitch() const { return _pitch_in; }
@@ -231,6 +237,14 @@ protected:
     LowPassFilterFloat  _throttle_filter;           // throttle input filter
     DesiredSpoolState   _spool_desired;             // desired spool state
     SpoolState          _spool_state;               // current spool mode
+
+
+    //hc robust force
+    float               _yaw_robust_force;
+    float               _depth_robust_force;
+    float               _att_robust_force;
+
+    bool                _motor_mode;
 
     // air pressure compensation variables
     float               _air_density_ratio;     // air density / sea level density - decreases in altitude

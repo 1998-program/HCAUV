@@ -10,15 +10,37 @@ void HC::enable_motor_output()
 void HC::motors_output()
 {
     // Motor detection mode controls the thrusters directly
+    int motor_mode = 0;
     if (control_mode == MOTOR_DETECT){
         return;
     }
-    // check if we are performing the motor test
-    if (ap.motor_test) {
-        verify_motor_test();
-    } else {
-        motors.set_interlock(true);
-        motors.output();
+    
+    else if(control_mode == ATT_ROBUST){
+        motor_mode = 1;
+        motors.set_att_robust_force(hc_att_robust_force);
+        motors.set_motor_mode(motor_mode);
+    }
+    else if(control_mode == DEPTH_HOLD_ROBUST){
+        motor_mode = 1;
+        motors.set_depth_robust_force(hc_depth_hold_robust_force);
+        motors.set_motor_mode(motor_mode);
+    }
+    else if(control_mode == YAW_ROBUST){
+        motor_mode = 1;
+        motors.set_yaw_robust_force(hc_yaw_robust_force);
+        motors.set_motor_mode(motor_mode);
+    }
+    else{
+        // check if we are performing the motor test
+        if (ap.motor_test) {
+            verify_motor_test();
+        } else {
+            motor_mode = 1;
+            motors.set_motor_mode(motor_mode);
+            motors.set_interlock(true);
+            motors.output();
+
+        }
     }
 }
 

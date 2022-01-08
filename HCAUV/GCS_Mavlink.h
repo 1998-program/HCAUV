@@ -2,15 +2,15 @@
 
 #include <GCS_MAVLink/GCS.h>
 
-class GCS_MAVLINK_HC : public GCS_MAVLINK {
+class GCS_MAVLINK_HC : public GCS_MAVLINK
+{
 
 public:
-
     using GCS_MAVLINK::GCS_MAVLINK;
 
 protected:
-
-    uint32_t telem_delay() const override {
+    uint32_t telem_delay() const override
+    {
         return 0;
     };
 
@@ -33,17 +33,20 @@ protected:
     int32_t global_position_int_relative_alt() const override;
 
     bool set_home_to_current_location(bool lock) override WARN_IF_UNUSED;
-    bool set_home(const Location& loc, bool lock) override WARN_IF_UNUSED;
+    bool set_home(const Location &loc, bool lock) override WARN_IF_UNUSED;
 
     void send_nav_controller_output() const override;
     void send_pid_tuning() override;
+
+    void send_dvl_vel() const override;
+    void send_dvl_pos() const override;
+    void send_ms5387() const override;
 
     uint64_t capabilities() const override;
 
     uint8_t get_battery_remaining_percentage(uint8_t instance) const override { return -1; };
 
 private:
-
     void handleMessage(const mavlink_message_t &msg) override;
     bool handle_guided_request(AP_Mission::Mission_Command &cmd) override;
     void handle_change_alt_request(AP_Mission::Mission_Command &cmd) override;
@@ -56,5 +59,4 @@ private:
     MAV_STATE system_status() const override;
 
     int16_t vfr_hud_throttle() const override;
-
 };

@@ -44,6 +44,8 @@ public:
      * -1 if nothing available, uint8_t value otherwise. */
     virtual int16_t read() = 0;
 
+    // virtual void clear() = 0; 
+
     /* NB txspace was traditionally a member of BetterStream in the
      * FastSerial library. As far as concerns go, it belongs with available() */
     virtual uint32_t txspace() = 0;

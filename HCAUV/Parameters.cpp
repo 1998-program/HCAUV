@@ -605,6 +605,7 @@ const AP_Param::Info HC::var_info[] = {
     GSCALAR(target_yaw,  "TARGET_YAW",   TARGET_YAW),
     GSCALAR(target_roll,  "TARGET_ROLL",   TARGET_ROLL),
     GSCALAR(target_pitch,  "TARGET_PITCH",   TARGET_PITCH),
+    GSCALAR(target_depth,  "TARGET_DEPTH",   TARGET_DEPTH),
     AP_VAREND
 };
 

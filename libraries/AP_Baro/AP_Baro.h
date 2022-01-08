@@ -87,6 +87,8 @@ public:
     // get altitude difference in meters relative given a base
     // pressure in Pascal
     float get_altitude_difference(float base_pressure, float pressure) const;
+    // returns which i2c bus is considered "the" external bus
+    uint8_t external_bus() const { return _ext_bus; }
 
     // get scale factor required to convert equivalent to true airspeed
     float get_EAS2TAS(void);

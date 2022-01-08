@@ -1,9 +1,7 @@
 #include "HC.h"
 
-// stabilize_init - initialise stabilize controller
-bool HC::stabilize_init()
+bool HC::att_robust_init()
 {
-    // set target altitude to zero for reporting
     pos_control.set_alt_target(0);
     if (prev_control_mode == DEPTH_HOLD_PID) {
         last_roll = ahrs.roll_sensor;
@@ -17,11 +15,8 @@ bool HC::stabilize_init()
     return true;
 }
 
-// stabilize_run - runs the main stabilize controller
-// should be called at 100hz or more
-void HC::stabilize_run()
-{
-    // if not armed set throttle to zero and exit immediately
+void HC::att_robust_run()
+{    // if not armed set throttle to zero and exit immediately
     if (!motors.armed()) {
         motors.set_desired_spool_state(AP_Motors::DesiredSpoolState::GROUND_IDLE);
         attitude_control.set_throttle_out(0,true,g.throttle_filt);
@@ -32,14 +27,11 @@ void HC::stabilize_run()
         return;
     }
     motors.set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
-
-    handle_attitude();
+//  hc_att_robust_error
+//    handle_attitude();
 
     // output pilot's throttle
-    attitude_control.set_throttle_out(channel_throttle->norm_input(), false, g.throttle_filt);
+//    attitude_control.set_throttle_out(channel_throttle->norm_input(), false, g.throttle_filt);
 
-    //control_in is range -1000-1000
-    //radio_in is raw pwm value
-    motors.set_forward(channel_forward->norm_input());
-    motors.set_lateral(channel_lateral->norm_input());
+    attitude_control.hc_input_euler_angle_roll_pitch_yaw(g.target_roll * 100, g.target_pitch * 100 , g.target_yaw * 100, true);
 }

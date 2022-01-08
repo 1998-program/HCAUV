@@ -746,6 +746,9 @@ ap_message GCS_MAVLINK::mavlink_id_to_ap_message_id(const uint32_t mavlink_id) c
         { MAVLINK_MSG_ID_PARAM_VALUE,           MSG_NEXT_PARAM},
         { MAVLINK_MSG_ID_FENCE_STATUS,          MSG_FENCE_STATUS},
         { MAVLINK_MSG_ID_AHRS,                  MSG_AHRS},
+        { MAVLINK_MSG_ID_DVL_VEL,               MSG_DVL_VEL},
+        { MAVLINK_MSG_ID_DVL_POS,               MSG_DVL_POS},
+        { MAVLINK_MSG_ID_MS5387_PRESSURE,       MSG_MS5387_PRESSURE},
         { MAVLINK_MSG_ID_SIMSTATE,              MSG_SIMSTATE},
         { MAVLINK_MSG_ID_AHRS2,                 MSG_AHRS2},
         { MAVLINK_MSG_ID_AHRS3,                 MSG_AHRS3},
@@ -4317,6 +4320,18 @@ bool GCS_MAVLINK::try_send_message(const enum ap_message id)
     case MSG_AHRS:
         CHECK_PAYLOAD_SIZE(AHRS);
         send_ahrs();
+        break;
+    case MSG_DVL_VEL:
+        CHECK_PAYLOAD_SIZE(DVL_VEL);
+        send_dvl_vel();
+        break;
+    case MSG_DVL_POS:
+        CHECK_PAYLOAD_SIZE(DVL_POS);
+        send_dvl_pos();
+        break;
+    case MSG_MS5387_PRESSURE:
+        CHECK_PAYLOAD_SIZE(MS5387_PRESSURE);
+        send_ms5387();
         break;
 
     case MSG_EXTENDED_SYS_STATE:

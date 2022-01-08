@@ -72,5 +72,8 @@ enum ap_message : uint8_t {
     MSG_NAMED_FLOAT,
     MSG_EXTENDED_SYS_STATE,
     MSG_AUTOPILOT_VERSION,
+    MSG_DVL_VEL,
+    MSG_DVL_POS,
+    MSG_MS5387_PRESSURE,
     MSG_LAST // MSG_LAST must be the last entry in this enum
 };

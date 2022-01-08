@@ -5,7 +5,7 @@ bool HC::hc_robust_init()
 {
     // set target altitude to zero for reporting
     pos_control.set_alt_target(0);
-    if (prev_control_mode == ALT_HOLD) {
+    if (prev_control_mode == DEPTH_HOLD_PID) {
         last_roll = ahrs.roll_sensor;
         last_pitch = ahrs.pitch_sensor;
     } else {

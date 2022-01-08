@@ -6,7 +6,7 @@
  */
 
 // althold_init - initialise althold controller
-bool HC::althold_init()
+bool HC::depth_hold_robust_init()
 {
     if(!control_check_barometer()) {
         return false;
@@ -20,7 +20,7 @@ bool HC::althold_init()
     pos_control.set_target_to_stopping_point_z();
     holding_depth = true;
 
-    if (prev_control_mode == STABILIZE) {
+    if (prev_control_mode == DEPTH_HOLD_PID) {
         last_roll = ahrs.roll_sensor;
         last_pitch = ahrs.pitch_sensor;
     } else {
@@ -35,61 +35,61 @@ bool HC::althold_init()
 }
 
 
-void HC::handle_attitude()
-{
-    uint32_t tnow = AP_HAL::millis();
+// void HC::handle_attitude()
+// {
+//     uint32_t tnow = AP_HAL::millis();
 
-    motors.set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
+//     motors.set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
 
-    // get pilot desired lean angles
-    float target_roll, target_pitch, target_yaw;
+//     // get pilot desired lean angles
+//     float target_roll, target_pitch, target_yaw;
 
-    // Check if set_attitude_target_no_gps is valid
-    if (tnow - hc.set_attitude_target_no_gps.last_message_ms < 5000) {
-        Quaternion(
-            set_attitude_target_no_gps.packet.q
-        ).to_euler(
-            target_roll,
-            target_pitch,
-            target_yaw
-        );
-        target_roll = 100 * degrees(target_roll);
-        target_pitch = 100 * degrees(target_pitch);
-        target_yaw = 100 * degrees(target_yaw);
-        last_roll = target_roll;
-        last_pitch = target_pitch;
-        last_yaw = target_yaw;
+//     // Check if set_attitude_target_no_gps is valid
+//     if (tnow - hc.set_attitude_target_no_gps.last_message_ms < 5000) {
+//         Quaternion(
+//             set_attitude_target_no_gps.packet.q
+//         ).to_euler(
+//             target_roll,
+//             target_pitch,
+//             target_yaw
+//         );
+//         target_roll = 100 * degrees(target_roll);
+//         target_pitch = 100 * degrees(target_pitch);
+//         target_yaw = 100 * degrees(target_yaw);
+//         last_roll = target_roll;
+//         last_pitch = target_pitch;
+//         last_yaw = target_yaw;
         
-        attitude_control.input_euler_angle_roll_pitch_yaw(target_roll, target_pitch, target_yaw, true);
-    } else {
-        // If we don't have a mavlink attitude target, we use the pilot's input instead
-        get_pilot_desired_lean_angles(channel_roll->get_control_in(), channel_pitch->get_control_in(), target_roll, target_pitch, attitude_control.get_althold_lean_angle_max());
-        target_yaw = get_pilot_desired_yaw_rate(channel_yaw->get_control_in());
-        if (abs(target_roll) > 50 || abs(target_pitch) > 50) {
-            last_roll = ahrs.roll_sensor;
-            last_pitch = ahrs.pitch_sensor;
-            last_yaw = ahrs.yaw_sensor;
-            last_input_ms = tnow;
-            attitude_control.input_rate_bf_roll_pitch_yaw(target_roll, target_pitch, target_yaw);
-        } else if (abs(target_yaw) > 50) {
-            // if only yaw is being controlled, don't update pitch and roll
-            attitude_control.input_rate_bf_roll_pitch_yaw(0, 0, target_yaw);
-            last_yaw = ahrs.yaw_sensor;
-            last_input_ms = tnow;
-        } else if (tnow < last_input_ms + 250) {
-            // just brake for a few mooments so we don't bounce
-            last_yaw = ahrs.yaw_sensor;
-            attitude_control.input_rate_bf_roll_pitch_yaw(0, 0, 0);
-        } else {
-            // Lock attitude
-            attitude_control.input_euler_angle_roll_pitch_yaw(last_roll, last_pitch, last_yaw, true);
-        }
-    }
-}
+//         attitude_control.input_euler_angle_roll_pitch_yaw(target_roll, target_pitch, target_yaw, true);
+//     } else {
+//         // If we don't have a mavlink attitude target, we use the pilot's input instead
+//         get_pilot_desired_lean_angles(channel_roll->get_control_in(), channel_pitch->get_control_in(), target_roll, target_pitch, attitude_control.get_althold_lean_angle_max());
+//         target_yaw = get_pilot_desired_yaw_rate(channel_yaw->get_control_in());
+//         if (abs(target_roll) > 50 || abs(target_pitch) > 50) {
+//             last_roll = ahrs.roll_sensor;
+//             last_pitch = ahrs.pitch_sensor;
+//             last_yaw = ahrs.yaw_sensor;
+//             last_input_ms = tnow;
+//             attitude_control.input_rate_bf_roll_pitch_yaw(target_roll, target_pitch, target_yaw);
+//         } else if (abs(target_yaw) > 50) {
+//             // if only yaw is being controlled, don't update pitch and roll
+//             attitude_control.input_rate_bf_roll_pitch_yaw(0, 0, target_yaw);
+//             last_yaw = ahrs.yaw_sensor;
+//             last_input_ms = tnow;
+//         } else if (tnow < last_input_ms + 250) {
+//             // just brake for a few mooments so we don't bounce
+//             last_yaw = ahrs.yaw_sensor;
+//             attitude_control.input_rate_bf_roll_pitch_yaw(0, 0, 0);
+//         } else {
+//             // Lock attitude
+//             attitude_control.input_euler_angle_roll_pitch_yaw(last_roll, last_pitch, last_yaw, true);
+//         }
+//     }
+// }
 
-// althold_run - runs the althold controller
-// should be called at 100hz or more
-void HC::althold_run()
+// // althold_run - runs the althold controller
+// // should be called at 100hz or more
+void HC::depth_hold_robust_run()
 {
     // When unarmed, disable motors and stabilization
     if (!motors.armed()) {
@@ -104,6 +104,7 @@ void HC::althold_run()
         holding_depth = false;
         return;
     }
+    //hc_depth_hold_robust_error
 
     // Vehicle is armed, motors are free to run
     motors.set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);

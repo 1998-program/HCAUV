@@ -15,15 +15,20 @@ public:
         k_disarm                = 4,            ///< disarm vehicle
 
         k_mode_manual           = 5,            ///< enter enter manual mode
-        k_mode_stabilize        = 6,            ///< enter stabilize mode
-        k_mode_depth_hold       = 7,            ///< enter depth hold mode
-        k_mode_poshold          = 8,            ///< enter poshold mode
+//        k_mode_stabilize        = 6,            ///< enter stabilize mode
+        k_mode_depth_hold_PID   = 6,
+        k_mode_depth_hold_robust  = 7,            ///< enter depth hold mode
+//        k_mode_poshold          = 8,            ///< enter poshold mode
+        k_mode_att_PID          = 8,
         k_mode_auto             = 9,            ///< enter auto mode
-        k_mode_circle           = 10,           ///< enter circle mode
+        // k_mode_circle           = 10,           ///< enter circle mode
+        k_mode_att_robust       = 10,
         k_mode_guided           = 11,           ///< enter guided mode
-        k_mode_acro             = 12,           ///< enter acro mode
+//        k_mode_acro             = 12,           ///< enter acro mode
         k_mode_hc_robust        = 13,           ///< enter robust test mode
-        k_mode_yaw              = 14,           ///< enter HCAUV yaw mode
+        k_mode_yaw_PID          = 14,           ///< enter HCAUV yaw mode
+        k_mode_yaw_robust       = 15,
+        k_mode_thruster_test    = 16,
  
         // 12-20 reserved for future mode functions
         k_mount_center          = 21,           ///< move mount to center

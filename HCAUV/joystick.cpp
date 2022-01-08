@@ -170,33 +170,54 @@ void HC::handle_jsbutton_press(uint8_t button, bool shift, bool held)
     case JSButton::button_function_t::k_mode_manual:
         set_mode(MANUAL, MODE_REASON_TX_COMMAND);
         break;
-    case JSButton::button_function_t::k_mode_stabilize:
-        set_mode(STABILIZE, MODE_REASON_TX_COMMAND);
-        break;
-    case JSButton::button_function_t::k_mode_depth_hold:
-        set_mode(ALT_HOLD, MODE_REASON_TX_COMMAND);
-        break;
+    // case JSButton::button_function_t::k_mode_stabilize:
+    //     set_mode(STABILIZE, MODE_REASON_TX_COMMAND);
+    //     break;
+    // case JSButton::button_function_t::k_mode_depth_hold:
+    //     set_mode(ALT_HOLD, MODE_REASON_TX_COMMAND);
+    //     break;
     case JSButton::button_function_t::k_mode_auto:
         set_mode(AUTO, MODE_REASON_TX_COMMAND);
         break;
     case JSButton::button_function_t::k_mode_guided:
         set_mode(GUIDED, MODE_REASON_TX_COMMAND);
         break;
-    case JSButton::button_function_t::k_mode_circle:
-        set_mode(CIRCLE, MODE_REASON_TX_COMMAND);
-        break;
-	case JSButton::button_function_t::k_mode_hc_robust:
-		set_mode(HC_ROBUST,MODE_REASON_TX_COMMAND);
+    // case JSButton::button_function_t::k_mode_circle:
+    //     set_mode(CIRCLE, MODE_REASON_TX_COMMAND);
+    //     break;
+	// case JSButton::button_function_t::k_mode_hc_robust:
+	// 	set_mode(HC_ROBUST,MODE_REASON_TX_COMMAND);
+	// 	break;
+
+    case JSButton::button_function_t::k_mode_yaw_PID:
+		set_mode(YAW_PID,MODE_REASON_TX_COMMAND);
 		break;
-    case JSButton::button_function_t::k_mode_yaw:
-		set_mode(YAW,MODE_REASON_TX_COMMAND);
+    case JSButton::button_function_t::k_mode_yaw_robust:
+		set_mode(YAW_ROBUST,MODE_REASON_TX_COMMAND);
+		break;  
+
+    case JSButton::button_function_t::k_mode_depth_hold_PID:
+		set_mode(DEPTH_HOLD_PID,MODE_REASON_TX_COMMAND);
 		break;
-    case JSButton::button_function_t::k_mode_acro:
-        set_mode(ACRO, MODE_REASON_TX_COMMAND);
-        break;
-    case JSButton::button_function_t::k_mode_poshold:
-        set_mode(POSHOLD, MODE_REASON_TX_COMMAND);
-        break;
+    case JSButton::button_function_t::k_mode_depth_hold_robust:
+		set_mode(DEPTH_HOLD_ROBUST,MODE_REASON_TX_COMMAND);
+		break;   
+
+    case JSButton::button_function_t::k_mode_att_PID:
+		set_mode(ATT_PID,MODE_REASON_TX_COMMAND);
+		break;
+    case JSButton::button_function_t::k_mode_att_robust:
+		set_mode(ATT_ROBUST,MODE_REASON_TX_COMMAND);
+		break;   
+    case JSButton::button_function_t::k_mode_thruster_test:
+		set_mode(THRUSTER_TEST,MODE_REASON_TX_COMMAND);
+		break;       
+    // case JSButton::button_function_t::k_mode_acro:
+    //     set_mode(ACRO, MODE_REASON_TX_COMMAND);
+    //     break;
+    // case JSButton::button_function_t::k_mode_poshold:
+    //     set_mode(POSHOLD, MODE_REASON_TX_COMMAND);
+    //     break;
 
     case JSButton::button_function_t::k_mount_center:
 #if MOUNT == ENABLED
@@ -706,8 +727,8 @@ void HC::default_js_buttons()
     JSButton::button_function_t defaults[16][2] = {
         {JSButton::button_function_t::k_none,                   JSButton::button_function_t::k_none},
         {JSButton::button_function_t::k_mode_manual,            JSButton::button_function_t::k_none},
-        {JSButton::button_function_t::k_mode_depth_hold,        JSButton::button_function_t::k_none},
-        {JSButton::button_function_t::k_mode_stabilize,         JSButton::button_function_t::k_none},
+        {JSButton::button_function_t::k_mode_depth_hold_PID,        JSButton::button_function_t::k_none},
+        {JSButton::button_function_t::k_mode_yaw_PID,         JSButton::button_function_t::k_none},
 
         {JSButton::button_function_t::k_disarm,                 JSButton::button_function_t::k_none},
         {JSButton::button_function_t::k_shift,                  JSButton::button_function_t::k_none},

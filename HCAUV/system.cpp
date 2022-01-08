@@ -37,7 +37,9 @@ void HC::init_ardupilot()
 
 #if AP_FEATURE_BOARD_DETECT
     // Detection won't work until after BoardConfig.init()
+    hal.uartD->printf("AP_FEATURE_BOARD_DETECT\n");
     switch (AP_BoardConfig::get_board_type()) {
+    hal.uartD->printf("type is %d",AP_BoardConfig::get_board_type());
     case AP_BoardConfig::PX4_BOARD_PIXHAWK2:
         AP_Param::set_by_name("GND_EXT_BUS", 0);
         celsius.init(0);
@@ -47,6 +49,25 @@ void HC::init_ardupilot()
         celsius.init(1);
         break;
     }
+// #if AP_FEATURE_BOARD_DETECT
+//     // Detection won't work until after BoardConfig.init()
+//     hal.uartD->printf("AP_FEATURE_BOARD_DETECT\n");
+//     switch (AP_BoardConfig::get_board_type()) {
+//     hal.uartD->printf("type is %d",AP_BoardConfig::get_board_type());
+//     case AP_BoardConfig::PX4_BOARD_PIXHAWK2:
+//         AP_Param::set_default_by_name("GND_EXT_BUS", 0);
+//         break;
+//     case AP_BoardConfig::PX4_BOARD_PIXHAWK:
+//         AP_Param::set_by_name("GND_EXT_BUS", 1);
+//         break;
+//     default:
+//         AP_Param::set_default_by_name("GND_EXT_BUS", 1);
+//         break;
+//     }
+// #else
+//     AP_Param::set_default_by_name("GND_EXT_BUS", 1);
+// #endif
+//     celsius.init(barometer.external_bus());
 #else
     AP_Param::set_default_by_name("GND_EXT_BUS", 1);
     celsius.init(1);
@@ -152,6 +173,10 @@ void HC::init_ardupilot()
             sensor_health.depth = barometer.healthy(depth_sensor_idx); // initialize health flag
             break; // Go with the first one we find
         }
+        // if(hc_ms5837_flag == true){
+        //     ap.depth_sensor_present = true;
+        //     sensor_health.depth = true;
+        // }
     }
 
     if (!ap.depth_sensor_present) {
@@ -168,6 +193,10 @@ void HC::init_ardupilot()
     leak_detector.init();
 
     last_pilot_heading = ahrs.yaw_sensor;
+
+    hc_dvl_pos_flag = false;
+    hc_dvl_vel_flag = false;
+    hc_ms5837_flag = false;
 
     // initialise rangefinder
 #if RANGEFINDER_ENABLED == ENABLED

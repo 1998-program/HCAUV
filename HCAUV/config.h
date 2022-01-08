@@ -191,6 +191,9 @@
 #define TARGET_PITCH            0
 #endif
 
+#ifndef TARGET_DEPTH
+#define TARGET_DEPTH            0
+#endif
 
 // AUTO Mode
 #ifndef WP_YAW_BEHAVIOR_DEFAULT

@@ -42,12 +42,12 @@ void GCS_HC::update_vehicle_sensor_status_flags()
         MAV_SYS_STATUS_SENSOR_XY_POSITION_CONTROL;
 
     switch (hc.control_mode) {
-    case ALT_HOLD:
+    // case ALT_HOLD:
     case AUTO:
     case GUIDED:
-    case CIRCLE:
-    case SURFACE:
-    case POSHOLD:
+    // case CIRCLE:
+    // case SURFACE:
+    // case POSHOLD:
         control_sensors_enabled |= MAV_SYS_STATUS_SENSOR_Z_ALTITUDE_CONTROL;
         control_sensors_health |= MAV_SYS_STATUS_SENSOR_Z_ALTITUDE_CONTROL;
         control_sensors_enabled |= MAV_SYS_STATUS_SENSOR_XY_POSITION_CONTROL;

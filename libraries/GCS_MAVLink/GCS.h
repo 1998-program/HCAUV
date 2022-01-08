@@ -178,6 +178,9 @@ public:
     void send_proximity() const;
     virtual void send_nav_controller_output() const = 0;
     virtual void send_pid_tuning() = 0;
+    virtual void send_dvl_vel() const = 0;
+    virtual void send_dvl_pos() const = 0;
+    virtual void send_ms5387() const = 0;
     void send_ahrs2();
     void send_ahrs3();
     void send_system_time();

@@ -235,7 +235,25 @@ void AP_Motors6DOF::output_min()
 
 int16_t AP_Motors6DOF::calc_thrust_to_pwm(float thrust_in) const
 {
-    return constrain_int16(1500 + thrust_in * 400, _throttle_radio_min, _throttle_radio_max);
+    if(_motor_mode == 1){
+        int16_t pwm = 1500;
+        if(thrust_in >= 0 && thrust_in < 2.25){
+            pwm = -7.594 * thrust_in *thrust_in + 110.1 * thrust_in + 1544;
+        }
+        else if(thrust_in < 0 && thrust_in > -1.75){
+            pwm = 11.47 * thrust_in * thrust_in + 138.1 * thrust_in + 1456;
+        }
+        else if(thrust_in >= 2.25){
+            pwm = 1753;
+        }
+        else if(thrust_in <= 1.75)
+        {
+            pwm = 1249;
+        }
+        return pwm;
+    }
+    else 
+        return constrain_int16(1500 + thrust_in * 400, _throttle_radio_min, _throttle_radio_max);
 }
 
 void AP_Motors6DOF::output_to_motors()
@@ -292,109 +310,191 @@ float AP_Motors6DOF::get_current_limit_max_throttle()
 // ToDo calculate headroom for rpy to be added for stabilization during full throttle/forward/lateral commands
 void AP_Motors6DOF::output_armed_stabilizing()
 {
-    if ((sub_frame_t)_last_frame_class == SUB_FRAME_VECTORED) {
-        output_armed_stabilizing_vectored();
-    } else if ((sub_frame_t)_last_frame_class == SUB_FRAME_VECTORED_6DOF) {
-        output_armed_stabilizing_vectored_6dof();
-    } else {
-        uint8_t i;                          // general purpose counter
-        float   roll_thrust;                // roll thrust input value, +/- 1.0
-        float   pitch_thrust;               // pitch thrust input value, +/- 1.0
-        float   yaw_thrust;                 // yaw thrust input value, +/- 1.0
-        float   throttle_thrust;            // throttle thrust input value, +/- 1.0
-        float   forward_thrust;             // forward thrust input value, +/- 1.0
-        float   lateral_thrust;             // lateral thrust input value, +/- 1.0
+    if(_motor_mode == 0){
+        if ((sub_frame_t)_last_frame_class == SUB_FRAME_VECTORED) {
+            output_armed_stabilizing_vectored();
+        } else if ((sub_frame_t)_last_frame_class == SUB_FRAME_VECTORED_6DOF) {
+            output_armed_stabilizing_vectored_6dof();
+        } else {
+            uint8_t i;                          // general purpose counter
+            float   roll_thrust;                // roll thrust input value, +/- 1.0
+            float   pitch_thrust;               // pitch thrust input value, +/- 1.0
+            float   yaw_thrust;                 // yaw thrust input value, +/- 1.0
+            float   throttle_thrust;            // throttle thrust input value, +/- 1.0
+            float   forward_thrust;             // forward thrust input value, +/- 1.0
+            float   lateral_thrust;             // lateral thrust input value, +/- 1.0
 
-        roll_thrust = (_roll_in + _roll_in_ff);
-        pitch_thrust = (_pitch_in + _pitch_in_ff);
-        yaw_thrust = (_yaw_in + _yaw_in_ff);
-        throttle_thrust = get_throttle_bidirectional();
-        forward_thrust = _forward_in;
-        lateral_thrust = _lateral_in;
+            roll_thrust = (_roll_in + _roll_in_ff);
+            pitch_thrust = (_pitch_in + _pitch_in_ff);
+            yaw_thrust = (_yaw_in + _yaw_in_ff);
+            throttle_thrust = get_throttle_bidirectional();
+            forward_thrust = _forward_in;
+            lateral_thrust = _lateral_in;
 
-        float rpy_out[AP_MOTORS_MAX_NUM_MOTORS]; // buffer so we don't have to multiply coefficients multiple times.
-        float linear_out[AP_MOTORS_MAX_NUM_MOTORS]; // 3 linear DOF mix for each motor
+            float rpy_out[AP_MOTORS_MAX_NUM_MOTORS]; // buffer so we don't have to multiply coefficients multiple times.
+            float linear_out[AP_MOTORS_MAX_NUM_MOTORS]; // 3 linear DOF mix for each motor
 
-        // initialize limits flags
-        limit.roll = false;
-        limit.pitch = false;
-        limit.yaw = false;
-        limit.throttle_lower = false;
-        limit.throttle_upper = false;
+            // initialize limits flags
+            limit.roll = false;
+            limit.pitch = false;
+            limit.yaw = false;
+            limit.throttle_lower = false;
+            limit.throttle_upper = false;
 
-        // sanity check throttle is above zero and below current limited throttle
-        if (throttle_thrust <= -_throttle_thrust_max) {
-            throttle_thrust = -_throttle_thrust_max;
-            limit.throttle_lower = true;
-        }
-        if (throttle_thrust >= _throttle_thrust_max) {
-            throttle_thrust = _throttle_thrust_max;
-            limit.throttle_upper = true;
-        }
+            // sanity check throttle is above zero and below current limited throttle
+            if (throttle_thrust <= -_throttle_thrust_max) {
+                throttle_thrust = -_throttle_thrust_max;
+                limit.throttle_lower = true;
+            }
+            if (throttle_thrust >= _throttle_thrust_max) {
+                throttle_thrust = _throttle_thrust_max;
+                limit.throttle_upper = true;
+            }
 
-        // calculate roll, pitch and yaw for each motor
-        for (i=0; i<AP_MOTORS_MAX_NUM_MOTORS; i++) {
-            if (motor_enabled[i]) {
-                rpy_out[i] = roll_thrust * _roll_factor[i] +
-                             pitch_thrust * _pitch_factor[i] +
-                             yaw_thrust * _yaw_factor[i];
+            // calculate roll, pitch and yaw for each motor
+            for (i=0; i<AP_MOTORS_MAX_NUM_MOTORS; i++) {
+                if (motor_enabled[i]) {
+                    rpy_out[i] = roll_thrust * _roll_factor[i] +
+                                pitch_thrust * _pitch_factor[i] +
+                                yaw_thrust * _yaw_factor[i];
 
+                }
+            }
+
+            // calculate linear command for each motor
+            // linear factors should be 0.0 or 1.0 for now
+            for (i=0; i<AP_MOTORS_MAX_NUM_MOTORS; i++) {
+                if (motor_enabled[i]) {
+                    linear_out[i] = throttle_thrust * _throttle_factor[i] +
+                                    forward_thrust * _forward_factor[i] +
+                                    lateral_thrust * _lateral_factor[i];
+                }
+            }
+
+            // Calculate final output for each motor
+            for (i=0; i<AP_MOTORS_MAX_NUM_MOTORS; i++) {
+                if (motor_enabled[i]) {
+                    _thrust_rpyt_out[i] = constrain_float(_motor_reverse[i]*(rpy_out[i] + linear_out[i]),-1.0f,1.0f);
+                }
             }
         }
 
-        // calculate linear command for each motor
-        // linear factors should be 0.0 or 1.0 for now
-        for (i=0; i<AP_MOTORS_MAX_NUM_MOTORS; i++) {
+        const AP_BattMonitor &battery = AP::battery();
+
+        // Current limiting
+        float _batt_current;
+        if (_batt_current_max <= 0.0f || !battery.current_amps(_batt_current)) {
+            return;
+        }
+
+        float _batt_current_delta = _batt_current - _batt_current_last;
+
+        float loop_interval = 1.0f/_loop_rate;
+
+        float _current_change_rate = _batt_current_delta / loop_interval;
+
+        float predicted_current = _batt_current + (_current_change_rate * loop_interval * 5);
+
+        float batt_current_ratio = _batt_current/_batt_current_max;
+
+        float predicted_current_ratio = predicted_current/_batt_current_max;
+        _batt_current_last = _batt_current;
+
+        if (predicted_current > _batt_current_max * 1.5f) {
+            batt_current_ratio = 2.5f;
+        } else if (_batt_current < _batt_current_max && predicted_current > _batt_current_max) {
+            batt_current_ratio = predicted_current_ratio;
+        }
+        _output_limited += (loop_interval/(loop_interval+_batt_current_time_constant)) * (1 - batt_current_ratio);
+
+        _output_limited = constrain_float(_output_limited, 0.0f, 1.0f);
+
+        for (uint8_t i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; i++) {
             if (motor_enabled[i]) {
-                linear_out[i] = throttle_thrust * _throttle_factor[i] +
-                                forward_thrust * _forward_factor[i] +
-                                lateral_thrust * _lateral_factor[i];
+                _thrust_rpyt_out[i] *= _output_limited;
+            }
+        } 
+    }
+    else //xin mo shi
+    {
+        {
+            uint8_t i;                          // general purpose counter
+            float   roll_thrust;                // roll thrust input value, +/- 1.0
+            float   pitch_thrust;               // pitch thrust input value, +/- 1.0
+            float   yaw_thrust;                 // yaw thrust input value, +/- 1.0
+            float   throttle_thrust;            // throttle thrust input value, +/- 1.0
+            float   forward_thrust;             // forward thrust input value, +/- 1.0
+            float   lateral_thrust;             // lateral thrust input value, +/- 1.0
+
+            // roll_thrust = (_roll_in + _roll_in_ff);
+            // pitch_thrust = (_pitch_in + _pitch_in_ff);
+            // yaw_thrust = (_yaw_in + _yaw_in_ff);
+            // throttle_thrust = get_throttle_bidirectional();
+            // forward_thrust = _forward_in;
+            // lateral_thrust = _lateral_in;
+            roll_thrust = 0.0;
+            pitch_thrust = 0.0;
+            yaw_thrust = _yaw_robust_force / 0.4187 / 2 / 9.8;
+            throttle_thrust = _depth_robust_force / 4 / 0.8660 / 9.8;
+            forward_thrust = 0.0;
+            lateral_thrust = 0.0;
+
+            float rpy_out[AP_MOTORS_MAX_NUM_MOTORS]; // buffer so we don't have to multiply coefficients multiple times.
+            float linear_out[AP_MOTORS_MAX_NUM_MOTORS]; // 3 linear DOF mix for each motor
+
+            // initialize limits flags
+            limit.roll = false;
+            limit.pitch = false;
+            limit.yaw = false;
+            limit.throttle_lower = false;
+            limit.throttle_upper = false;
+
+            // sanity check throttle is above zero and below current limited throttle
+            if (throttle_thrust <= -_throttle_thrust_max) {
+                throttle_thrust = -_throttle_thrust_max;
+                limit.throttle_lower = true;
+            }
+            if (throttle_thrust >= _throttle_thrust_max) {
+                throttle_thrust = _throttle_thrust_max;
+                limit.throttle_upper = true;
+            }
+
+            // calculate roll, pitch and yaw for each motor
+            for (i=0; i<AP_MOTORS_MAX_NUM_MOTORS; i++) {
+                if (motor_enabled[i]) {
+                    if(_yaw_factor[i] > 0){
+                        rpy_out[i] = roll_thrust * _roll_factor[i] +
+                                    pitch_thrust * _pitch_factor[i] +
+                                    yaw_thrust * _yaw_factor[i] * 0.5625;
+                    }
+                    else{
+                        rpy_out[i] = roll_thrust * _roll_factor[i] +
+                                    pitch_thrust * _pitch_factor[i] +
+                                    yaw_thrust * _yaw_factor[i] * 0.4375;
+                    }
+                }
+            }
+
+            // calculate linear command for each motor
+            // linear factors should be 0.0 or 1.0 for now
+            for (i=0; i<AP_MOTORS_MAX_NUM_MOTORS; i++) {
+                if (motor_enabled[i]) {
+                    linear_out[i] = throttle_thrust * _throttle_factor[i] +
+                                    forward_thrust * _forward_factor[i] +
+                                    lateral_thrust * _lateral_factor[i];
+                }
+            }
+
+            // Calculate final output for each motor
+            for (i=0; i<AP_MOTORS_MAX_NUM_MOTORS; i++) {
+                if (motor_enabled[i]) {
+                    _thrust_rpyt_out[i] = _motor_reverse[i]*(rpy_out[i] + linear_out[i]);
+                }
             }
         }
 
-        // Calculate final output for each motor
-        for (i=0; i<AP_MOTORS_MAX_NUM_MOTORS; i++) {
-            if (motor_enabled[i]) {
-                _thrust_rpyt_out[i] = constrain_float(_motor_reverse[i]*(rpy_out[i] + linear_out[i]),-1.0f,1.0f);
-            }
-        }
     }
-
-    const AP_BattMonitor &battery = AP::battery();
-
-	// Current limiting
-    float _batt_current;
-    if (_batt_current_max <= 0.0f || !battery.current_amps(_batt_current)) {
-        return;
-    }
-
-    float _batt_current_delta = _batt_current - _batt_current_last;
-
-    float loop_interval = 1.0f/_loop_rate;
-
-    float _current_change_rate = _batt_current_delta / loop_interval;
-
-    float predicted_current = _batt_current + (_current_change_rate * loop_interval * 5);
-
-    float batt_current_ratio = _batt_current/_batt_current_max;
-
-    float predicted_current_ratio = predicted_current/_batt_current_max;
-    _batt_current_last = _batt_current;
-
-    if (predicted_current > _batt_current_max * 1.5f) {
-        batt_current_ratio = 2.5f;
-    } else if (_batt_current < _batt_current_max && predicted_current > _batt_current_max) {
-        batt_current_ratio = predicted_current_ratio;
-    }
-    _output_limited += (loop_interval/(loop_interval+_batt_current_time_constant)) * (1 - batt_current_ratio);
-
-    _output_limited = constrain_float(_output_limited, 0.0f, 1.0f);
-
-    for (uint8_t i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; i++) {
-        if (motor_enabled[i]) {
-            _thrust_rpyt_out[i] *= _output_limited;
-        }
-    }
+    
 }
 
 // output_armed - sends commands to the motors

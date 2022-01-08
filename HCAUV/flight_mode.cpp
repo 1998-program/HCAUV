@@ -17,47 +17,69 @@ bool HC::set_mode(control_mode_t mode, mode_reason_t reason)
     }
 
     switch (mode) {
-    case ACRO:
-        success = acro_init();
+    // case ACRO:
+    //     success = acro_init();
+    //     break;
+
+    // case STABILIZE:
+    //     success = stabilize_init();
+    //     break;
+
+    // case ALT_HOLD:
+    //     success = althold_init();
+    //     break;
+
+    case YAW_PID:
+        success = yaw_PID_init();
+        break;
+        
+    case THRUSTER_TEST:
+        success = thruster_test_init();
         break;
 
-    case STABILIZE:
-        success = stabilize_init();
+    case YAW_ROBUST:
+        success = yaw_robust_init();
         break;
 
-    case ALT_HOLD:
-        success = althold_init();
+    case DEPTH_HOLD_PID:
+        success = depth_hold_PID_init();
+        break;
+    case DEPTH_HOLD_ROBUST:
+        success = depth_hold_robust_init();
         break;
 
-    case YAW:
-        success = yaw_init();
+    case ATT_PID:
+        success = att_PID_init();
         break;
-	
-	case HC_ROBUST:
-		success = hc_robust_init();
-		break;
+    case ATT_ROBUST:
+        success = att_robust_init();
+        break;
+
+	// case HC_ROBUST:
+	// 	success = hc_robust_init();
+	// 	break;
 
     case AUTO:
         success = auto_init();
         break;
 
-    case CIRCLE:
-        success = circle_init();
-        break;
+    // case CIRCLE:
+    //     success = circle_init();
+    //     break;
 
     case GUIDED:
         success = guided_init();
         break;
 
-    case SURFACE:
-        success = surface_init();
-        break;
+//     case SURFACE:
+//         success = surface_init();
+//         break;
 
-#if POSHOLD_ENABLED == ENABLED
-    case POSHOLD:
-        success = poshold_init();
-        break;
-#endif
+// #if POSHOLD_ENABLED == ENABLED
+//     case POSHOLD:
+//         success = poshold_init();
+//         break;
+// #endif
 
     case MANUAL:
         success = manual_init();
@@ -112,47 +134,67 @@ bool HC::set_mode(control_mode_t mode, mode_reason_t reason)
 void HC::update_flight_mode()
 {
     switch (control_mode) {
-    case ACRO:
-        acro_run();
+    // case ACRO:
+    //     acro_run();
+    //     break;
+
+    // case STABILIZE:
+    //     stabilize_run();
+    //     break;
+    
+    case YAW_PID:
+        yaw_PID_run();
         break;
 
-    case STABILIZE:
-        stabilize_run();
+    case YAW_ROBUST:
+        yaw_robust_run();
         break;
 
-    case YAW:
-        yaw_run();
+    case DEPTH_HOLD_PID:
+        depth_hold_PID_run();
         break;
 
-    case ALT_HOLD:
-        althold_run();
+    case THRUSTER_TEST:
+        thruster_test_run();
         break;
 
-	case HC_ROBUST:
-		hc_robust_run();
-		break;
+    case DEPTH_HOLD_ROBUST:
+        depth_hold_robust_run();
+        break;  
+
+    case ATT_PID:
+        att_PID_run();
+        break;
+
+    case ATT_ROBUST:
+        att_robust_run();
+        break;
+
+	// case HC_ROBUST:
+	// 	hc_robust_run();
+	// 	break;
 
     case AUTO:
         auto_run();
         break;
 
-    case CIRCLE:
-        circle_run();
-        break;
+    // case CIRCLE:
+    //     circle_run();
+    //     break;
 
     case GUIDED:
         guided_run();
         break;
 
-    case SURFACE:
-        surface_run();
-        break;
+    // case SURFACE:
+    //     surface_run();
+    //     break;
 
-#if POSHOLD_ENABLED == ENABLED
-    case POSHOLD:
-        poshold_run();
-        break;
-#endif
+// #if POSHOLD_ENABLED == ENABLED
+//     case POSHOLD:
+//         poshold_run();
+//         break;
+// #endif
 
     case MANUAL:
         manual_run();
@@ -187,8 +229,8 @@ bool HC::mode_requires_GPS(control_mode_t mode)
     switch (mode) {
     case AUTO:
     case GUIDED:
-    case CIRCLE:
-    case POSHOLD:
+    // case CIRCLE:
+    // case POSHOLD:
         return true;
     default:
         return false;
@@ -201,8 +243,8 @@ bool HC::mode_requires_GPS(control_mode_t mode)
 bool HC::mode_has_manual_throttle(control_mode_t mode)
 {
     switch (mode) {
-    case ACRO:
-    case STABILIZE:
+    // case ACRO:
+    // case STABILIZE:
     case MANUAL:
         return true;
     default:
@@ -217,8 +259,8 @@ bool HC::mode_has_manual_throttle(control_mode_t mode)
 bool HC::mode_allows_arming(control_mode_t mode, bool arming_from_gcs)
 {
     return (mode_has_manual_throttle(mode)
-        || mode == ALT_HOLD
-        || mode == POSHOLD
+        // || mode == ALT_HOLD
+        // || mode == POSHOLD
         || (arming_from_gcs&& mode == GUIDED)
     );
 }
@@ -229,8 +271,8 @@ void HC::notify_flight_mode(control_mode_t mode)
     switch (mode) {
     case AUTO:
     case GUIDED:
-    case CIRCLE:
-    case SURFACE:
+    // case CIRCLE:
+    // case SURFACE:
         // autopilot modes
         AP_Notify::flags.autopilot_mode = true;
         break;

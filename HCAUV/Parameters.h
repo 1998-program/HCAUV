@@ -213,6 +213,7 @@ public:
         k_param_target_yaw,    //241
         k_param_target_roll,
         k_param_target_pitch,
+        k_param_target_depth,
 
     };
 
@@ -310,6 +311,7 @@ public:
     AP_Int16        target_yaw;
     AP_Float        target_roll;
     AP_Float        target_pitch;
+    AP_Float        target_depth;
 
     // Note: keep initializers here in the same order as they are declared
     // above.

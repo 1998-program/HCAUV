@@ -31,18 +31,24 @@ enum autopilot_yaw_mode {
 
 // Auto Pilot Modes enumeration
 enum control_mode_t {
-    STABILIZE =     0,  // manual angle with manual depth/throttle
-    ACRO =          1,  // manual body-frame angular rate with manual depth/throttle
-    ALT_HOLD =      2,  // manual angle with automatic depth/throttle
+    // STABILIZE =     0,  // manual angle with manual depth/throttle
+    // ACRO =          1,  // manual body-frame angular rate with manual depth/throttle
+    YAW_PID = 0,
+    YAW_ROBUST = 1,
+    // ALT_HOLD =      2,  // manual angle with automatic depth/throttle
     AUTO =          3,  // fully automatic waypoint control using mission commands
     GUIDED =        4,  // fully automatic fly to coordinate or fly at velocity/direction using GCS immediate commands
-    CIRCLE =        7,  // automatic circular flight with automatic throttle
-    SURFACE =       9,  // automatically return to surface, pilot maintains horizontal control
-    POSHOLD =      16,  // automatic position hold with manual override, with automatic throttle
+    // CIRCLE =        7,  // automatic circular flight with automatic throttle
+    // SURFACE =       9,  // automatically return to surface, pilot maintains horizontal control
+    // POSHOLD =      16,  // automatic position hold with manual override, with automatic throttle
+    DEPTH_HOLD_PID = 5,
+    DEPTH_HOLD_ROBUST = 6,
+    ATT_PID = 7,
+    ATT_ROBUST = 8,
+    
     MANUAL =       19,  // Pass-through input with no stabilization
     MOTOR_DETECT = 20,   // Automatically detect motors orientation
-    HC_ROBUST  = 21,
-    YAW = 22
+    THRUSTER_TEST = 21
 };
 
 enum mode_reason_t {

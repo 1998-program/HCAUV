@@ -28,6 +28,7 @@ const AP_Scheduler::Task HC::scheduler_tasks[] = {
     SCHED_TASK(fifty_hz_loop, 50, 75),
     SCHED_TASK(update_GPS, 50, 200),
     SCHED_TASK(update_batt_compass, 10, 120),
+    // SCHED_TASK(receive_from_rasp, 100, 200),
     SCHED_TASK(read_rangefinder, 20, 100),
     SCHED_TASK(update_altitude, 10, 100),
     SCHED_TASK(three_hz_loop, 3, 75),
@@ -86,7 +87,7 @@ void HC::setup()
 
     // initialise the main loop scheduler
     scheduler.init(&scheduler_tasks[0], ARRAY_SIZE(scheduler_tasks), MASK_LOG_PM);
-    init_mod_ciscrea();
+    // init_mod_ciscrea();
     //	hal.uartD->printf("ciscrea_A:%f\n",CIS_A[3]);
     //	hal.uartD->printf("X1_N:%f\n",X1_N);
 }
@@ -106,23 +107,16 @@ void HC::fast_loop()
     ins.update();
 
     //don't run rate controller in manual or motordetection modes
-    if (control_mode != MANUAL && control_mode != MOTOR_DETECT)
+    if (control_mode != MANUAL && control_mode != MOTOR_DETECT && control_mode != YAW_ROBUST && control_mode != DEPTH_HOLD_ROBUST && control_mode != ATT_ROBUST)
     {
         // run low level rate controllers that only require IMU data
 
         attitude_control.hc_rate_controller_run();
     }
 
-
-
+    receive_from_rasp();
     // send outputs to the motors library
     motors_output();
-
-    //test vscode 123
-    if(check_robust_arm()){
-        communication_rasp();
-    }
-    //	hal.uartC->printf("real_angle:%f\n",real_angle);
 
     // run EKF state estimator (expensive)
     // --------------------
@@ -136,7 +130,16 @@ void HC::fast_loop()
     check_ekf_yaw_reset();
 
     // run the attitude controllers
-    update_flight_mode();
+    // frequency_divider 200hz
+    if (frequency_divider == 1)
+    {
+        update_flight_mode();
+        frequency_divider = 0;
+    }
+    else
+    {
+        frequency_divider++;
+    }
 
     // update home from EKF if necessary
     update_home_from_EKF();
@@ -161,7 +164,6 @@ void HC::fast_loop()
 }
 
 // 200 Hz tasks
-
 //void HC::twohundred_hz_logging(){
 //
 //
@@ -182,6 +184,17 @@ void HC::fifty_hz_loop()
     // Update rc input/output
     rc().read_input();
     SRV_Channels::output_ch_all();
+
+    if(hc_ms5837_flag != false){
+        ap.depth_sensor_present = true;
+        sensor_health.depth = true;
+    }
+    else{
+        ap.depth_sensor_present = false;
+        sensor_health.depth = false;
+    }
+
+
 }
 
 // update_batt_compass - read battery and compass
@@ -369,7 +382,7 @@ void HC::update_altitude()
 {
     // read in baro altitude
     read_barometer();
-    hal.uartD->printf("update_altitude");
+    // hal.uartD->printf("update_altitude\n");
     if (should_log(MASK_LOG_CTUN))
     {
         Log_Write_Control_Tuning();
@@ -381,7 +394,7 @@ bool HC::control_check_barometer()
 #if CONFIG_HAL_BOARD != HAL_BOARD_SITL
     if (!ap.depth_sensor_present)
     { // can't hold depth without a depth sensor
-        gcs().send_text(MAV_SEVERITY_WARNING, "Depth sensor is not connected.");
+        gcs().send_text(MAV_SEVERITY_WARNING, "HC Depth sensor is not connected.");
         return false;
     }
     else if (failsafe.sensor_health)
@@ -392,7 +405,6 @@ bool HC::control_check_barometer()
 #endif
     return true;
 }
-
 
 // void HC::send_to_rasp()
 // {
@@ -588,8 +600,6 @@ bool HC::control_check_barometer()
 
 //     //	hal.uartD->printf("_bufferrx is 0 ?:%d",int(_bufferrx[3]));
 // }
-
-
 
 //void HC::hc_decode(int16_t numc){
 //	if(numc > 0){
