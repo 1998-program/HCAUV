@@ -183,17 +183,39 @@
 #define TARGET_YAW            120
 #endif
 
-#ifndef TARGET_ROLL
-#define TARGET_ROLL            0
+// #ifndef TARGET_ROLL
+// #define TARGET_ROLL            0
+// #endif
+
+// #ifndef TARGET_PITCH
+// #define TARGET_PITCH            0
+// #endif
+
+// #ifndef TARGET_DEPTH
+// #define TARGET_DEPTH            0
+// #endif
+
+#ifndef PWM_YAW_VALUE
+#define PWM_YAW_VALUE            0
 #endif
 
-#ifndef TARGET_PITCH
-#define TARGET_PITCH            0
+#ifndef DVL_ON
+#define DVL_ON            0
 #endif
 
-#ifndef TARGET_DEPTH
-#define TARGET_DEPTH            0
+
+#ifndef PWM_LAT_VALUE
+#define PWM_LAT_VALUE       0
 #endif
+
+#ifndef PWM_FOR_VALUE
+#define PWM_FOR_VALUE       0
+#endif
+
+#ifndef PWM_DEPTH_VALUE
+#define PWM_DEPTH_VALUE     0
+#endif
+
 
 // AUTO Mode
 #ifndef WP_YAW_BEHAVIOR_DEFAULT

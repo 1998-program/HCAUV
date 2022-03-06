@@ -15,33 +15,58 @@ void HC::motors_output()
         return;
     }
     
-    else if(control_mode == ATT_ROBUST){
+    if(control_mode == ATT_ROBUST){
         motor_mode = 1;
-        motors.set_att_robust_force(hc_att_robust_force);
+        motors.set_att_force(hc_att_robust_force);
         motors.set_motor_mode(motor_mode);
     }
     else if(control_mode == DEPTH_HOLD_ROBUST){
         motor_mode = 1;
-        motors.set_depth_robust_force(hc_depth_hold_robust_force);
+        motors.set_depth_force(hc_depth_hold_robust_force);
         motors.set_motor_mode(motor_mode);
     }
     else if(control_mode == YAW_ROBUST){
         motor_mode = 1;
-        motors.set_yaw_robust_force(hc_yaw_robust_force);
+        hc_yaw_robust_force = constrain_float(hc_yaw_robust_force,-33.26,33.26);
+        motors.set_yaw_force(hc_yaw_robust_force);
+        motors.set_motor_mode(motor_mode);
+    }
+    else if(control_mode == YAW_PID){
+        motor_mode = 1;
+        // motors.set_yaw_robust_force(hc_yaw_robust_force);
+        motors.set_motor_mode(motor_mode);
+    }
+    else if(control_mode == DEPTH_HOLD_PID){
+        motor_mode = 1;
+        // motors.set_yaw_robust_force(hc_yaw_robust_force);
+        motors.set_motor_mode(motor_mode);
+    }
+    else if(control_mode == ATT_PID){
+        motor_mode = 1;
+        // motors.set_yaw_robust_force(hc_yaw_robust_force);
+        motors.set_motor_mode(motor_mode);
+    }
+    else if(control_mode == THRUSTER_TEST){
+        motor_mode = 2;
         motors.set_motor_mode(motor_mode);
     }
     else{
-        // check if we are performing the motor test
-        if (ap.motor_test) {
-            verify_motor_test();
-        } else {
-            motor_mode = 1;
-            motors.set_motor_mode(motor_mode);
-            motors.set_interlock(true);
-            motors.output();
-
-        }
+        motor_mode = 0;
+        motors.set_motor_mode(motor_mode);
     }
+    // else{
+        // check if we are performing the motor test
+    if (ap.motor_test) {
+        verify_motor_test();
+    } else {
+        // motor_mode = 1;
+        // motors.set_motor_mode(motor_mode);
+        // hal.uartC->printf("motors_output\n");
+        motors.set_interlock(true);
+        motors.output();
+
+    }
+    // }
 }
 
 // Initialize new style motor test

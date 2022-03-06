@@ -24,5 +24,5 @@ void HC::att_PID_run()
     motors.set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
 
 
-    attitude_control.hc_input_euler_angle_roll_pitch_yaw(g.target_roll * 100, g.target_pitch * 100 , 0, true);
+    // attitude_control.hc_input_euler_angle_roll_pitch_yaw(g.target_roll * 100, g.target_pitch * 100 , 0, true);
 }

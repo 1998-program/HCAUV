@@ -33,5 +33,5 @@ void HC::att_robust_run()
     // output pilot's throttle
 //    attitude_control.set_throttle_out(channel_throttle->norm_input(), false, g.throttle_filt);
 
-    attitude_control.hc_input_euler_angle_roll_pitch_yaw(g.target_roll * 100, g.target_pitch * 100 , g.target_yaw * 100, true);
+    // attitude_control.hc_input_euler_angle_roll_pitch_yaw(g.target_roll * 100, g.target_pitch * 100 , g.target_yaw * 100, true);
 }

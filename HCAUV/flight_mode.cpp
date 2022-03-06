@@ -144,22 +144,27 @@ void HC::update_flight_mode()
     
     case YAW_PID:
         yaw_PID_run();
+        // hal.uartC->printf("YAW_PID\n");
         break;
 
     case YAW_ROBUST:
         yaw_robust_run();
+        // hal.uartC->printf("YAW_ROBUST\n");
         break;
 
     case DEPTH_HOLD_PID:
         depth_hold_PID_run();
+        // hal.uartC->printf("DEPTH_HOLD_PID\n");
         break;
 
     case THRUSTER_TEST:
         thruster_test_run();
+        // hal.uartC->printf("THRUSTER_TEST\n");
         break;
 
     case DEPTH_HOLD_ROBUST:
         depth_hold_robust_run();
+        // hal.uartC->printf("DEPTH_HOLD_ROBUST\n");
         break;  
 
     case ATT_PID:
@@ -198,6 +203,7 @@ void HC::update_flight_mode()
 
     case MANUAL:
         manual_run();
+        // hal.uartC->printf("MANUAL\n");
         break;
 
     case MOTOR_DETECT:

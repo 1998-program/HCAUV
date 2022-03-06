@@ -345,12 +345,17 @@ private:
     //    float CIS_C[2] = {1,0};
     //    float CIS_D = 0;
     //200
-    float CIS_A[4] = {1.0, 0.005, 0, 0.9820};
-    float CIS_B[2] = {0, 0.01};
+    // float CIS_A[4] = {1.0, 0.005, 0, 0.9820};
+    // float CIS_B[2] = {0, 0.01};
+    // float CIS_C[2] = {1, 0};
+    // float CIS_D = 0;
+    char IS_ARM;
+    float CIS_A[4] = {0, 1, 0, -0.3059};
+    float CIS_B[2] = {0, 0.0122};
     float CIS_C[2] = {1, 0};
     float CIS_D = 0;
-    char IS_ARM;
 
+    float real_vel;
     float torque;
     float torque_test;
     float real_angle;
@@ -550,6 +555,9 @@ private:
     float hc_depth_hold_robust_error = 0.0;
     float hc_att_robust_error = 0.0;
 
+    float hc_yaw_pid_error = 0.0;
+    float hc_yaw_pid_force = 0.0;
+
     bool hc_dvl_vel_flag;
     bool hc_dvl_pos_flag;
     bool hc_ms5837_flag;
@@ -583,12 +591,14 @@ private:
     //ciscrea
     void init_disarm_ciscrea();
     void init_mod_ciscrea();
-    void cal_ciscrea_angle();
+    void cal_ciscrea_angle(float force);
     void send_to_rasp(float error,int mode,int isarm);
     void receive_from_rasp();
     void hc_decode(int16_t numc);
     void hc_code();
     void uart_test();
+    float get_pos(){return real_angle;};
+    float get_vel(){return real_vel;};
 
     //HCAUV
     void fast_loop();
@@ -620,7 +630,10 @@ private:
     void Log_Write_Performance();
     void Log_Write_Attitude();
     void Log_write_HC();
+    void Log_write_HC_PID();
+    void Log_write_HC_Robust();
     void Log_Write_MotBatt();
+    void Log_write_DVL();
     void Log_Write_Event(Log_Event id);
     void Log_Write_Data(uint8_t id, int32_t value);
     void Log_Write_Data(uint8_t id, uint32_t value);

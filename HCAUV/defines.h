@@ -120,6 +120,9 @@ enum LoggingParameters {
     LOG_DATA_UINT32_MSG,
     LOG_DATA_FLOAT_MSG,
     LOG_HC_MSG,
+    LOG_HC_PID_MSG,
+    LOG_DVL_MSG,
+    LOG_HC_ROBUST_MSG,
     LOG_MOTBATT_MSG,
     LOG_PARAMTUNE_MSG,
     LOG_GUIDEDTARGET_MSG,
@@ -144,6 +147,8 @@ enum LoggingParameters {
 #define MASK_LOG_IMU_FAST               (1UL<<18)
 #define MASK_LOG_IMU_RAW                (1UL<<19)
 #define MASK_LOG_HC                     (1UL<<20)
+#define MASK_LOG_HC_PID                 (1UL<<21)
+#define MASK_LOG_DVL                    (1UL<<22)
 #define MASK_LOG_ANY                    0xFFFF
 
 // GCS failsafe

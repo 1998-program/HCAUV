@@ -105,8 +105,8 @@ void HC::receive_from_rasp()
     // }yaw_force,depth_force,att_force;
     
     numc = hal.uartD->available(); //length of data
-    hal.uartC->printf("numc:%d\n", numc);
-    hal.uartC->printf("flag:%d\n", hc_ms5837_flag);
+    // hal.uartC->printf("numc:%d\n", numc);
+    // hal.uartC->printf("flag:%d\n", hc_ms5837_flag);
 
     uint32_t tnum = 0;
     // if ((numc + temp_pass_flag) == 11 || (numc + temp_pass_flag) == 19 || (numc + temp_pass_flag) == 23){
@@ -126,6 +126,7 @@ void HC::receive_from_rasp()
     if(run_time > 2000000){
         hc_ms5837_flag = false;
     }
+    
                         
 
     if (pass_flag)
@@ -187,7 +188,7 @@ void HC::receive_from_rasp()
                                     }
                                 hc_dvl50_distacne = dvl_distance.value;
                                 // hal.uartC->printf("distacne:%f\n",hc_dvl50_distacne); 
-                                // hal.uartC->printf("vx:%f vy:%f vz:%f vdistacne:%f\n",hc_dvl50_vel_x,hc_dvl50_vel_y,hc_dvl50_vel_z,hc_dvl50_distacne);
+                                hal.uartC->printf("vx:%f vy:%f vz:%f vdistacne:%f\n",hc_dvl50_vel_x,hc_dvl50_vel_y,hc_dvl50_vel_z,hc_dvl50_distacne);
                                 //dvl_v
                                 break;
 
@@ -208,7 +209,7 @@ void HC::receive_from_rasp()
                                     }
                                 hc_dvl50_yaw = dvl_yaw.value;
                                 // hal.uartC->printf("yaw:%f\n",hc_dvl50_yaw); 
-                                // hal.uartC->printf("roll:%f pitch:%f yaw:%f\n",hc_dvl50_roll,hc_dvl50_pitch,hc_dvl50_yaw); 
+                                hal.uartC->printf("roll:%f pitch:%f yaw:%f\n",hc_dvl50_roll,hc_dvl50_pitch,hc_dvl50_yaw); 
                                 break;
                             }
                             case 0x79:
@@ -218,7 +219,7 @@ void HC::receive_from_rasp()
                                         yaw_force.value_char[i-payload] = _bufferrx[i];
                                     }
                                 hc_yaw_robust_force = yaw_force.value;
-                                // hal.uartC->printf("hc_yaw_robust_force:%f\n",hc_yaw_robust_force);
+                                hal.uartC->printf("hc_yaw_robust_force:%f\n",hc_yaw_robust_force);
                                 break;
                             }
                             case 0x64:

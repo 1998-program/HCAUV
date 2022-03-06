@@ -19,6 +19,7 @@ void AC_AttitudeControl::control_monitor_filter_pid(float value, float &rms)
     rms = filter_constant * rms + (1.0f - filter_constant) * sq(value);
 }
 
+
 /*
   update state in _control_monitor
  */

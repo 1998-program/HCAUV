@@ -209,11 +209,19 @@ public:
         k_param_cam_slew_limit = 237, // deprecated
         k_param_lights_steps,
         k_param_pilot_speed_dn,
-        k_param_cis_heading,
+        // k_param_cis_heading,
         k_param_target_yaw,    //241
-        k_param_target_roll,
-        k_param_target_pitch,
-        k_param_target_depth,
+        // k_param_target_roll,
+        // k_param_target_pitch,
+        // k_param_target_depth,
+
+        k_param_pwm_yaw_value,   //245
+        k_param_pwm_for_value,
+        k_param_pwm_lat_value,
+        k_param_pwm_depth_value,
+
+        k_param_dvl_on,
+        
 
     };
 
@@ -307,11 +315,19 @@ public:
     AP_Float                surface_depth;
     AP_Int8                 frame_configuration;
 
-	AP_Int16		cis_heading;
+	// AP_Int16		cis_heading;
     AP_Int16        target_yaw;
-    AP_Float        target_roll;
-    AP_Float        target_pitch;
-    AP_Float        target_depth;
+    // AP_Float        target_roll;
+    // AP_Float        target_pitch;
+    // AP_Float        target_depth;
+
+    AP_Float        pwm_yaw_value;
+    AP_Float        pwm_lat_value;
+    AP_Float        pwm_for_value;
+    AP_Float        pwm_depth_value;
+
+    AP_Int8         dvl_on;
+
 
     // Note: keep initializers here in the same order as they are declared
     // above.

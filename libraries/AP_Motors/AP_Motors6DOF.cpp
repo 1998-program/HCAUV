@@ -237,66 +237,86 @@ int16_t AP_Motors6DOF::calc_thrust_to_pwm(float thrust_in) const
 {
     if(_motor_mode == 1){
         int16_t pwm = 1500;
-        if(thrust_in >= 0 && thrust_in < 2.25){
-            pwm = -7.594 * thrust_in *thrust_in + 110.1 * thrust_in + 1544;
+        if(thrust_in > 0 && thrust_in <= 0.327){
+            pwm = -227.9 * thrust_in *thrust_in + 236.1 * thrust_in + 1526;
         }
-        else if(thrust_in < 0 && thrust_in > -1.75){
-            pwm = 11.47 * thrust_in * thrust_in + 138.1 * thrust_in + 1456;
+        else if(thrust_in > 0.327 && thrust_in <= 2.25){
+            pwm = -6.08 * thrust_in *thrust_in + 110.8 * thrust_in + 1553;
+        } 
+        else if(thrust_in < 0 && thrust_in > -0.259){
+            pwm = 208.3 * thrust_in * thrust_in + 250.6 * thrust_in + 1471;
+        }      
+        else if(thrust_in <= -0.259  && thrust_in > -1.75){
+            pwm = 8.981 * thrust_in * thrust_in + 127.4 * thrust_in + 1447;
         }
-        else if(thrust_in >= 2.25){
+        else if(thrust_in > 2.25){
             pwm = 1753;
         }
         else if(thrust_in <= 1.75)
         {
             pwm = 1249;
         }
+        else pwm = 0;
         return pwm;
     }
-    else 
+    else
         return constrain_int16(1500 + thrust_in * 400, _throttle_radio_min, _throttle_radio_max);
+    
+    // else if(_motor_mode == 2){
+
+    // }
 }
 
 void AP_Motors6DOF::output_to_motors()
 {
-    int8_t i;
-    int16_t motor_out[AP_MOTORS_MAX_NUM_MOTORS];    // final pwm values sent to the motor
+    // if(_motor_mode == 2){
 
-    switch (_spool_state) {
-    case SpoolState::SHUT_DOWN:
-        // sends minimum values out to the motors
-        // set motor output based on thrust requests
-        for (i=0; i<AP_MOTORS_MAX_NUM_MOTORS; i++) {
-            if (motor_enabled[i]) {
-                motor_out[i] = 1500;
-            }
-        }
-        break;
-    case SpoolState::GROUND_IDLE:
-        // sends output to motors when armed but not flying
-        for (i=0; i<AP_MOTORS_MAX_NUM_MOTORS; i++) {
-            if (motor_enabled[i]) {
-                motor_out[i] = 1500;
-            }
-        }
-        break;
-    case SpoolState::SPOOLING_UP:
-    case SpoolState::THROTTLE_UNLIMITED:
-    case SpoolState::SPOOLING_DOWN:
-        // set motor output based on thrust requests
-        for (i=0; i<AP_MOTORS_MAX_NUM_MOTORS; i++) {
-            if (motor_enabled[i]) {
-                motor_out[i] = calc_thrust_to_pwm(_thrust_rpyt_out[i]);
-            }
-        }
-        break;
-    }
+    // }
+    // else{}
+        int8_t i;
+        int16_t motor_out[AP_MOTORS_MAX_NUM_MOTORS];    // final pwm values sent to the motor
 
-    // send output to each motor
-    for (i=0; i<AP_MOTORS_MAX_NUM_MOTORS; i++) {
-        if (motor_enabled[i]) {
-            rc_write(i, motor_out[i]);
+        switch (_spool_state) {
+        case SpoolState::SHUT_DOWN:
+            // sends minimum values out to the motors
+            // set motor output based on thrust requests
+            for (i=0; i<AP_MOTORS_MAX_NUM_MOTORS; i++) {
+                if (motor_enabled[i]) {
+                    motor_out[i] = 1500;
+                }
+            }
+            break;
+        case SpoolState::GROUND_IDLE:
+            // sends output to motors when armed but not flying
+            for (i=0; i<AP_MOTORS_MAX_NUM_MOTORS; i++) {
+                if (motor_enabled[i]) {
+                    motor_out[i] = 1500;
+                }
+            }
+            break;
+        case SpoolState::SPOOLING_UP:
+        case SpoolState::THROTTLE_UNLIMITED:
+        case SpoolState::SPOOLING_DOWN:
+            // set motor output based on thrust requests
+            for (i = 0; i < 4; i++){
+                if (motor_enabled[i]) {
+                    motor_out[i] = constrain_int16(1500 + _thrust_rpyt_out[i] * 400, _throttle_radio_min, _throttle_radio_max);
+                }                
+            }
+            for (i=4; i<AP_MOTORS_MAX_NUM_MOTORS; i++) {
+                if (motor_enabled[i]) {
+                    motor_out[i] = calc_thrust_to_pwm(_thrust_rpyt_out[i]);
+                }
+            }
+            break;
         }
-    }
+
+        // send output to each motor
+        for (i=0; i<AP_MOTORS_MAX_NUM_MOTORS; i++) {
+            if (motor_enabled[i]) {
+                rc_write(i, motor_out[i]);
+            }
+        }
 }
 
 float AP_Motors6DOF::get_current_limit_max_throttle()
@@ -310,7 +330,8 @@ float AP_Motors6DOF::get_current_limit_max_throttle()
 // ToDo calculate headroom for rpy to be added for stabilization during full throttle/forward/lateral commands
 void AP_Motors6DOF::output_armed_stabilizing()
 {
-    if(_motor_mode == 0){
+    // hal.uartC->printf("_yaw_force: %f\n",_yaw_force);
+    if(_motor_mode != 1){
         if ((sub_frame_t)_last_frame_class == SUB_FRAME_VECTORED) {
             output_armed_stabilizing_vectored();
         } else if ((sub_frame_t)_last_frame_class == SUB_FRAME_VECTORED_6DOF) {
@@ -379,42 +400,43 @@ void AP_Motors6DOF::output_armed_stabilizing()
             }
         }
 
-        const AP_BattMonitor &battery = AP::battery();
+        // const AP_BattMonitor &battery = AP::battery();
 
-        // Current limiting
-        float _batt_current;
-        if (_batt_current_max <= 0.0f || !battery.current_amps(_batt_current)) {
-            return;
-        }
+        // // Current limiting
+        // float _batt_current;
+        // if (_batt_current_max <= 0.0f || !battery.current_amps(_batt_current)) {
+        //     return;
+        // }
 
-        float _batt_current_delta = _batt_current - _batt_current_last;
+        // float _batt_current_delta = _batt_current - _batt_current_last;
 
-        float loop_interval = 1.0f/_loop_rate;
+        // float loop_interval = 1.0f/_loop_rate;
 
-        float _current_change_rate = _batt_current_delta / loop_interval;
+        // float _current_change_rate = _batt_current_delta / loop_interval;
 
-        float predicted_current = _batt_current + (_current_change_rate * loop_interval * 5);
+        // float predicted_current = _batt_current + (_current_change_rate * loop_interval * 5);
 
-        float batt_current_ratio = _batt_current/_batt_current_max;
+        // float batt_current_ratio = _batt_current/_batt_current_max;
 
-        float predicted_current_ratio = predicted_current/_batt_current_max;
-        _batt_current_last = _batt_current;
+        // float predicted_current_ratio = predicted_current/_batt_current_max;
+        // _batt_current_last = _batt_current;
 
-        if (predicted_current > _batt_current_max * 1.5f) {
-            batt_current_ratio = 2.5f;
-        } else if (_batt_current < _batt_current_max && predicted_current > _batt_current_max) {
-            batt_current_ratio = predicted_current_ratio;
-        }
-        _output_limited += (loop_interval/(loop_interval+_batt_current_time_constant)) * (1 - batt_current_ratio);
+        // if (predicted_current > _batt_current_max * 1.5f) {
+        //     batt_current_ratio = 2.5f;
+        // } else if (_batt_current < _batt_current_max && predicted_current > _batt_current_max) {
+        //     batt_current_ratio = predicted_current_ratio;
+        // }
+        // _output_limited += (loop_interval/(loop_interval+_batt_current_time_constant)) * (1 - batt_current_ratio);
 
-        _output_limited = constrain_float(_output_limited, 0.0f, 1.0f);
+        // _output_limited = constrain_float(_output_limited, 0.0f, 1.0f);
 
-        for (uint8_t i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; i++) {
-            if (motor_enabled[i]) {
-                _thrust_rpyt_out[i] *= _output_limited;
-            }
-        } 
+        // for (uint8_t i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; i++) {
+        //     if (motor_enabled[i]) {
+        //         _thrust_rpyt_out[i] *= _output_limited;
+        //     }
+        // } 
     }
+    
     else //xin mo shi
     {
         {
@@ -432,10 +454,11 @@ void AP_Motors6DOF::output_armed_stabilizing()
             // throttle_thrust = get_throttle_bidirectional();
             // forward_thrust = _forward_in;
             // lateral_thrust = _lateral_in;
+            
             roll_thrust = 0.0;
             pitch_thrust = 0.0;
-            yaw_thrust = _yaw_robust_force / 0.4187 / 2 / 9.8;
-            throttle_thrust = _depth_robust_force / 4 / 0.8660 / 9.8;
+            yaw_thrust = _yaw_force / 0.4187 / 2 / 9.8;
+            throttle_thrust = get_throttle_bidirectional();
             forward_thrust = 0.0;
             lateral_thrust = 0.0;
 
@@ -494,6 +517,7 @@ void AP_Motors6DOF::output_armed_stabilizing()
         }
 
     }
+    
     
 }
 

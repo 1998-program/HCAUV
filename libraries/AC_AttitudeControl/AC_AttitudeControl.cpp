@@ -236,6 +236,82 @@ void AC_AttitudeControl::input_quaternion(Quaternion attitude_desired_quat)
     // Call quaternion attitude controller
     attitude_controller_run_quat();
 }
+//200HZ
+float AC_AttitudeControl::HC_POS_PID(float target, float measurement, bool limit, float Kp, float Ki, float Kd)
+{
+    // hal.uartC->printf("_dt:%f\n",_dt);
+    // don't process inf or NaN
+    if (!isfinite(target) || !isfinite(measurement))
+    {
+        return 0.0f;
+    }
+
+    float error_last = hc_pos_error;
+    hc_pos_error = hc_pos_target - measurement;
+    if (hc_dt > 0.0f)
+    {
+        hc_pos_derivative = (hc_pos_error - error_last) / hc_dt;
+            // _derivative += get_filt_D_alpha() * (derivative - _derivative);
+    }
+
+    // update I term
+    // update_i(limit);
+    if (!is_zero(Ki) && is_positive(hc_dt)) {
+        // Ensure that integrator can only be reduced if the output is saturated
+        if (!limit || ((is_positive(hc_pos_integrator) && is_negative(hc_pos_error)) || (is_negative(hc_pos_integrator) && is_positive(hc_pos_error)))) {
+            hc_pos_integrator += ((float)hc_pos_error * Ki) * hc_dt;
+            // hc_integrator = constrain_float(hc_integrator, -_kimax, _kimax);
+        }
+    } else {
+        hc_pos_integrator = 0.0f;
+    }
+
+    float P_out = (hc_pos_error * Kp);
+    float D_out = (hc_pos_derivative * Kd);
+
+
+
+    return P_out + hc_pos_integrator + D_out;
+}
+
+float AC_AttitudeControl::HC_VEL_PID(float target, float measurement, bool limit, float Kp, float Ki, float Kd)
+{
+    // don't process inf or NaN
+    // hal.uartC->printf("_dt:%f\n",_dt);
+    if (!isfinite(target) || !isfinite(measurement))
+    {
+        return 0.0f;
+    }
+
+    float error_last = hc_vel_error;
+    hc_vel_error = hc_vel_target - measurement;
+    if (hc_dt > 0.0f)
+    {
+        hc_vel_derivative = (hc_vel_error - error_last) / hc_dt;
+            // _derivative += get_filt_D_alpha() * (derivative - _derivative);
+    }
+
+    // update I term
+    // update_i(limit);
+    if (!is_zero(Ki) && is_positive(hc_dt)) {
+        // Ensure that integrator can only be reduced if the output is saturated
+        if (!limit || ((is_positive(hc_vel_integrator) && is_negative(hc_vel_error)) || (is_negative(hc_vel_integrator) && is_positive(hc_vel_error)))) {
+            hc_vel_integrator += ((float)hc_vel_error * Ki) * hc_dt;
+            // hc_integrator = constrain_float(hc_integrator, -_kimax, _kimax);
+        }
+    } else {
+        hc_vel_integrator = 0.0f;
+    }
+
+    float P_out = (hc_vel_error * Kp);
+    float D_out = (hc_vel_derivative * Kd);
+
+
+
+    return P_out + hc_vel_integrator + D_out;
+}
+
+
 
 // Command an euler roll and pitch angle and an euler yaw rate with angular velocity feedforward and smoothing
 void AC_AttitudeControl::input_euler_angle_roll_pitch_euler_rate_yaw(float euler_roll_angle_cd, float euler_pitch_angle_cd, float euler_yaw_rate_cds)
@@ -338,7 +414,7 @@ void AC_AttitudeControl::hc_input_euler_angle_roll_pitch_yaw(float euler_roll_an
         // }
         // Compute quaternion target attitude
         _attitude_target_quat.from_euler(_attitude_target_euler_angle.x, _attitude_target_euler_angle.y, _attitude_target_euler_angle.z);
-
+        // hal.uartC->printf("_attitude_target_euler_angle:%f\n",_attitude_target_euler_angle.z);
         // Set rate feedforward requests to zero
         _attitude_target_euler_rate = Vector3f(0.0f, 0.0f, 0.0f);
         _attitude_target_ang_vel = Vector3f(0.0f, 0.0f, 0.0f);
@@ -729,11 +805,18 @@ void AC_AttitudeControl::hc_attitude_controller_run_quat()
     // Compute attitude error
     Vector3f attitude_error_vector;
     hc_thrust_heading_rotation_angles(_attitude_target_quat, attitude_vehicle_quat, attitude_error_vector, _thrust_error_angle);
-
+    
     // Compute the angular velocity target from the attitude error
     // Position loop control waihuan
-    _rate_target_ang_vel = update_ang_vel_target_from_att_error(attitude_error_vector);
-
+    
+    hc_attitude_error_vector = attitude_error_vector;
+    // hal.uartC->printf("hc_attitude_error_vector:%f\n",hc_attitude_error_vector.z);
+    // _rate_target_ang_vel = update_ang_vel_target_from_att_error(attitude_error_vector);
+    // hal.uartC->printf("_rate_target_ang_vel:%f\n",_rate_target_ang_vel.z);
+    yaw_pid_force = HC_POS_PID(0,-attitude_error_vector.z,false,45,0.05,35);
+    yaw_pid_force = constrain_float(yaw_pid_force,-33.26,33.26);
+    _motors.set_yaw_force(yaw_pid_force);
+    // hal.uartC->printf(":%f\n",);
     // Add feedforward term that attempts to ensure that roll and pitch errors rotate with the body frame rather than the reference frame.
     // todo: this should probably be a matrix that couples yaw as well.
     // _rate_target_ang_vel.x += constrain_float(attitude_error_vector.y, -M_PI / 4, M_PI / 4) * _ahrs.get_gyro().z;
@@ -850,61 +933,66 @@ void AC_AttitudeControl::attitude_controller_run_quat()
 
 void AC_AttitudeControl::hc_thrust_heading_rotation_angles(Quaternion &att_to_quat, const Quaternion &att_from_quat, Vector3f &att_diff_angle, float &thrust_vec_dot)
 {
-    Matrix3f att_to_rot_matrix; // rotation from the target body frame to the inertial frame.
-    att_to_quat.rotation_matrix(att_to_rot_matrix);
-    Vector3f att_to_thrust_vec = att_to_rot_matrix * Vector3f(0.0f, 0.0f, 1.0f);
+    if(_dvl_on == 0){
+        Matrix3f att_to_rot_matrix; // rotation from the target body frame to the inertial frame.
+        att_to_quat.rotation_matrix(att_to_rot_matrix);
+        Vector3f att_to_thrust_vec = att_to_rot_matrix * Vector3f(0.0f, 0.0f, 1.0f);
 
-    Matrix3f att_from_rot_matrix; // rotation from the current body frame to the inertial frame.
-    att_from_quat.rotation_matrix(att_from_rot_matrix);
-    Vector3f att_from_thrust_vec = att_from_rot_matrix * Vector3f(0.0f, 0.0f, 1.0f);
+        Matrix3f att_from_rot_matrix; // rotation from the current body frame to the inertial frame.
+        att_from_quat.rotation_matrix(att_from_rot_matrix);
+        Vector3f att_from_thrust_vec = att_from_rot_matrix * Vector3f(0.0f, 0.0f, 1.0f);
 
-    // the cross product of the desired and target thrust vector defines the rotation vector
-    Vector3f thrust_vec_cross = att_from_thrust_vec % att_to_thrust_vec;
+        // the cross product of the desired and target thrust vector defines the rotation vector
+        Vector3f thrust_vec_cross = att_from_thrust_vec % att_to_thrust_vec;
 
-    // the dot product is used to calculate the angle between the target and desired thrust vectors
-    thrust_vec_dot = acosf(constrain_float(att_from_thrust_vec * att_to_thrust_vec, -1.0f, 1.0f));
+        // the dot product is used to calculate the angle between the target and desired thrust vectors
+        thrust_vec_dot = acosf(constrain_float(att_from_thrust_vec * att_to_thrust_vec, -1.0f, 1.0f));
 
-    // Normalize the thrust rotation vector
-    float thrust_vector_length = thrust_vec_cross.length();
-    if (is_zero(thrust_vector_length) || is_zero(thrust_vec_dot))
-    {
-        thrust_vec_cross = Vector3f(0, 0, 1);
-        thrust_vec_dot = 0.0f;
-    }
-    else
-    {
-        thrust_vec_cross /= thrust_vector_length;
-    }
-    Quaternion thrust_vec_correction_quat;
-    thrust_vec_correction_quat.from_axis_angle(thrust_vec_cross, thrust_vec_dot);
+        // Normalize the thrust rotation vector
+        float thrust_vector_length = thrust_vec_cross.length();
+        if (is_zero(thrust_vector_length) || is_zero(thrust_vec_dot))
+        {
+            thrust_vec_cross = Vector3f(0, 0, 1);
+            thrust_vec_dot = 0.0f;
+        }
+        else
+        {
+            thrust_vec_cross /= thrust_vector_length;
+        }
+        Quaternion thrust_vec_correction_quat;
+        thrust_vec_correction_quat.from_axis_angle(thrust_vec_cross, thrust_vec_dot);
 
-    // Rotate thrust_vec_correction_quat to the att_from frame
-    thrust_vec_correction_quat = att_from_quat.inverse() * thrust_vec_correction_quat * att_from_quat;
+        // Rotate thrust_vec_correction_quat to the att_from frame
+        thrust_vec_correction_quat = att_from_quat.inverse() * thrust_vec_correction_quat * att_from_quat;
 
-    // calculate the remaining rotation required after thrust vector is rotated transformed to the att_from frame
-    Quaternion yaw_vec_correction_quat = thrust_vec_correction_quat.inverse() * att_from_quat.inverse() * att_to_quat;
+        // calculate the remaining rotation required after thrust vector is rotated transformed to the att_from frame
+        Quaternion yaw_vec_correction_quat = thrust_vec_correction_quat.inverse() * att_from_quat.inverse() * att_to_quat;
 
-    // calculate the angle error in x and y.
-    Vector3f rotation;
-    thrust_vec_correction_quat.to_axis_angle(rotation);
-    att_diff_angle.x = rotation.x;
-    att_diff_angle.y = rotation.y;
+        // calculate the angle error in x and y.
+        Vector3f rotation;
+        thrust_vec_correction_quat.to_axis_angle(rotation);
+        att_diff_angle.x = rotation.x;
+        att_diff_angle.y = rotation.y;
 
-    // calculate the angle error in z (x and y should be zero here).
-    yaw_vec_correction_quat.to_axis_angle(rotation);
-    att_diff_angle.z = rotation.z;
+        // calculate the angle error in z (x and y should be zero here).
+        yaw_vec_correction_quat.to_axis_angle(rotation);
+        att_diff_angle.z = rotation.z;
 
-    // Todo: Limit roll an pitch error based on output saturation and maximum error.
+        // Todo: Limit roll an pitch error based on output saturation and maximum error.
 
-    // Limit Yaw Error based on maximum acceleration - Update to include output saturation and maximum error.
-    // Currently the limit is based on the maximum acceleration using the linear part of the SQRT controller.
-    // This should be updated to be based on an angle limit, saturation, or unlimited based on user defined parameters.
-    if (!is_zero(_p_angle_yaw.kP()) && fabsf(att_diff_angle.z) > AC_ATTITUDE_ACCEL_Y_CONTROLLER_MAX_RADSS / _p_angle_yaw.kP())
-    {
-        att_diff_angle.z = constrain_float(wrap_PI(att_diff_angle.z), -AC_ATTITUDE_ACCEL_Y_CONTROLLER_MAX_RADSS / _p_angle_yaw.kP(), AC_ATTITUDE_ACCEL_Y_CONTROLLER_MAX_RADSS / _p_angle_yaw.kP());
+        // Limit Yaw Error based on maximum acceleration - Update to include output saturation and maximum error.
+        // Currently the limit is based on the maximum acceleration using the linear part of the SQRT controller.
+        // This should be updated to be based on an angle limit, saturation, or unlimited based on user defined parameters.
+        // if (!is_zero(_p_angle_yaw.kP()) && fabsf(att_diff_angle.z) > AC_ATTITUDE_ACCEL_Y_CONTROLLER_MAX_RADSS / _p_angle_yaw.kP())
+        // {
+            // att_diff_angle.z = constrain_float(wrap_PI(att_diff_angle.z), -AC_ATTITUDE_ACCEL_Y_CONTROLLER_MAX_RADSS / _p_angle_yaw.kP(), AC_ATTITUDE_ACCEL_Y_CONTROLLER_MAX_RADSS / _p_angle_yaw.kP());
+            // att_diff_angle.z = constrain_float(wrap_PI(att_diff_angle.z), -1.2, 1.2);
+        att_diff_angle.z = wrap_PI(att_diff_angle.z);
         yaw_vec_correction_quat.from_axis_angle(Vector3f(0.0f, 0.0f, att_diff_angle.z));
         att_to_quat = att_from_quat * thrust_vec_correction_quat * yaw_vec_correction_quat;
+        // }
     }
+
 }
 
 // calculates the velocity correction from an angle error. The angular velocity has acceleration and
@@ -1069,10 +1157,18 @@ bool AC_AttitudeControl::ang_vel_to_euler_rate(const Vector3f &euler_rad, const 
 // Update rate_target_ang_vel using attitude_error_rot_vec_rad
 Vector3f AC_AttitudeControl::update_ang_vel_target_from_att_error(const Vector3f &attitude_error_rot_vec_rad)
 {
+    
+    // hal.uartC->printf("_hc_yaw_vel_PID:%f\n",_hc_yaw_vel_PID.get_d());
     Vector3f rate_target_ang_vel;
     rate_target_ang_vel.x = _p_angle_roll.kP() * attitude_error_rot_vec_rad.x;
     rate_target_ang_vel.y = _p_angle_pitch.kP() * attitude_error_rot_vec_rad.y;
     rate_target_ang_vel.z = _p_angle_yaw.kP() * attitude_error_rot_vec_rad.z;
+    // return rate_target_ang_vel;
+    // rate_target_ang_vel.z = HC_POS_PID(0,-attitude_error_rot_vec_rad.z,false,2.0,0,0.6);
+    // rate_target_ang_vel.z = HC_POS_PID(0,-attitude_error_rot_vec_rad.z,false,2.0,0,0.6);
+    rate_target_ang_vel.z = constrain_float(rate_target_ang_vel.z, -1.2, 1.2);
+
+    // rate_target_ang_vel.z = _hc_yaw_vel_PID.update_all(0.0,-attitude_error_rot_vec_rad.z);
     return rate_target_ang_vel;
     // Compute the roll angular velocity demand from the roll angle error
     // if (_use_sqrt_controller)

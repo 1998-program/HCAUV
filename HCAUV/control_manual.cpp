@@ -33,4 +33,6 @@ void HC::manual_run()
     motors.set_throttle(channel_throttle->norm_input());
     motors.set_forward(channel_forward->norm_input());
     motors.set_lateral(channel_lateral->norm_input());
+    // hal.uartC->printf("set_throttle:%f,set_forward:%f,set_lateral:%f,set_yaw:%f\n",channel_throttle->norm_input(),channel_forward->norm_input(),channel_lateral->norm_input(),channel_yaw->norm_input());
+
 }

@@ -105,62 +105,71 @@ void HC::fast_loop()
 {
     // update INS immediately to get current gyro data populated
     ins.update();
-
-    //don't run rate controller in manual or motordetection modes
-    if (control_mode != MANUAL && control_mode != MOTOR_DETECT && control_mode != YAW_ROBUST && control_mode != DEPTH_HOLD_ROBUST && control_mode != ATT_ROBUST)
-    {
-        // run low level rate controllers that only require IMU data
-
-        attitude_control.hc_rate_controller_run();
-    }
+    // hal.uartC->printf("G_Dt:%f\n",G_Dt);
 
     receive_from_rasp();
-    // send outputs to the motors library
-    motors_output();
 
-    // run EKF state estimator (expensive)
-    // --------------------
-    read_AHRS();
+    
+    if (frequency_divider == 1){
+        //don't run rate controller in manual or motordetection modes
+        // if (control_mode != MANUAL && control_mode != MOTOR_DETECT && control_mode != YAW_ROBUST && control_mode != DEPTH_HOLD_ROBUST && control_mode != ATT_ROBUST)
+        // {
+        //     // run low level rate controllers that only require IMU data
 
-    // Inertial Nav
-    // --------------------
-    read_inertia();
+        //     attitude_control.hc_rate_controller_run();
+        // }
+        // send outputs to the motors library
+        motors_output();
+    }
+        // run EKF state estimator (expensive)
+        // --------------------
+        read_AHRS();
 
-    // check if ekf has reset target heading
-    check_ekf_yaw_reset();
+        // Inertial Nav
+        // --------------------
+        read_inertia();
 
-    // run the attitude controllers
-    // frequency_divider 200hz
-    if (frequency_divider == 1)
-    {
+        // check if ekf has reset target heading
+        check_ekf_yaw_reset();
+
+        // run the attitude controllers
+        // frequency_divider 200hz
+        // if (frequency_divider == 1)
+        // {
+        //     update_flight_mode();
+        //     frequency_divider = 0;
+        // }
+        // else
+        // {
+        //     frequency_divider++;
+        // }
+    if (frequency_divider == 1){    
         update_flight_mode();
-        frequency_divider = 0;
     }
-    else
-    {
-        frequency_divider++;
-    }
+    else frequency_divider++;
+        // update home from EKF if necessary
+        update_home_from_EKF();
 
-    // update home from EKF if necessary
-    update_home_from_EKF();
+        // check if we've reached the surface or bottom
+        update_surface_and_bottom_detector();
 
-    // check if we've reached the surface or bottom
-    update_surface_and_bottom_detector();
+    // #if MOUNT == ENABLED
+    //     // camera mount's fast update
+    //     camera_mount.update_fast();
+    // #endif
 
-#if MOUNT == ENABLED
-    // camera mount's fast update
-    camera_mount.update_fast();
-#endif
-
-    // log sensor health
+        // log sensor health
     if (should_log(MASK_LOG_ANY))
     {
         Log_Sensor_Health();
     }
     if (should_log(MASK_LOG_RCIN))
     {
-        Log_write_HC();
+        // Log_write_HC();
     }
+    attitude_control.set_dvl_state(g.dvl_on);
+
+
 }
 
 // 200 Hz tasks
@@ -181,18 +190,32 @@ void HC::fifty_hz_loop()
 
     failsafe_sensors_check();
 
+    if (should_log(MASK_LOG_CTUN))
+    {
+        Log_Write_Control_Tuning();  //HC
+    }
+
+    if (should_log(MASK_LOG_IMU)){
+        Log_write_HC();
+    }    
+    if (should_log(MASK_LOG_RCIN)){
+        Log_write_HC_PID();
+        Log_write_HC_Robust();
+        Log_write_DVL();
+    }
+    
     // Update rc input/output
     rc().read_input();
     SRV_Channels::output_ch_all();
 
-    if(hc_ms5837_flag != false){
-        ap.depth_sensor_present = true;
-        sensor_health.depth = true;
-    }
-    else{
-        ap.depth_sensor_present = false;
-        sensor_health.depth = false;
-    }
+    // if(hc_ms5837_flag != false){
+    //     ap.depth_sensor_present = true;
+    //     sensor_health.depth = true;
+    // }
+    // else{
+    //     ap.depth_sensor_present = false;
+    //     sensor_health.depth = false;
+    // }
 
 
 }
@@ -271,6 +294,14 @@ void HC::twentyfive_hz_logging()
             logger.Write_PID(LOG_PIDA_MSG, pos_control.get_accel_z_pid().get_pid_info());
         }
     }
+    // if (should_log(MASK_LOG_IMU)){
+    //     Log_write_HC();
+    // }    
+    // if (should_log(MASK_LOG_RCIN)){
+    //     Log_write_HC_PID();
+    //     Log_write_HC_Robust();
+    //     Log_write_DVL();
+    // }
 
     // log IMU data if we're not already logging at the higher rate
     if (should_log(MASK_LOG_IMU) && !should_log(MASK_LOG_IMU_RAW))
@@ -383,10 +414,10 @@ void HC::update_altitude()
     // read in baro altitude
     read_barometer();
     // hal.uartD->printf("update_altitude\n");
-    if (should_log(MASK_LOG_CTUN))
-    {
-        Log_Write_Control_Tuning();
-    }
+    // if (should_log(MASK_LOG_CTUN))
+    // {
+    //     Log_Write_Control_Tuning();
+    // }
 }
 
 bool HC::control_check_barometer()

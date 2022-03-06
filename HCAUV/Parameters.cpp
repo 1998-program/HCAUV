@@ -601,11 +601,17 @@ const AP_Param::Info HC::var_info[] = {
     // @Path: Parameters.cpp
     GOBJECT(g2, "",  ParametersG2),
 
-	GSCALAR(cis_heading,  "CIS_HEADING",   CIS_HEADING),
+	// GSCALAR(cis_heading,  "CIS_HEADING",   CIS_HEADING),
     GSCALAR(target_yaw,  "TARGET_YAW",   TARGET_YAW),
-    GSCALAR(target_roll,  "TARGET_ROLL",   TARGET_ROLL),
-    GSCALAR(target_pitch,  "TARGET_PITCH",   TARGET_PITCH),
-    GSCALAR(target_depth,  "TARGET_DEPTH",   TARGET_DEPTH),
+    // GSCALAR(target_roll,  "TARGET_ROLL",   TARGET_ROLL),
+    // GSCALAR(target_pitch,  "TARGET_PITCH",   TARGET_PITCH),
+    // GSCALAR(target_depth,  "TARGET_DEPTH",   TARGET_DEPTH),
+
+    GSCALAR(pwm_yaw_value,  "PWM_YAW_VALUE",   PWM_YAW_VALUE),
+    GSCALAR(pwm_lat_value,  "PWM_LAT_VALUE",   PWM_LAT_VALUE),
+    GSCALAR(pwm_for_value,  "PWM_FOR_VALUE",   PWM_FOR_VALUE),
+    GSCALAR(pwm_depth_value,  "PWM_DEPTH_VALUE",   PWM_DEPTH_VALUE),
+    GSCALAR(dvl_on,  "DVL_ON",   DVL_ON),
     AP_VAREND
 };
 

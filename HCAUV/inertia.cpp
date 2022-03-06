@@ -22,4 +22,5 @@ void HC::read_inertia()
     // get velocity, altitude is always absolute frame, referenced from
     // water's surface
     climb_rate = inertial_nav.get_velocity_z();
+    
 }

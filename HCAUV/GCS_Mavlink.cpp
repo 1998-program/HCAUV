@@ -142,7 +142,7 @@ void GCS_MAVLINK_HC::send_scaled_pressure3()
         AP_HAL::millis(),
         hc.hc_ms5837_pressure,
         0,
-        hc.celsius.temperature() * 100);
+        0);
 }
 
 bool GCS_MAVLINK_HC::send_info()

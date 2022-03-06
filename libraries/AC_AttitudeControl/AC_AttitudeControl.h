@@ -81,6 +81,7 @@ public:
     // Sets the roll acceleration limit in centidegrees/s/s
     void set_accel_roll_max(float accel_roll_max) { _accel_roll_max = accel_roll_max; }
 
+    void set_dvl_state(float dvl_on){_dvl_on = dvl_on;}
     // Sets and saves the roll acceleration limit in centidegrees/s/s
     void save_accel_roll_max(float accel_roll_max) { _accel_roll_max.set_and_save(accel_roll_max); }
 
@@ -185,6 +186,10 @@ public:
     // Return the angle between the target thrust vector and the current thrust vector.
     float get_att_error_angle_deg() const { return degrees(_thrust_error_angle); }
 
+    float get_hc_yaw_ang_error() const {return hc_attitude_error_vector.z; }
+
+    float get_vel_error() const {return hc_vel_error;}
+
     // Set x-axis angular velocity in centidegrees/s
     void rate_bf_roll_target(float rate_cds) { _rate_target_ang_vel.x = radians(rate_cds * 0.01f); }
 
@@ -261,7 +266,8 @@ public:
     // calculates the expected angular velocity correction from an angle error based on the AC_AttitudeControl settings.
     // This function can be used to predict the delay associated with angle requests.
     void input_shaping_rate_predictor(const Vector2f &error_angle, Vector2f& target_ang_vel, float dt) const;
-
+    float HC_POS_PID(float target, float measurement, bool limit, float Kp, float Ki, float Kd);
+    float HC_VEL_PID(float target, float measurement, bool limit, float Kp, float Ki, float Kd);
     // translates body frame acceleration limits to the euler axis
     void ang_vel_limit(Vector3f& euler_rad, float ang_vel_roll_max, float ang_vel_pitch_max, float ang_vel_yaw_max) const;
 
@@ -352,6 +358,30 @@ protected:
     AC_P                _p_angle_pitch;
     AC_P                _p_angle_yaw;
 
+    int8_t _dvl_on = 0;
+
+    float hc_pos_error;
+    float hc_pos_target;
+    float hc_pos_dt;
+    float hc_pos_derivative;
+    float hc_pos_integrator;
+
+    float hc_vel_error;
+    float hc_vel_target;
+    float hc_vel_dt;
+    float hc_vel_derivative;
+    float hc_vel_integrator;
+
+    float yaw_vel_P;
+    float yaw_vel_I;
+    float yaw_vel_D;
+
+    float yaw_pos_P;
+    float yaw_pos_I;
+    float yaw_pos_D;
+
+    float yaw_pid_force;
+
     // Angle limit time constant (to maintain altitude)
     AP_Float            _angle_limit_tc;
 
@@ -360,6 +390,7 @@ protected:
 
     // Intersampling period in seconds
     float               _dt;
+    float               hc_dt = 0.005;
 
     // This represents a 321-intrinsic rotation in NED frame to the target (setpoint)
     // attitude used in the attitude controller, in radians.
@@ -382,6 +413,8 @@ protected:
     // This represents the angular velocity in radians per second in the body frame, used in the angular
     // velocity controller.
     Vector3f            _rate_target_ang_vel;
+
+    Vector3f            hc_attitude_error_vector;
 
     // This represents a quaternion attitude error in the body frame, used for inertial frame reset handling.
     Quaternion          _attitude_ang_error;

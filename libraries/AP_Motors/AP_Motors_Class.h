@@ -85,19 +85,31 @@ public:
     void                set_roll_ff(float roll_in) { _roll_in_ff = roll_in; };    // range -1 ~ +1
     void                set_pitch(float pitch_in) { _pitch_in = pitch_in; };    // range -1 ~ +1
     void                set_pitch_ff(float pitch_in) { _pitch_in_ff = pitch_in; };  // range -1 ~ +1
-    void                set_yaw(float yaw_in) { _yaw_in = yaw_in; };            // range -1 ~ +1
+    void                set_yaw(float yaw_in) { _yaw_in = yaw_in; }; 
+    void                set_yaw_pwm(float yaw_in_pwm) { _yaw_in_pwm = yaw_in_pwm; };          // range -1 ~ +1
     void                set_yaw_ff(float yaw_in) { _yaw_in_ff = yaw_in; };      // range -1 ~ +1
     void                set_throttle(float throttle_in) { _throttle_in = throttle_in; };   // range 0 ~ 1
+    void                set_throttle_pwm(float throttle_in_pwm) { _throttle_in_pwm = throttle_in_pwm; };
     void                set_throttle_avg_max(float throttle_avg_max) { _throttle_avg_max = constrain_float(throttle_avg_max, 0.0f, 1.0f); };   // range 0 ~ 1
     void                set_throttle_filter_cutoff(float filt_hz) { _throttle_filter.set_cutoff_frequency(filt_hz); }
     void                set_forward(float forward_in) { _forward_in = forward_in; }; // range -1 ~ +1
     void                set_lateral(float lateral_in) { _lateral_in = lateral_in; };     // range -1 ~ +1
+    void                set_forward_pwm(float forward_in_pwm) { _forward_in_pwm = forward_in_pwm; }; // range -1 ~ +1
+    void                set_lateral_pwm(float lateral_in_pwm) { _lateral_in_pwm = lateral_in_pwm; };
 
     void                set_yaw_robust_force(float yaw_robust_force){_yaw_robust_force = yaw_robust_force;};
     void                set_depth_robust_force(float depth_robust_force){_depth_robust_force = depth_robust_force;};
     void                set_att_robust_force(float att_robust_force){_att_robust_force = att_robust_force;};
 
-    void                set_motor_mode(int motor_mode){_motor_mode = motor_mode;};
+    void                set_yaw_PID_force(float yaw_PID_force){_yaw_PID_force = yaw_PID_force;};
+    void                set_depth_PID_force(float depth_PID_force){_depth_PID_force = depth_PID_force;};
+    void                set_att_PID_force(float att_PID_force){_att_PID_force = att_PID_force;};
+
+    void                set_yaw_force(float yaw_force){_yaw_force = yaw_force;};
+    void                set_depth_force(float depth_force){_depth_force = depth_force;};
+    void                set_att_force(float att_force){_att_force = att_force;};
+
+    void                set_motor_mode(int motor_mode){_motor_mode = motor_mode;}; //0 is the initial mode
 
     // accessors for roll, pitch, yaw and throttle inputs to motors
     float               get_roll() const { return _roll_in; }
@@ -108,6 +120,7 @@ public:
     float               get_forward() const { return _forward_in; }
     float               get_lateral() const { return _lateral_in; }
     virtual float       get_throttle_hover() const = 0;
+    float               get_yaw_force() const {return _yaw_force;}
 
     // motor failure handling
     void                set_thrust_boost(bool enable) { _thrust_boost = enable; }
@@ -229,10 +242,14 @@ protected:
     float               _pitch_in;                  // desired pitch control from attitude controller, -1 ~ +1
     float               _pitch_in_ff;               // desired pitch feed forward control from attitude controller, -1 ~ +1
     float               _yaw_in;                    // desired yaw control from attitude controller, -1 ~ +1
+    float               _yaw_in_pwm;
     float               _yaw_in_ff;                 // desired yaw feed forward control from attitude controller, -1 ~ +1
     float               _throttle_in;               // last throttle input from set_throttle caller
+    float               _throttle_in_pwm;
     float               _forward_in;                // last forward input from set_forward caller
+    float               _forward_in_pwm;    
     float               _lateral_in;                // last lateral input from set_lateral caller
+    float               _lateral_in_pwm;    
     float               _throttle_avg_max;          // last throttle input from set_throttle_avg_max
     LowPassFilterFloat  _throttle_filter;           // throttle input filter
     DesiredSpoolState   _spool_desired;             // desired spool state
@@ -244,7 +261,16 @@ protected:
     float               _depth_robust_force;
     float               _att_robust_force;
 
-    bool                _motor_mode;
+    float               _yaw_PID_force;
+    float               _depth_PID_force;
+    float               _att_PID_force;
+
+    float               _yaw_force;
+    float               _depth_force;
+    float               _att_force;
+
+    int                _motor_mode = 0; //Propeller initial PWM 0:shoudong  1:PID robust 2: tuijinqi test
+
 
     // air pressure compensation variables
     float               _air_density_ratio;     // air density / sea level density - decreases in altitude
